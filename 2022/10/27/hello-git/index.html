@@ -16,21 +16,21 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+    <meta name="description" content="Git 入门笔记，带你快速使用 Git Bash 命令 Git 入门git 分布式版本控制 记录版本号 ，每个版本都有（高效的压缩解压算法） 本地库本地结构 1. 本地库 1. 暂存区 1. 工作区  git init初始化本地库 git add git commit工作区 -》git add 【】暂存区 -》git commit 【】 本地库 工作区 下（.git 同级）未 git add 缓存">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello World">
-<meta property="og:url" content="http://example.com/2022/10/26/hello-world/index.html">
+<meta property="og:title" content="Hello Git">
+<meta property="og:url" content="http://example.com/2022/10/27/hello-git/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="Welcome to Hexo! This is your very first post. Check documentation for more info. If you get any problems when using Hexo, you can find the answer in troubleshooting or you can ask me on GitHub. Quick">
+<meta property="og:description" content="Git 入门笔记，带你快速使用 Git Bash 命令 Git 入门git 分布式版本控制 记录版本号 ，每个版本都有（高效的压缩解压算法） 本地库本地结构 1. 本地库 1. 暂存区 1. 工作区  git init初始化本地库 git add git commit工作区 -》git add 【】暂存区 -》git commit 【】 本地库 工作区 下（.git 同级）未 git add 缓存">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2022-10-26T14:17:50.030Z">
-<meta property="article:modified_time" content="2022-10-26T14:15:22.610Z">
+<meta property="article:published_time" content="2022-10-27T05:53:28.883Z">
+<meta property="article:modified_time" content="2022-10-27T05:56:14.257Z">
 <meta property="article:author" content="yilin">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>Hello World - Yilin派哟yoo🥧</title>
+  <title>Hello Git - Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -195,7 +195,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello World"></span>
+            <span id="subtitle" data-typed-text="Hello Git"></span>
           
         </div>
 
@@ -206,8 +206,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-10-26 22:17" pubdate>
-          2022年10月26日 晚上
+        <time datetime="2022-10-27 13:53" pubdate>
+          2022年10月27日 下午
         </time>
       </span>
     
@@ -218,7 +218,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          367 字
+          1k 字
         
       </span>
     
@@ -229,7 +229,7 @@
         
         
         
-          4 分钟
+          9 分钟
         
       </span>
     
@@ -267,24 +267,69 @@
         <div id="board">
           <article class="post-content mx-auto">
             <!-- SEO header -->
-            <h1 style="display: none">Hello World</h1>
+            <h1 style="display: none">Hello Git</h1>
             
             
               <div class="markdown-body">
                 
-                <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+                <p>Git 入门笔记，带你快速使用 Git Bash 命令</p>
+<h1 id="Git-入门"><a href="#Git-入门" class="headerlink" title="Git 入门"></a>Git 入门</h1><p>git 分布式版本控制</p>
+<p>记录版本号 ，每个版本都有（高效的压缩解压算法）</p>
+<h2 id="本地库"><a href="#本地库" class="headerlink" title="本地库"></a>本地库</h2><p>本地结构</p>
+<pre><code class="hljs">1. 本地库
+1. 暂存区
+1. 工作区
+</code></pre>
+<h4 id="git-init"><a href="#git-init" class="headerlink" title="git init"></a>git init</h4><p>初始化本地库</p>
+<h4 id="git-add-git-commit"><a href="#git-add-git-commit" class="headerlink" title="git add git commit"></a>git add <strong>git commit</strong></h4><p>工作区 -》<strong>git add</strong> 【】暂存区 -》<strong>git commit</strong> 【】 本地库</p>
+<p>工作区 下（.git 同级）未 git add</p>
+<p>缓存区 已经 git add 未 git commit</p>
+<h4 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h4><p>查看工作状态</p>
+<h4 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h4><p>提交日志（由近到远）</p>
+<p>每一条内容 有一个 key 索引唯一对应</p>
+<p>不同展示样式：</p>
+<h5 id="git-log-–pretty-oneline"><a href="#git-log-–pretty-oneline" class="headerlink" title="git log –pretty=oneline"></a>git log –pretty=oneline</h5><h5 id="git-log-–oneline"><a href="#git-log-–oneline" class="headerlink" title="git log –oneline"></a>git log –oneline</h5><h5 id="git-reflog"><a href="#git-reflog" class="headerlink" title="git reflog"></a>git reflog</h5><h4 id="git-reset-–【】索引"><a href="#git-reset-–【】索引" class="headerlink" title="git reset –【】索引"></a>git reset –【】索引</h4><p>1.使用 hard（使用最多）</p>
+<p>​ 本地库的指针移动的同时 同步工作区、暂存区、本地库</p>
+<p>2.使用 mixed</p>
+<p>​ 本地库的指针移动的同时 同步赞存区、本地库</p>
+<p>2.使用 soft</p>
+<p>​ 只会让本地移动</p>
+<h4 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h4><p>比较工作区和暂存区的差异 （带文件比文件 ，不带比所有）</p>
+<h3 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h3><p>新建分支会先将主分支的最新版本然后加到分支</p>
+<p><em>各自分支相互独立</em></p>
+<h4 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h4><h5 id="git-branch-v"><a href="#git-branch-v" class="headerlink" title="git branch -v"></a>git branch -v</h5><p>​ 查看当前所有分支</p>
+<h5 id="git-branch-【】"><a href="#git-branch-【】" class="headerlink" title="git branch 【】"></a>git branch 【】</h5><p>创建分支</p>
+<h5 id="git-checkout-【】"><a href="#git-checkout-【】" class="headerlink" title="git checkout 【】"></a>git checkout 【】</h5><p>切换分支</p>
+<p>主分支合并 其他分支</p>
+<ol>
+<li>切换到主分支</li>
+<li>使用 git merge 【分支】（当主分支和其他分支 都修改了同一文件的同一位置就会冲突）</li>
+<li>解决冲突方法：直接文件选择性删除 （再添加 提交）</li>
+</ol>
+<h2 id="远程库"><a href="#远程库" class="headerlink" title="远程库"></a>远程库</h2><p><strong>github</strong></p>
+<p><strong>gitee</strong></p>
+<p><strong>gitlab</strong></p>
+<h4 id="git-remote-add-【name】【https-…-】"><a href="#git-remote-add-【name】【https-…-】" class="headerlink" title="git remote add 【name】【https://…..】"></a>git remote add 【name】【https://…..】</h4><p>本地库起远程库别名</p>
+<h4 id="git-remote-v"><a href="#git-remote-v" class="headerlink" title="git remote -v"></a>git remote -v</h4><p>查看别名</p>
+<p><strong>git push 【name】【分支】</strong></p>
+<p>向远程仓库（别名）推送 本地仓库 的指定分支</p>
+<p><strong>git clone 【https://…..】</strong></p>
+<p>初始化本地库 从远程库克隆到本地 起了别名 origin</p>
+<p><strong>库的拥有者拉取</strong></p>
+<ol>
+<li>fetch +merge 操作</li>
+</ol>
+<h5 id="git-fetch-【name】-【分支】"><a href="#git-fetch-【name】-【分支】" class="headerlink" title="git fetch 【name】 【分支】"></a>git fetch 【name】 【分支】</h5><p>从远程库抓取到本地库，工作区不变 这时候本地有个分支是 <strong>name/分支</strong></p>
+<p>切换到本地 master 分支 调用 git merge name/分支 就可以合并</p>
+<ol start="2">
+<li>pull 操作</li>
+</ol>
+<h5 id="git-pull【name】-【分支】"><a href="#git-pull【name】-【分支】" class="headerlink" title="git pull【name】 【分支】"></a>git pull【name】 【分支】</h5><p>冲突产生 需要到本地 解决再 push 到 远程仓库</p>
+<h2 id="免密操作"><a href="#免密操作" class="headerlink" title="免密操作"></a>免密操作</h2><p>$ ssh-keygen -t rsa -C【email】</p>
+<h3 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h3><p>idea 远程 pull 前提准备</p>
+<p>git pull origin master –allow-unrelated-histories</p>
+<p>推送到上游其它分支</p>
+<p>git push –set-upstream origin myblog（分支）</p>
 
                 
               </div>
@@ -302,8 +347,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello World</div>
-      <div>http://example.com/2022/10/26/hello-world/</div>
+      <div>Hello Git</div>
+      <div>http://example.com/2022/10/27/hello-git/</div>
     </div>
     <div class="license-meta">
       
@@ -315,7 +360,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2022年10月26日</div>
+          <div>2022年10月27日</div>
         </div>
       
       
@@ -347,15 +392,15 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2022/10/27/hello-git/" title="Hello Git">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Hello Git</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
+                    
+                      <a href="/2022/10/26/hello-world/" title="Hello World">
+                        <span class="hidden-mobile">Hello World</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
                     
                   </article>
                 </div>
