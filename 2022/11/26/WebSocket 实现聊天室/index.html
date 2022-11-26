@@ -28,8 +28,8 @@
 <meta property="og:image" content="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/12570/image-20221125171042690.png">
 <meta property="og:image" content="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/12570/image-20221125171211620.png">
 <meta property="og:image" content="https://xingqiu-tuchuang-1256524210.cos.ap-shanghai.myqcloud.com/12570/image-20221125171244569.png">
-<meta property="article:published_time" content="2022-11-26T11:58:15.550Z">
-<meta property="article:modified_time" content="2022-11-26T11:58:15.550Z">
+<meta property="article:published_time" content="2022-11-26T12:34:17.437Z">
+<meta property="article:modified_time" content="2022-11-26T12:34:17.437Z">
 <meta property="article:author" content="yilin">
 <meta property="article:tag" content="项目">
 <meta name="twitter:card" content="summary_large_image">
@@ -213,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2022-11-26 11:58" pubdate>
-          2022年11月26日 中午
+        <time datetime="2022-11-26 12:34" pubdate>
+          2022年11月26日 下午
         </time>
       </span>
     
@@ -262,24 +262,32 @@
     
       
 
-<div class="container-fluid nopadding-x">
-  <div class="row nomargin-x">
-    <div class="side-col d-none d-lg-block col-lg-2">
-      
+    <div class="container-fluid nopadding-x">
 
-    </div>
-
-    <div class="col-lg-8 nopadding-x-md">
-      <div class="container nopadding-x-md" id="board-ctn">
-        <div id="board">
-          <article class="post-content mx-auto">
-            <!-- SEO header -->
-            <h1 style="display: none">WebSocket 实现聊天室</h1>
-            
-            
-              <div class="markdown-body">
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
                 
-                <h2 id="WebSockect-实现聊天室"><a href="#WebSockect-实现聊天室" class="headerlink" title="WebSockect 实现聊天室"></a>WebSockect 实现聊天室</h2><p><strong>说明：最近二手交易课设有一个需求是实现 购买者和商品发布者有一个聊天对话的功能，类似于咸鱼的聊天对话功能吧。想到的就是 WebSocket 协议来实现，问了一个前端小伙伴，他一般使用 socketio(一个 websocket 框架)，我看了下也有 java 版的，但思考了下决定还是使用原生 websocket 来写前后端。</strong></p>
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                WebSocket 实现聊天室
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h2 id="WebSockect-实现聊天室"><a href="#WebSockect-实现聊天室" class="headerlink" title="WebSockect 实现聊天室"></a>WebSockect 实现聊天室</h2><p><strong>说明：最近二手交易课设有一个需求是实现 购买者和商品发布者有一个聊天对话的功能，类似于咸鱼的聊天对话功能吧。想到的就是 WebSocket 协议来实现，问了一个前端小伙伴，他一般使用 socketio(一个 websocket 框架)，我看了下也有 java 版的，但思考了下决定还是使用原生 websocket 来写前后端。</strong></p>
 <h4 id="什么是-websocket？"><a href="#什么是-websocket？" class="headerlink" title="什么是 websocket？"></a>什么是 websocket？</h4><p>这里放一个知乎的高赞回答，看完很清楚。<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear 的回答 - 知乎</a></p>
 <p>首先我们先说说大家都很了解的 Http 协议，在 B/S 开发中，我们常用这种协议来进行各种响应和处理。</p>
 <p>他的特点就是一个 Request 和 一个 Response 而且是无状态的（想要保持状态需要间接通过 session 和 cookie）。虽然在一些不那么复杂的需求下，这样的机制已经足够了，但是一些复杂的应用场景如需要一直监听某个数据的变化就显得力不从心了。当然我们也可以使用 ajax 来轮询，但这样其实是非常低效率的，你把自己想成服务器，假设有个人（客户端）一直在你耳边叨叨（数据更新了没。。。）我想你也一定要疯掉了吧。</p>
@@ -338,12 +346,15 @@
 <p><a target="_blank" rel="noopener" href="https://gitee.com/yilinyo/lkd-javee-trade-frontend">二手交易系统前端</a></p>
 <p><a target="_blank" rel="noopener" href="https://gitee.com/yilinyo/lkd-javaee-trade-backend">二手交易系统后端</a></p>
 
-                
-              </div>
-            
-            <hr/>
-            <div>
-              <div class="post-metas my-3">
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/WebSocket 实现聊天室.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
   
   
     <div class="post-meta">
@@ -356,7 +367,7 @@
 </div>
 
 
-              
+                                                                        
   
 
   <div class="license-box my-3">
@@ -401,40 +412,44 @@
 
 
 
-              
-                <div class="post-prevnext my-3">
-                  <article class="post-prev col-6">
-                    
-                    
-                      <a href="/2022/11/26/hello-git/" title="Hello Git">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Hello Git</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
-                  </article>
-                  <article class="post-next col-6">
-                    
-                    
-                      <a href="/2022/11/26/%E9%B1%BC%E7%9A%AE%E7%94%A8%E6%88%B7%E4%B8%AD%E5%BF%83%E6%94%B6%E8%8E%B7/" title="鱼皮用户中心收获">
-                        <span class="hidden-mobile">鱼皮用户中心收获</span>
-                        <span class="visible-mobile">下一篇</span>
-                        <i class="iconfont icon-arrowright"></i>
-                      </a>
-                    
-                  </article>
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2022/11/26/hello-git/" title="Hello Git">
+                                                                                                    <i class="iconfont icon-arrowleft"></i>
+                                                                                                    <span class="hidden-mobile">Hello Git</span>
+                                                                                                    <span class="visible-mobile">上一篇</span>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2022/11/26/%E9%B1%BC%E7%9A%AE%E7%94%A8%E6%88%B7%E4%B8%AD%E5%BF%83%E6%94%B6%E8%8E%B7/" title="鱼皮用户中心收获">
+                                                                                                    <span class="hidden-mobile">鱼皮用户中心收获</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+                        </article>
+                    </div>
                 </div>
-              
             </div>
 
-            
-          </article>
-        </div>
-      </div>
-    </div>
 
-    <div class="side-col d-none d-lg-block col-lg-2">
-      
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
   <aside class="sidebar" style="margin-left: -1rem">
     <div id="toc">
   <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
@@ -446,15 +461,14 @@
   </aside>
 
 
+            </div>
+
+        </div>
+
+
     </div>
-  </div>
-</div>
 
-
-
-
-
-  
+    
 
 
 
@@ -474,10 +488,13 @@
 
 
 
+  
 
 
 
 
+
+        
     
 
     
