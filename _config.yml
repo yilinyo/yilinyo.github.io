@@ -103,5 +103,5 @@ theme: fluid
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: https://github.com/yilinyo/yilinyo.github.io.git
+  repo: git@github.com:yilinyo/yilinyo.github.io.git
   branch: master
