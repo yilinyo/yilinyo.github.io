@@ -1,6 +1,6 @@
 ---
 title: Hello Git
-tag：工具
+tag: 工具
 ---
 
 Git 入门笔记，带你快速使用 Git Bash 命令
