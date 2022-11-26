@@ -30,7 +30,7 @@ websocket 协由握手和数据传输构成
 
 #### Java 怎么写服务端的 WebSocket（SpringBoot）
 
-非常类似 Servlet，这里我们需要写**ServeEndPoint**
+非常类似 Servlet，这里我们需要写**ServerEndPoint**
 
 这里我们主要重写三个方法
 
