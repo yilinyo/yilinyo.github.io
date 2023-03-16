@@ -15,7 +15,7 @@ tag: 项目
 
 他的特点就是一个 Request 和 一个 Response 而且是无状态的（想要保持状态需要间接通过 session 和 cookie）。虽然在一些不那么复杂的需求下，这样的机制已经足够了，但是一些复杂的应用场景如需要一直监听某个数据的变化就显得力不从心了。当然我们也可以使用 ajax 来轮询，但这样其实是非常低效率的，你把自己想成服务器，假设有个人（客户端）一直在你耳边叨叨（数据更新了没。。。）我想你也一定要疯掉了吧。
 
-<div align=center><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/u=3797482105,2011720067&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto" alt="img" width="200"></div>
+<div align=center><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/inkun.jpg" alt="img" width="200"></div>
 
 其次 Http 协议的另一个特点，浏览器只能主动发送请求接收信息，不能被动接收服务器信息。这一点确实蛋疼，使得一旦数据有了变化我需要自己去请求，但是我又怎么知道数据什么时候更新了呢？
 
@@ -25,7 +25,7 @@ websocket 协由握手和数据传输构成
 
 握手基于 HTTP 协议，然后客户端和服务端实现长连接，所以说 websocket 和 http 是有交集的。
 
-![关系图](https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/6651f2f811ec133b0e6d7e6d0e194b4c_720w.webp)
+![关系图](https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230316170428.png)
 
 那么数据如何传输呢？只需要在服务端设立转发的服务，那么数据就可以实现从 A 客户端到 B 客户端的发送，拿聊天举例，正是这种长连接机制以及允许客户端主动接收服务端消息的机制使得聊天消息能够看上去好像在两个客户端建立了连接。其实就是服务器做了一次转发。
 
