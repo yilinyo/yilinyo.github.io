@@ -23,17 +23,17 @@
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
 <meta property="og:description" content="WebSockect 实现聊天室说明：最近二手交易课设有一个需求是实现 购买者和商品发布者有一个聊天对话的功能，类似于咸鱼的聊天对话功能吧。想到的就是 WebSocket 协议来实现，问了一个前端小伙伴，他一般使用 socketio(一个 websocket 框架)，我看了下也有 java 版的，但思考了下决定还是使用原生 websocket 来写前后端。 什么是 websocket？这里放一个知">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/u=3797482105,2011720067&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto">
-<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/6651f2f811ec133b0e6d7e6d0e194b4c_720w.webp">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/inkun.jpg">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230316170428.png">
 <meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/image-20221125171042690.png">
 <meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/image-20221125171211620.png">
 <meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/image-20221125171244569.png">
-<meta property="article:published_time" content="2023-03-16T08:56:46.321Z">
-<meta property="article:modified_time" content="2023-03-16T08:56:46.321Z">
+<meta property="article:published_time" content="2023-03-16T09:07:15.358Z">
+<meta property="article:modified_time" content="2023-03-16T09:07:15.358Z">
 <meta property="article:author" content="yilin">
 <meta property="article:tag" content="项目">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/u=3797482105,2011720067&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto">
+<meta name="twitter:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/inkun.jpg">
   
   
   
@@ -213,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-03-16 08:56" pubdate>
-          2023年3月16日 早上
+        <time datetime="2023-03-16 09:07" pubdate>
+          2023年3月16日 上午
         </time>
       </span>
     
@@ -291,13 +291,13 @@
 <h4 id="什么是-websocket？"><a href="#什么是-websocket？" class="headerlink" title="什么是 websocket？"></a>什么是 websocket？</h4><p>这里放一个知乎的高赞回答，看完很清楚。<a target="_blank" rel="noopener" href="https://www.zhihu.com/question/20215561/answer/40316953">WebSocket 是什么原理？为什么可以实现持久连接？ - Ovear 的回答 - 知乎</a></p>
 <p>首先我们先说说大家都很了解的 Http 协议，在 B/S 开发中，我们常用这种协议来进行各种响应和处理。</p>
 <p>他的特点就是一个 Request 和 一个 Response 而且是无状态的（想要保持状态需要间接通过 session 和 cookie）。虽然在一些不那么复杂的需求下，这样的机制已经足够了，但是一些复杂的应用场景如需要一直监听某个数据的变化就显得力不从心了。当然我们也可以使用 ajax 来轮询，但这样其实是非常低效率的，你把自己想成服务器，假设有个人（客户端）一直在你耳边叨叨（数据更新了没。。。）我想你也一定要疯掉了吧。</p>
-<div align=center><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/u=3797482105,2011720067&fm=253&app=138&size=w931&n=0&f=JPEG&fmt=auto" srcset="/img/loading.gif" lazyload alt="img" width="200"></div>
+<div align=center><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/inkun.jpg" srcset="/img/loading.gif" lazyload alt="img" width="200"></div>
 
 <p>其次 Http 协议的另一个特点，浏览器只能主动发送请求接收信息，不能被动接收服务器信息。这一点确实蛋疼，使得一旦数据有了变化我需要自己去请求，但是我又怎么知道数据什么时候更新了呢？</p>
 <p>然鹅，websocket 的出现就可以巧妙的解决这些问题。</p>
 <p>websocket 协由握手和数据传输构成</p>
 <p>握手基于 HTTP 协议，然后客户端和服务端实现长连接，所以说 websocket 和 http 是有交集的。</p>
-<p><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/6651f2f811ec133b0e6d7e6d0e194b4c_720w.webp" srcset="/img/loading.gif" lazyload alt="关系图"></p>
+<p><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230316170428.png" srcset="/img/loading.gif" lazyload alt="关系图"></p>
 <p>那么数据如何传输呢？只需要在服务端设立转发的服务，那么数据就可以实现从 A 客户端到 B 客户端的发送，拿聊天举例，正是这种长连接机制以及允许客户端主动接收服务端消息的机制使得聊天消息能够看上去好像在两个客户端建立了连接。其实就是服务器做了一次转发。</p>
 <h4 id="Java-怎么写服务端的-WebSocket（SpringBoot）"><a href="#Java-怎么写服务端的-WebSocket（SpringBoot）" class="headerlink" title="Java 怎么写服务端的 WebSocket（SpringBoot）"></a>Java 怎么写服务端的 WebSocket（SpringBoot）</h4><p>非常类似 Servlet，这里我们需要写<strong>ServerEndPoint</strong></p>
 <p>这里我们主要重写三个方法</p>
