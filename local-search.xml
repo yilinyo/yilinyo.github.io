@@ -23,25 +23,6 @@
   
   
   <entry>
-    <title>Hello Git</title>
-    <link href="/2023/04/08/hello-git/"/>
-    <url>/2023/04/08/hello-git/</url>
-    
-    <content type="html"><![CDATA[<p>Git 入门笔记，带你快速使用 Git Bash 命令</p><h1 id="Git-入门"><a href="#Git-入门" class="headerlink" title="Git 入门"></a>Git 入门</h1><p>git 分布式版本控制</p><p>记录版本号 ，每个版本都有（高效的压缩解压算法）</p><h2 id="本地库"><a href="#本地库" class="headerlink" title="本地库"></a>本地库</h2><p>本地结构</p><pre><code class="hljs">1. 本地库1. 暂存区1. 工作区</code></pre><h4 id="git-init"><a href="#git-init" class="headerlink" title="git init"></a>git init</h4><p>初始化本地库</p><h4 id="git-add-git-commit"><a href="#git-add-git-commit" class="headerlink" title="git add git commit"></a>git add <strong>git commit</strong></h4><p>工作区 -》<strong>git add</strong> 【】暂存区 -》<strong>git commit</strong> 【】 本地库</p><p>工作区 下（.git 同级）未 git add</p><p>缓存区 已经 git add 未 git commit</p><h4 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h4><p>查看工作状态</p><h4 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h4><p>提交日志（由近到远）</p><p>每一条内容 有一个 key 索引唯一对应</p><p>不同展示样式：</p><h5 id="git-log-–pretty-oneline"><a href="#git-log-–pretty-oneline" class="headerlink" title="git log –pretty=oneline"></a>git log –pretty=oneline</h5><h5 id="git-log-–oneline"><a href="#git-log-–oneline" class="headerlink" title="git log –oneline"></a>git log –oneline</h5><h5 id="git-reflog"><a href="#git-reflog" class="headerlink" title="git reflog"></a>git reflog</h5><h4 id="git-reset-–【】索引"><a href="#git-reset-–【】索引" class="headerlink" title="git reset –【】索引"></a>git reset –【】索引</h4><p>1.使用 hard（使用最多）</p><p>​ 本地库的指针移动的同时 同步工作区、暂存区、本地库</p><p>2.使用 mixed</p><p>​ 本地库的指针移动的同时 同步暂存区、本地库</p><p>2.使用 soft</p><p>​ 只会让本地移动</p><h4 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h4><p>比较工作区和暂存区的差异 （带文件比文件 ，不带比所有）</p><h3 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h3><p>新建分支会先将主分支的最新版本然后加到分支</p><p><em>各自分支相互独立</em></p><h4 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h4><h5 id="git-branch-v"><a href="#git-branch-v" class="headerlink" title="git branch -v"></a>git branch -v</h5><p>​ 查看当前所有分支</p><h5 id="git-branch-【】"><a href="#git-branch-【】" class="headerlink" title="git branch 【】"></a>git branch 【】</h5><p>创建分支</p><h5 id="git-checkout-【】"><a href="#git-checkout-【】" class="headerlink" title="git checkout 【】"></a>git checkout 【】</h5><p>切换分支</p><p>主分支合并 其他分支</p><ol><li>切换到主分支</li><li>使用 git merge 【分支】（当主分支和其他分支 都修改了同一文件的同一位置就会冲突）</li><li>解决冲突方法：直接文件选择性删除 （再添加 提交）</li></ol><h2 id="远程库"><a href="#远程库" class="headerlink" title="远程库"></a>远程库</h2><p><strong>github</strong></p><p><strong>gitee</strong></p><p><strong>gitlab</strong></p><h4 id="git-remote-add-【name】【https-…-】"><a href="#git-remote-add-【name】【https-…-】" class="headerlink" title="git remote add 【name】【https://…..】"></a>git remote add 【name】【https://…..】</h4><p>本地库起远程库别名</p><h4 id="git-remote-v"><a href="#git-remote-v" class="headerlink" title="git remote -v"></a>git remote -v</h4><p>查看别名</p><p><strong>git push 【name】【分支】</strong></p><p>向远程仓库（别名）推送 本地仓库 的指定分支</p><p><strong>git clone 【https://…..】</strong></p><p>初始化本地库 从远程库克隆到本地 起了别名 origin</p><p><strong>库的拥有者拉取</strong></p><ol><li>fetch +merge 操作</li></ol><h5 id="git-fetch-【name】-【分支】"><a href="#git-fetch-【name】-【分支】" class="headerlink" title="git fetch 【name】 【分支】"></a>git fetch 【name】 【分支】</h5><p>从远程库抓取到本地库，工作区不变 这时候本地有个分支是 <strong>name/分支</strong></p><p>切换到本地 master 分支 调用 git merge name/分支 就可以合并</p><ol start="2"><li>pull 操作</li></ol><h5 id="git-pull【name】-【分支】"><a href="#git-pull【name】-【分支】" class="headerlink" title="git pull【name】 【分支】"></a>git pull【name】 【分支】</h5><p>冲突产生 需要到本地 解决再 push 到 远程仓库</p><h2 id="免密操作"><a href="#免密操作" class="headerlink" title="免密操作"></a>免密操作</h2><p>$ ssh-keygen -t rsa -C【email】</p><h3 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h3><p>idea 远程 pull 前提准备</p><p>git pull origin master –allow-unrelated-histories</p><p>推送到上游其它分支</p><p>git push –set-upstream origin myblog（分支）</p>]]></content>
-    
-    
-    
-    <tags>
-      
-      <tag>工具</tag>
-      
-    </tags>
-    
-  </entry>
-  
-  
-  
-  <entry>
     <title>WebSocket 实现聊天室</title>
     <link href="/2023/04/08/WebSocket%20%E5%AE%9E%E7%8E%B0%E8%81%8A%E5%A4%A9%E5%AE%A4/"/>
     <url>/2023/04/08/WebSocket%20%E5%AE%9E%E7%8E%B0%E8%81%8A%E5%A4%A9%E5%AE%A4/</url>
@@ -53,6 +34,25 @@
     <tags>
       
       <tag>项目</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello Git</title>
+    <link href="/2023/02/06/hello-git/"/>
+    <url>/2023/02/06/hello-git/</url>
+    
+    <content type="html"><![CDATA[<p>Git 入门笔记，带你快速使用 Git Bash 命令</p><h1 id="Git-入门"><a href="#Git-入门" class="headerlink" title="Git 入门"></a>Git 入门</h1><p>git 分布式版本控制</p><p>记录版本号 ，每个版本都有（高效的压缩解压算法）</p><h2 id="本地库"><a href="#本地库" class="headerlink" title="本地库"></a>本地库</h2><p>本地结构</p><pre><code class="hljs">1. 本地库1. 暂存区1. 工作区</code></pre><h4 id="git-init"><a href="#git-init" class="headerlink" title="git init"></a>git init</h4><p>初始化本地库</p><h4 id="git-add-git-commit"><a href="#git-add-git-commit" class="headerlink" title="git add git commit"></a>git add <strong>git commit</strong></h4><p>工作区 -》<strong>git add</strong> 【】暂存区 -》<strong>git commit</strong> 【】 本地库</p><p>工作区 下（.git 同级）未 git add</p><p>缓存区 已经 git add 未 git commit</p><h4 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h4><p>查看工作状态</p><h4 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h4><p>提交日志（由近到远）</p><p>每一条内容 有一个 key 索引唯一对应</p><p>不同展示样式：</p><h5 id="git-log-–pretty-oneline"><a href="#git-log-–pretty-oneline" class="headerlink" title="git log –pretty=oneline"></a>git log –pretty=oneline</h5><h5 id="git-log-–oneline"><a href="#git-log-–oneline" class="headerlink" title="git log –oneline"></a>git log –oneline</h5><h5 id="git-reflog"><a href="#git-reflog" class="headerlink" title="git reflog"></a>git reflog</h5><h4 id="git-reset-–【】索引"><a href="#git-reset-–【】索引" class="headerlink" title="git reset –【】索引"></a>git reset –【】索引</h4><p>1.使用 hard（使用最多）</p><p>​ 本地库的指针移动的同时 同步工作区、暂存区、本地库</p><p>2.使用 mixed</p><p>​ 本地库的指针移动的同时 同步暂存区、本地库</p><p>2.使用 soft</p><p>​ 只会让本地移动</p><h4 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h4><p>比较工作区和暂存区的差异 （带文件比文件 ，不带比所有）</p><h3 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h3><p>新建分支会先将主分支的最新版本然后加到分支</p><p><em>各自分支相互独立</em></p><h4 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h4><h5 id="git-branch-v"><a href="#git-branch-v" class="headerlink" title="git branch -v"></a>git branch -v</h5><p>​ 查看当前所有分支</p><h5 id="git-branch-【】"><a href="#git-branch-【】" class="headerlink" title="git branch 【】"></a>git branch 【】</h5><p>创建分支</p><h5 id="git-checkout-【】"><a href="#git-checkout-【】" class="headerlink" title="git checkout 【】"></a>git checkout 【】</h5><p>切换分支</p><p>主分支合并 其他分支</p><ol><li>切换到主分支</li><li>使用 git merge 【分支】（当主分支和其他分支 都修改了同一文件的同一位置就会冲突）</li><li>解决冲突方法：直接文件选择性删除 （再添加 提交）</li></ol><h2 id="远程库"><a href="#远程库" class="headerlink" title="远程库"></a>远程库</h2><p><strong>github</strong></p><p><strong>gitee</strong></p><p><strong>gitlab</strong></p><h4 id="git-remote-add-【name】【https-…-】"><a href="#git-remote-add-【name】【https-…-】" class="headerlink" title="git remote add 【name】【https://…..】"></a>git remote add 【name】【https://…..】</h4><p>本地库起远程库别名</p><h4 id="git-remote-v"><a href="#git-remote-v" class="headerlink" title="git remote -v"></a>git remote -v</h4><p>查看别名</p><p><strong>git push 【name】【分支】</strong></p><p>向远程仓库（别名）推送 本地仓库 的指定分支</p><p><strong>git clone 【https://…..】</strong></p><p>初始化本地库 从远程库克隆到本地 起了别名 origin</p><p><strong>库的拥有者拉取</strong></p><ol><li>fetch +merge 操作</li></ol><h5 id="git-fetch-【name】-【分支】"><a href="#git-fetch-【name】-【分支】" class="headerlink" title="git fetch 【name】 【分支】"></a>git fetch 【name】 【分支】</h5><p>从远程库抓取到本地库，工作区不变 这时候本地有个分支是 <strong>name/分支</strong></p><p>切换到本地 master 分支 调用 git merge name/分支 就可以合并</p><ol start="2"><li>pull 操作</li></ol><h5 id="git-pull【name】-【分支】"><a href="#git-pull【name】-【分支】" class="headerlink" title="git pull【name】 【分支】"></a>git pull【name】 【分支】</h5><p>冲突产生 需要到本地 解决再 push 到 远程仓库</p><h2 id="免密操作"><a href="#免密操作" class="headerlink" title="免密操作"></a>免密操作</h2><p>$ ssh-keygen -t rsa -C【email】</p><h3 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h3><p>idea 远程 pull 前提准备</p><p>git pull origin master –allow-unrelated-histories</p><p>推送到上游其它分支</p><p>git push –set-upstream origin myblog（分支）</p>]]></content>
+    
+    
+    
+    <tags>
+      
+      <tag>工具</tag>
       
     </tags>
     
