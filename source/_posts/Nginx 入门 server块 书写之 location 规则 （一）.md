@@ -1,13 +1,13 @@
 
 ---
 title: Nginx 入门 server块 书写之 location 规则 （一）
-tag: Nignx
+tag: Nginx
 date: 2023-4-9 02:17:00
 ---
 
 
 
-#### Nginx 入门 server块 书写之 location 规则 （一）
+# Nginx 入门 server块 书写之 location 规则 （一）
 
 一个高性能的支持高并发的Web服务器，代理服务器
 
