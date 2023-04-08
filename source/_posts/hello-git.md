@@ -1,6 +1,7 @@
 ---
 title: Hello Git
 tag: 工具
+date: 2023-2-6 23:37:00
 ---
 
 Git 入门笔记，带你快速使用 Git Bash 命令
