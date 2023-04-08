@@ -1,0 +1,710 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Nginx 入门 server块 书写之 location 规则 （一）一个高性能的支持高并发的Web服务器，代理服务器   反向代理  负载均衡  Web服务器  安全校验，接口限流  处理请求12345678server &amp;#123;            						# 第一个Server区块开始，表示一个独立的虚拟主机站点        listen       80；">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx 入门 server块 书写之 location 规则 （一）">
+<meta property="og:url" content="https://yilinyo.github.io/2023/04/09/Nginx%20%E5%85%A5%E9%97%A8%20server%E5%9D%97%20%E4%B9%A6%E5%86%99%E4%B9%8B%20location%20%E8%A7%84%E5%88%99%20%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="Nginx 入门 server块 书写之 location 规则 （一）一个高性能的支持高并发的Web服务器，代理服务器   反向代理  负载均衡  Web服务器  安全校验，接口限流  处理请求12345678server &amp;#123;            						# 第一个Server区块开始，表示一个独立的虚拟主机站点        listen       80；">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-09T02:17:00.000Z">
+<meta property="article:modified_time" content="2023-04-08T18:17:48.800Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="Nignx">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Nginx 入门 server块 书写之 location 规则 （一） - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Nginx 入门 server块 书写之 location 规则 （一）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-04-09 02:17" pubdate>
+          2023年4月9日 凌晨
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.7k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          31 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                Nginx 入门 server块 书写之 location 规则 （一）
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h4 id="Nginx-入门-server块-书写之-location-规则-（一）"><a href="#Nginx-入门-server块-书写之-location-规则-（一）" class="headerlink" title="Nginx 入门 server块 书写之 location 规则 （一）"></a>Nginx 入门 server块 书写之 location 规则 （一）</h4><p>一个高性能的支持高并发的Web服务器，代理服务器</p>
+<ol>
+<li> 反向代理</li>
+<li> 负载均衡</li>
+<li> Web服务器</li>
+<li> 安全校验，接口限流</li>
+</ol>
+<h4 id="处理请求"><a href="#处理请求" class="headerlink" title="处理请求"></a>处理请求</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;            						<span class="hljs-comment"># 第一个Server区块开始，表示一个独立的虚拟主机站点</span><br>        listen       80；      					<span class="hljs-comment"># 提供服务的端口，默认80</span><br>        server_name  localhost；       			<span class="hljs-comment"># 提供服务的域名主机名</span><br>        location / &#123;            				<span class="hljs-comment"># 第一个location区块开始</span><br>            root   html；       				<span class="hljs-comment"># 站点的根目录，相当于Nginx的安装目录</span><br>            index  index.html index.htm；      	<span class="hljs-comment"># 默认的首页文件，多个用空格分开</span><br>        &#125;          								<span class="hljs-comment"># 第一个location区块结果</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>接受请求后会通过listen 以及 server_name 来匹配server模块，然后根据location匹配路径资源，一个典型的应用就是一个二级域名下的子域名全部代理到同一个端口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;            						<span class="hljs-comment"># 第一个Server区块开始，表示一个独立的虚拟主机站点</span><br>        listen       80；      					<span class="hljs-comment"># 提供服务的端口，默认80</span><br>        server_name  demo1.aaa.com；       			<span class="hljs-comment"># 提供服务的域名主机名</span><br>        location / &#123;            				<span class="hljs-comment"># 第一个location区块开始</span><br>            root   html1；       				<span class="hljs-comment"># 站点的根目录，相当于Nginx的安装目录</span><br>            index  index.html index.htm；      	<span class="hljs-comment"># 默认的首页文件，多个用空格分开</span><br>        &#125;          								<span class="hljs-comment"># 第一个location区块结果</span><br>&#125;<br>server &#123;            						<span class="hljs-comment"># 第一个Server区块开始，表示一个独立的虚拟主机站点</span><br>        listen       80；      					<span class="hljs-comment"># 提供服务的端口，默认80</span><br>        server_name  demo2.aaa.com；       			<span class="hljs-comment"># 提供服务的域名主机名</span><br>        location / &#123;            				<span class="hljs-comment"># 第一个location区块开始</span><br>            root   html2；       				<span class="hljs-comment"># 站点的根目录，相当于Nginx的安装目录</span><br>            index  index.html index.htm；      	<span class="hljs-comment"># 默认的首页文件，多个用空格分开</span><br>        &#125;          								<span class="hljs-comment"># 第一个location区块结果</span><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="location语法"><a href="#location语法" class="headerlink" title="location语法"></a>location语法</h4><h5 id="先说alias-和-root-的区别"><a href="#先说alias-和-root-的区别" class="headerlink" title="先说alias 和 root 的区别"></a>先说alias 和 root 的区别</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">location /img/ &#123;<br>	<span class="hljs-built_in">alias</span> /var/www/image/;<br>&#125;<br><span class="hljs-comment">#若按照上述配置的话，则访问/img/目录里面的文件时，ningx会自动去/var/www/image/目录找文件</span><br>location /img/ &#123;<br>	root /var/www/image;<br>&#125;<br><span class="hljs-comment">#若按照这种配置的话，则访问/img/目录下的文件时，nginx会去/var/www/image/img/目录下找文件</span><br></code></pre></td></tr></table></figure>
+
+<p>所以使用alias 最后一定是 以 / 结尾 .</p>
+<h5 id="修饰符匹配"><a href="#修饰符匹配" class="headerlink" title="修饰符匹配"></a>修饰符匹配</h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br>    server_name website.com;<br>    location = /abcd &#123;<br>    […]<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">#  `http://website.com/abcd`**匹配**</span><br><span class="hljs-comment">#  `http://website.com/ABCD`**可能会匹配** ，也可以不匹配，取决于操作系统的文件系统是否大小写敏感（case-sensitive）。ps: Mac 默认是大小写不敏感的</span><br><span class="hljs-comment">#  `http://website.com/abcd?param1&amp;param2`**匹配**，忽略 querystring</span><br><span class="hljs-comment">#  `http://website.com/abcd/`**不匹配**，带有结尾的`/`</span><br><span class="hljs-comment">#  `http://website.com/abcde`**不匹配**</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br>    server_name website.com;<br>    location ~ ^/abcd$ &#123;<br>    […]<br>    &#125;<br>&#125;<br><br><span class="hljs-comment"># ^/abcd$这个正则表达式表示字符串必须以/开始，以$结束，中间必须是abcd</span><br><span class="hljs-comment">#区分大小写的正则匹配</span><br><span class="hljs-comment">#http://website.com/abcd匹配（完全匹配）</span><br><span class="hljs-comment">#http://website.com/ABCD不匹配，大小写敏感</span><br><span class="hljs-comment">#http://website.com/abcd?param1&amp;param2匹配</span><br><span class="hljs-comment">#http://website.com/abcd/不匹配，不能匹配正则表达式</span><br><span class="hljs-comment">#http://website.com/abcde不匹配，不能匹配正则表达式</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br>    server_name website.com;<br>    location ~* ^/abcd$ &#123;<br>    […]<br>    &#125;<br>&#125;<br><span class="hljs-comment">#不区分大小写的正则匹配</span><br><span class="hljs-comment">#http://website.com/abcd匹配 (完全匹配)</span><br><span class="hljs-comment">#http://website.com/ABCD匹配 (大小写不敏感)</span><br><span class="hljs-comment">#http://website.com/abcd?param1&amp;param2匹配</span><br><span class="hljs-comment">#http://website.com/abcd/ 不匹配，不能匹配正则表达式</span><br><span class="hljs-comment">#http://website.com/abcde 不匹配，不能匹配正则表达式</span><br></code></pre></td></tr></table></figure>
+
+<p>&#x20;以下表格   ~ 代表自己输入的英文字母</p>
+<table>
+<thead>
+<tr>
+<th align="center">匹配符</th>
+<th align="center">匹配规则</th>
+<th align="center">优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">=</td>
+<td align="center">精确匹配</td>
+<td align="center">1</td>
+</tr>
+<tr>
+<td align="center">^~</td>
+<td align="center">以某个字符开头</td>
+<td align="center">2</td>
+</tr>
+<tr>
+<td align="center">~</td>
+<td align="center">区分大小写的匹配正则</td>
+<td align="center">3</td>
+</tr>
+<tr>
+<td align="center">~*</td>
+<td align="center">不区分大小写的匹配正则</td>
+<td align="center">4</td>
+</tr>
+<tr>
+<td align="center">!~</td>
+<td align="center">区分大小写的不匹配正则</td>
+<td align="center">5</td>
+</tr>
+<tr>
+<td align="center">!~*</td>
+<td align="center">不区分大小写的不匹配正则</td>
+<td align="center">6</td>
+</tr>
+<tr>
+<td align="center">/</td>
+<td align="center">通用匹配,所有请求都匹配</td>
+<td align="center">7</td>
+</tr>
+</tbody></table>
+<p>**    前缀匹配下，返回最长匹配的 location，与 location 所在位置顺序无关**</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">	server &#123;<br>    server_name website.com;<br>	<span class="hljs-comment">#前缀匹配</span><br>    location /doc &#123;<br>        <span class="hljs-built_in">return</span> 702;<br>    &#125;<br>    location /docu &#123;<br>        <span class="hljs-built_in">return</span> 701;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment"># curl -I website.com:8080/document 依然返回 HTTP/1.1 701</span><br></code></pre></td></tr></table></figure>
+
+
+
+<p>**    正则匹配使用文件中的顺序，找到返回**</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs bash">server &#123;<br>	listen 8080;<br>	server_name website.com;<br><br>    location ~ ^/doc[a-z]+ &#123;<br>        <span class="hljs-built_in">return</span> 701;<br>    &#125;<br><br>    location ~ ^/docu[a-z]+ &#123;<br>        <span class="hljs-built_in">return</span> 702;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment"># curl -I website.com:8080/document 返回 HTTP/1.1 701</span><br><br>server &#123;<br>	listen 8080;<br>	server_name website.com;<br><br>    location ~ ^/docu[a-z]+ &#123;<br>        <span class="hljs-built_in">return</span> 702;<br>    &#125;<br>    <br>    location ~ ^/doc[a-z]+ &#123;<br>        <span class="hljs-built_in">return</span> 701;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment"># curl -I website.com:8080/document 返回 HTTP/1.1 702</span><br></code></pre></td></tr></table></figure>
+
+<p>所以当有多个匹配时匹配优先级如下</p>
+<p><strong>先精确匹配，没有则查找带有 <code>^~</code>的前缀匹配，没有则进行正则匹配，最后才返回前缀匹配的结果</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><code class="hljs bash">location = / &#123;<br><span class="hljs-comment"># 仅仅匹配请求 /</span><br>[ configuration A ]<br>&#125;<br> <br>location / &#123;<br><span class="hljs-comment"># 匹配所有以 / 开头的请求。但是如果有更长的同类型的表达式，则选择更长的表达式。如果有正则表达式可以匹配，则</span><br><span class="hljs-comment"># 优先匹配正则表达式。</span><br>[ configuration B ]<br>&#125;<br> <br>location /documents/ &#123;<br><span class="hljs-comment"># 匹配所有以 /documents/ 开头的请求。但是如果有更长的同类型的表达式，则选择更长的表达式。</span><br><span class="hljs-comment">#如果有正则表达式可以匹配，则优先匹配正则表达式。</span><br>[ configuration C ]<br>&#125;<br> <br>location ^~ /images/ &#123;<br><span class="hljs-comment"># 匹配所有以 /images/ 开头的表达式，如果匹配成功，则停止匹配查找。所以，即便有符合的正则表达式location，也</span><br><span class="hljs-comment"># 不会被使用</span><br>[ configuration D ]<br>&#125;<br> <br>location ~* \.(gif|jpg|jpeg)$ &#123;<br><span class="hljs-comment"># 匹配所有以 gif jpg jpeg结尾的请求。但是 以 /images/开头的请求，将使用 Configuration D</span><br>[ configuration E ]<br>&#125;<br><br><br><span class="hljs-comment">###########请求</span><br>/ -&gt; configuration A<br>/index.html -&gt; configuration B<br>/documents/document.html -&gt; configuration C<br>/images/1.gif -&gt; configuration D<br>/documents/1.jpg -&gt; configuration E<br><br></code></pre></td></tr></table></figure>
+
+
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/Nginx 入门 server块 书写之 location 规则 （一）.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Nignx/">#Nignx</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Nginx 入门 server块 书写之 location 规则 （一）</div>
+      <div>https://yilinyo.github.io/2023/04/09/Nginx 入门 server块 书写之 location 规则 （一）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年4月9日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2023/04/08/hello-git/" title="Hello Git">
+                                                                                                    <span class="hidden-mobile">Hello Git</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
