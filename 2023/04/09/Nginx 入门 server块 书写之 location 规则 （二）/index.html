@@ -1,0 +1,707 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Nginx 入门 server块 书写之 location 规则 （二）接上文，我们学习了location 路由匹配规则和优先级，今天我们深入其内部来探寻实际处理的各个属性书写方式。 Return 指令return一般用于对请求的客户端直接返回响应状态码。在该作用域内return后面的所有nginx配置都是无效的。可以使用在server、location以及if配置中。除了支持跟状态码，还可以跟字">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx 入门 server块 书写之 location 规则 （二）">
+<meta property="og:url" content="https://yilinyo.github.io/2023/04/09/Nginx%20%E5%85%A5%E9%97%A8%20server%E5%9D%97%20%E4%B9%A6%E5%86%99%E4%B9%8B%20location%20%E8%A7%84%E5%88%99%20%EF%BC%88%E4%BA%8C%EF%BC%89/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="Nginx 入门 server块 书写之 location 规则 （二）接上文，我们学习了location 路由匹配规则和优先级，今天我们深入其内部来探寻实际处理的各个属性书写方式。 Return 指令return一般用于对请求的客户端直接返回响应状态码。在该作用域内return后面的所有nginx配置都是无效的。可以使用在server、location以及if配置中。除了支持跟状态码，还可以跟字">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-04-09T14:00:00.000Z">
+<meta property="article:modified_time" content="2023-04-09T06:01:32.517Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="Nginx">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>Nginx 入门 server块 书写之 location 规则 （二） - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.3","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"follow_dnt":true,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml"};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                首页
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                归档
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                分类
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                标签
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                关于
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Nginx 入门 server块 书写之 location 规则 （二）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2023-04-09 14:00" pubdate>
+          2023年4月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          4.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          36 分钟
+        
+      </span>
+    
+
+    
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                Nginx 入门 server块 书写之 location 规则 （二）
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="Nginx-入门-server块-书写之-location-规则-（二）"><a href="#Nginx-入门-server块-书写之-location-规则-（二）" class="headerlink" title="Nginx 入门 server块 书写之 location 规则 （二）"></a>Nginx 入门 server块 书写之 location 规则 （二）</h1><p>接上文，我们学习了location 路由匹配规则和优先级，今天我们深入其内部来探寻实际处理的各个属性书写方式。</p>
+<h3 id="Return-指令"><a href="#Return-指令" class="headerlink" title="Return 指令"></a>Return 指令</h3><p><strong>return一般用于对请求的客户端直接返回响应状态码。在该作用域内return后面的所有nginx配置都是无效的。可以使用在server、location以及if配置中。除了支持跟状态码，还可以跟字符串或者url链接。</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs bash">  1 server&#123;<br>  2     listen 80;<br>  3     server_name www.aaa.com;<br>  4     <span class="hljs-built_in">return</span> 200 <span class="hljs-string">&quot;hello&quot;</span>;<br>  5 &#125;<br> <br> <br><span class="hljs-comment">#说明：如果要想返回字符串，必须要加上状态码，否则会报错。</span><br> <br> <br>  1 location ^~ /aming &#123;<br>  2     default_type application/json ;<br>  3     <span class="hljs-built_in">return</span> 200  <span class="hljs-string">&#x27;&#123;&quot;name&quot;:&quot;xhy&quot;,&quot;id&quot;:&quot;100&quot;&#125;&#x27;</span>;<br>  4 &#125;					<br><span class="hljs-comment">#返回的字符串也支持json数据。</span><br> <br> <br>  1 location /test &#123;<br>  2     <span class="hljs-built_in">return</span> 200 <span class="hljs-string">&quot;<span class="hljs-variable">$host</span> <span class="hljs-variable">$request_uri</span>&quot;</span>;<br>  3 &#125;					<br><span class="hljs-comment">#返回的字符串也支持变量</span><br> <br> <br>  1 server&#123;<br>  2     listen 80;<br>  3     server_name www.aaa.com;<br>  4     <span class="hljs-built_in">return</span> http://www.baidu.com;<br>  5     rewrite /(.*) /abc/<span class="hljs-variable">$1</span>;		<span class="hljs-comment">#该行配置位于return后，则不会被执行。</span><br>  6 &#125;<br> <br><span class="hljs-comment"># 注意：return后面的url必须是以http://或者https://开头的。</span><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment">#常见的重定向</span><br>location = /tutorial/learning-nginx &#123;<br>     <span class="hljs-built_in">return</span> 301 <span class="hljs-variable">$scheme</span>://example.com/nginx/understanding-nginx<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="Rewrite指令"><a href="#Rewrite指令" class="headerlink" title="Rewrite指令"></a>Rewrite指令</h3><figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs makefile">rewrite regex replacement-url [flag];<br><span class="hljs-section">regex: 正则表达式</span><br><span class="hljs-section">replacement-url: 替换的URL</span><br><span class="hljs-section">flag: 用于进行一些额外的处理</span><br><br></code></pre></td></tr></table></figure>
+
+<p>不同flag的效果：</p>
+<table>
+<thead>
+<tr>
+<th align="left">flag</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">last</td>
+<td align="left">停止解析，并开始搜索与更改后的<code>URI</code>相匹配的<code>location</code>;</td>
+</tr>
+<tr>
+<td align="left">break</td>
+<td align="left">中止 rewrite，不再继续匹配</td>
+</tr>
+<tr>
+<td align="left">redirect</td>
+<td align="left">返回临时重定向的 HTTP 状态 302</td>
+</tr>
+<tr>
+<td align="left">permanent</td>
+<td align="left">返回永久重定向的 HTTP 状态 301</td>
+</tr>
+</tbody></table>
+<p>案例</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs bash">location = /nginx-tutorial <br>&#123; <br>    rewrite ^/nginx-tutorial?$ /somePage.html last; <br>&#125;<br><br><br><span class="hljs-comment">#把`https://example.com/nginx-tutorial`重写为#`https://example.com/somePage.html`</span><br><br></code></pre></td></tr></table></figure>
+
+<h5 id=""><a href="#" class="headerlink" title=""></a></h5><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">location = /user.php <br>&#123; <br>    rewrite ^/user.php?<span class="hljs-built_in">id</span>=([0-9]+)$ /user/<span class="hljs-variable">$1</span> last; <br>&#125;<br><span class="hljs-comment">##### 动态替换案例</span><br><br><span class="hljs-comment">#把`https://www.example.com/user.php?id=11`重写为`https://exampleshop.com/user/11`</span><br><br><span class="hljs-comment"># 其中`$1`表示`regex`中第一个括号中的值，第二个括号中的值可通过`$2`获取</span><br><br></code></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash">location = /<br>&#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-variable">$http_user_agent</span> ~* (mobile|nokia|iphone|ipad|android|samsung|htc|blackberry)) &#123;<br>    rewrite ^(.*) https://m.example.com<span class="hljs-variable">$1</span> redirect;<br>    &#125;<br>&#125;<br><br><span class="hljs-comment">##### 手机访问重定向网址</span><br><br><span class="hljs-comment"># 把`https://www.example.com`重写为`https://m.exampleshop.com`</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="Proxy指令"><a href="#Proxy指令" class="headerlink" title="Proxy指令"></a>Proxy指令</h3><p>用于转发请求，常用于反向代理，注意以下细节</p>
+<ul>
+<li>  proxy_pass的链接无<code>/</code></li>
+<li>  proxy_pass的链接有<code>/</code></li>
+</ul>
+<h4 id="第一种：proxy-pass的链接无"><a href="#第一种：proxy-pass的链接无" class="headerlink" title="第一种：proxy_pass的链接无/"></a><strong>第一种：proxy_pass的链接无<code>/</code></strong></h4><p><strong>proxy_pass中，不带『/』，则把『匹配字符串及后缀（/api/xxx）』均带给转发地址</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 效果为：http://xxx.xxx.com/api/xxx -&gt; http://127.0.0.1:7000/api/xxx. 转发的时候,包含了url前缀.</span><br>location ^~ /api/ &#123; <br>    proxy_pass  http://127.0.0.1:7000; <br>&#125;<br><br><span class="hljs-comment"># 效果与上面一致</span><br>location ^~ /api &#123;<br>    proxy_pass  http://127.0.0.1:7000; <br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h4 id="第二种：proxy-pass的链接有"><a href="#第二种：proxy-pass的链接有" class="headerlink" title="第二种：proxy_pass的链接有/"></a>第二种：proxy_pass的链接有<code>/</code></h4><p>proxy_pass中，带『/』，则把『请求地址排除匹配字符串（/api/）』后，再带给转发地址</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-comment"># 效果为：http://xxx.xxx.com/api/xxx --&gt; http://127.0.0.1:7000/xxx</span><br>location ^~ /api/ &#123;<br>    proxy_pass  http://127.0.0.1:7000/; <span class="hljs-comment"># 端口后多了斜杠『/』</span><br>&#125;<br><br><span class="hljs-comment"># 注意：下面的代码会导致失败，原因为『/api/xxx排除了/api』后，会把『/xxx』带给转发地址，但转发地址中已有了斜杠，结果会多了一条斜杠，报错。</span><br><span class="hljs-comment"># 效果为：http://xxx.xxx.com/api/xxx --&gt; http://127.0.0.1:7000//xxx</span><br>location ^~ /api &#123;  <span class="hljs-comment"># 这里的匹配字符串最后少了斜杠『/』</span><br>    proxy_pass  http://127.0.0.1:7000/;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p><strong>location的修饰符为正则匹配时，proxy_pass的地址最后不要带斜杠</strong></p>
+<p>一些简单的常用的 proxy_pass参数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs bash">location / &#123;<br>      proxy_pass http://game;<br>      <span class="hljs-comment"># 用户请求的时候HOST的值是game1.test.com, 那么代理服务会像后端传递请求的还是game1.test.com</span><br>      proxy_set_header Host <span class="hljs-variable">$http_host</span>;<br>      <span class="hljs-comment"># 将$remote_addr的值放进变量X-Real-IP中，$remote_addr的值为客户端的ip</span><br>      proxy_set_header X-Real-IP <span class="hljs-variable">$remote_addr</span>;<br>      <span class="hljs-comment"># 客户端通过代理服务访问后端服务, 后端服务通过该变量会记录真实客户端地址</span><br>      proxy_set_header X-Forwarded-For <span class="hljs-variable">$proxy_add_x_forwarded_for</span>;<br>      <span class="hljs-comment"># nginx代理与后端服务器连接超时时间(代理连接超时)</span><br>      proxy_connect_timeout 10s;<br>     <span class="hljs-comment"># nginx代理等待后端服务器的响应时间 </span><br>     proxy_read_timeout 10s;<br>     <span class="hljs-comment"># 后端服务器数据回传给nginx代理超时时间</span><br>     proxy_send_timeout 10s;<br>     <span class="hljs-comment"># nignx会把后端返回的内容先放到缓冲区当中，然后再返回给客户端，边收边传, 不是全部接收完再传给客户  </span><br>     proxy_buffering on;<br>     <span class="hljs-comment"># 设置nginx代理保存用户头信息的缓冲区大小</span><br>     proxy_buffer_size  8k;<br>     <span class="hljs-comment"># proxy_buffers 缓冲区 </span><br>     proxy_buffers 8 8k;<br>     <span class="hljs-comment"># 状态标记</span><br>     proxy_next_upstream http_404  http_500  http_502  http_503  http_504  http_403  http_429;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<h3 id="try-files指令"><a href="#try-files指令" class="headerlink" title="try_files指令"></a>try_files指令</h3><p>　格式1：<strong>try_files</strong> <em><code>file</code></em> … <em><code>uri</code></em>;  格式2：<strong>try_files</strong> <em><code>file</code></em> … =<em><code>code</code></em>;</p>
+<blockquote>
+<p>**Checks the existence of files in the specified order and uses the first found file for request processing; the processing is performed in the current context. The path to a file is constructed from the *<code>file</code>*parameter according to the <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_core_module.html#root">root</a> and <a target="_blank" rel="noopener" href="http://nginx.org/en/docs/http/ngx_http_core_module.html#alias">alias</a> directives. It is possible to check directory’s existence by specifying a slash at the end of a name, e.g. “<code>$uri/</code>”. If none of the files were found, an internal redirect to the *****<code>uri</code>*** specified in the last parameter is made. </p>
+</blockquote>
+<ul>
+<li>  　　关键点1：按指定的file顺序查找存在的文件，并使用第一个找到的文件进行请求处理</li>
+</ul>
+<ul>
+<li>  　　关键点2：查找路径是按照给定的root或alias为根路径来查找的</li>
+</ul>
+<ul>
+<li>  　　关键点3：如果给出的file都没有匹配到，则重新请求最后一个参数给定的uri，就是新的location匹配</li>
+</ul>
+<ul>
+<li>  　　关键点4：如果是格式2，如果最后一个参数是 = 404 ，若给出的file都没有匹配到，则最后返回404的响应码</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs bash">location /images/ &#123;<br>    root /opt/html/;<br>    try_files <span class="hljs-variable">$uri</span>   <span class="hljs-variable">$uri</span>/  /images/default.gif; <br>&#125;<br><span class="hljs-comment"># 比如 请求 127.0.0.1/images/test.gif 会依次查找 1.文#件/opt/html/images/test.gif   2.文件夹 /opt/html/images/test.gif/下的index文件  3. 请求127.0.0.1/images/default.gif</span><br><br></code></pre></td></tr></table></figure>
+
+<p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/jedi1995/p/10900224.html">nginx配置选项try_files详解 - 陈一风 - 博客园 (cnblogs.com)</a></p>
+<h3 id="Nginx内置绑定变量"><a href="#Nginx内置绑定变量" class="headerlink" title="Nginx内置绑定变量"></a>Nginx内置绑定变量</h3><p><a target="_blank" rel="noopener" href="https://moonbingbing.gitbooks.io/openresty-best-practices/content/openresty/inline_var.html">使用 Nginx 内置绑定变量 · OpenResty最佳实践 (gitbooks.io)</a></p>
+
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/Nginx 入门 server块 书写之 location 规则 （二）.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Nginx/">#Nginx</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Nginx 入门 server块 书写之 location 规则 （二）</div>
+      <div>https://yilinyo.github.io/2023/04/09/Nginx 入门 server块 书写之 location 规则 （二）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2023年4月9日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2023/04/09/Nginx%20%E5%85%A5%E9%97%A8%20server%E5%9D%97%20%E4%B9%A6%E5%86%99%E4%B9%8B%20location%20%E8%A7%84%E5%88%99%20%EF%BC%88%E4%B8%80%EF%BC%89/" title="Nginx 入门 server块 书写之 location 规则 （一）">
+                                                                                                    <span class="hidden-mobile">Nginx 入门 server块 书写之 location 规则 （一）</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;目录</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+    </div>
+  
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.0/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.18.2/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
