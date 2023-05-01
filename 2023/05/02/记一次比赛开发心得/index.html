@@ -16,22 +16,28 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Git 入门笔记，带你快速使用 Git Bash 命令 Git 入门git 分布式版本控制 记录版本号 ，每个版本都有（高效的压缩解压算法） 本地库本地结构 1. 本地库 1. 暂存区 1. 工作区  git init初始化本地库 git add git commit工作区 -》git add 【】暂存区 -》git commit 【】 本地库 工作区 下（.git 同级）未 git add 缓存">
+    <meta name="description" content="应用开发的理解及效率的提升？换语言如何开发？前言最近结束了一个比赛的项目开发，做的是人工智能与图像识别相关的。本来是不打算参加的也是受人委托，当时拿到需求确实觉得简单，但是落实起来还是以遇到了许多困难。加上很久没有写大项目了也有些生疏了…虽然最后也完成了任务，但总觉得不够完美，当然此次开发确实是让我跳出了我自己的舒适圈，本来是打算上我最拿手的java,由于某些原因我不得不使用Python来开发后端">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hello Git">
-<meta property="og:url" content="https://yilinyo.github.io/2023/02/06/hello-git/index.html">
+<meta property="og:title" content="记一次比赛开发心得">
+<meta property="og:url" content="https://yilinyo.github.io/2023/05/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E6%AF%94%E8%B5%9B%E5%BC%80%E5%8F%91%E5%BF%83%E5%BE%97/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="Git 入门笔记，带你快速使用 Git Bash 命令 Git 入门git 分布式版本控制 记录版本号 ，每个版本都有（高效的压缩解压算法） 本地库本地结构 1. 本地库 1. 暂存区 1. 工作区  git init初始化本地库 git add git commit工作区 -》git add 【】暂存区 -》git commit 【】 本地库 工作区 下（.git 同级）未 git add 缓存">
+<meta property="og:description" content="应用开发的理解及效率的提升？换语言如何开发？前言最近结束了一个比赛的项目开发，做的是人工智能与图像识别相关的。本来是不打算参加的也是受人委托，当时拿到需求确实觉得简单，但是落实起来还是以遇到了许多困难。加上很久没有写大项目了也有些生疏了…虽然最后也完成了任务，但总觉得不够完美，当然此次开发确实是让我跳出了我自己的舒适圈，本来是打算上我最拿手的java,由于某些原因我不得不使用Python来开发后端">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2023-02-06T23:37:00.000Z">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000759.png">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000809.png">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502001816.png">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000759.png">
+<meta property="og:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000809.png">
+<meta property="article:published_time" content="2023-05-02T00:27:00.000Z">
 <meta property="article:modified_time" content="2023-05-01T16:33:37.804Z">
 <meta property="article:author" content="yilin">
-<meta property="article:tag" content="工具">
+<meta property="article:tag" content="心得">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000759.png">
   
   
   
-  <title>Hello Git - Yilin派哟yoo🥧</title>
+  <title>记一次比赛开发心得 - Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -196,7 +202,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Hello Git"></span>
+            <span id="subtitle" data-typed-text="记一次比赛开发心得"></span>
           
         </div>
 
@@ -207,8 +213,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2023-02-06 23:37" pubdate>
-          2023年2月6日 晚上
+        <time datetime="2023-05-02 00:27" pubdate>
+          2023年5月2日 凌晨
         </time>
       </span>
     
@@ -219,7 +225,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1k 字
+          2.8k 字
         
       </span>
     
@@ -230,7 +236,7 @@
         
         
         
-          9 分钟
+          24 分钟
         
       </span>
     
@@ -275,77 +281,67 @@
                         <article class="post-content mx-auto">
                             <!-- SEO header -->
                             <h1 style="display: none">
-                                Hello Git
+                                记一次比赛开发心得
                             </h1>
                             
                                     
                                                             <div class="markdown-body">
                                                                 
-                                                                    <p>Git 入门笔记，带你快速使用 Git Bash 命令</p>
-<h1 id="Git-入门"><a href="#Git-入门" class="headerlink" title="Git 入门"></a>Git 入门</h1><p>git 分布式版本控制</p>
-<p>记录版本号 ，每个版本都有（高效的压缩解压算法）</p>
-<h2 id="本地库"><a href="#本地库" class="headerlink" title="本地库"></a>本地库</h2><p>本地结构</p>
-<pre><code class="hljs">1. 本地库
-1. 暂存区
-1. 工作区
-</code></pre>
-<h4 id="git-init"><a href="#git-init" class="headerlink" title="git init"></a>git init</h4><p>初始化本地库</p>
-<h4 id="git-add-git-commit"><a href="#git-add-git-commit" class="headerlink" title="git add git commit"></a>git add <strong>git commit</strong></h4><p>工作区 -》<strong>git add</strong> 【】暂存区 -》<strong>git commit</strong> 【】 本地库</p>
-<p>工作区 下（.git 同级）未 git add</p>
-<p>缓存区 已经 git add 未 git commit</p>
-<h4 id="git-status"><a href="#git-status" class="headerlink" title="git status"></a>git status</h4><p>查看工作状态</p>
-<h4 id="git-log"><a href="#git-log" class="headerlink" title="git log"></a>git log</h4><p>提交日志（由近到远）</p>
-<p>每一条内容 有一个 key 索引唯一对应</p>
-<p>不同展示样式：</p>
-<h5 id="git-log-–pretty-oneline"><a href="#git-log-–pretty-oneline" class="headerlink" title="git log –pretty=oneline"></a>git log –pretty=oneline</h5><h5 id="git-log-–oneline"><a href="#git-log-–oneline" class="headerlink" title="git log –oneline"></a>git log –oneline</h5><h5 id="git-reflog"><a href="#git-reflog" class="headerlink" title="git reflog"></a>git reflog</h5><h4 id="git-reset-–【】索引"><a href="#git-reset-–【】索引" class="headerlink" title="git reset –【】索引"></a>git reset –【】索引</h4><p>1.使用 hard（使用最多）</p>
-<p>​ 本地库的指针移动的同时 同步工作区、暂存区、本地库</p>
-<p>2.使用 mixed</p>
-<p>​ 本地库的指针移动的同时 同步暂存区、本地库</p>
-<p>2.使用 soft</p>
-<p>​ 只会让本地移动</p>
-<h4 id="git-diff"><a href="#git-diff" class="headerlink" title="git diff"></a>git diff</h4><p>比较工作区和暂存区的差异 （带文件比文件 ，不带比所有）</p>
-<h3 id="分支"><a href="#分支" class="headerlink" title="分支"></a>分支</h3><p>新建分支会先将主分支的最新版本然后加到分支</p>
-<p><em>各自分支相互独立</em></p>
-<h4 id="git-branch"><a href="#git-branch" class="headerlink" title="git branch"></a>git branch</h4><h5 id="git-branch-v"><a href="#git-branch-v" class="headerlink" title="git branch -v"></a>git branch -v</h5><p>​ 查看当前所有分支</p>
-<h5 id="git-branch-【】"><a href="#git-branch-【】" class="headerlink" title="git branch 【】"></a>git branch 【】</h5><p>创建分支</p>
-<h5 id="git-checkout-【】"><a href="#git-checkout-【】" class="headerlink" title="git checkout 【】"></a>git checkout 【】</h5><p>切换分支</p>
-<p>主分支合并 其他分支</p>
-<ol>
-<li>切换到主分支</li>
-<li>使用 git merge 【分支】（当主分支和其他分支 都修改了同一文件的同一位置就会冲突）</li>
-<li>解决冲突方法：直接文件选择性删除 （再添加 提交）</li>
-</ol>
-<h2 id="远程库"><a href="#远程库" class="headerlink" title="远程库"></a>远程库</h2><p><strong>github</strong></p>
-<p><strong>gitee</strong></p>
-<p><strong>gitlab</strong></p>
-<h4 id="git-remote-add-【name】【https-…-】"><a href="#git-remote-add-【name】【https-…-】" class="headerlink" title="git remote add 【name】【https://…..】"></a>git remote add 【name】【https://…..】</h4><p>本地库起远程库别名</p>
-<h4 id="git-remote-v"><a href="#git-remote-v" class="headerlink" title="git remote -v"></a>git remote -v</h4><p>查看别名</p>
-<p><strong>git push 【name】【分支】</strong></p>
-<p>向远程仓库（别名）推送 本地仓库 的指定分支</p>
-<p><strong>git clone 【https://…..】</strong></p>
-<p>初始化本地库 从远程库克隆到本地 起了别名 origin</p>
-<p><strong>库的拥有者拉取</strong></p>
-<ol>
-<li>fetch +merge 操作</li>
-</ol>
-<h5 id="git-fetch-【name】-【分支】"><a href="#git-fetch-【name】-【分支】" class="headerlink" title="git fetch 【name】 【分支】"></a>git fetch 【name】 【分支】</h5><p>从远程库抓取到本地库，工作区不变 这时候本地有个分支是 <strong>name/分支</strong></p>
-<p>切换到本地 master 分支 调用 git merge name/分支 就可以合并</p>
-<ol start="2">
-<li>pull 操作</li>
-</ol>
-<h5 id="git-pull【name】-【分支】"><a href="#git-pull【name】-【分支】" class="headerlink" title="git pull【name】 【分支】"></a>git pull【name】 【分支】</h5><p>冲突产生 需要到本地 解决再 push 到 远程仓库</p>
-<h2 id="免密操作"><a href="#免密操作" class="headerlink" title="免密操作"></a>免密操作</h2><p>$ ssh-keygen -t rsa -C【email】</p>
-<h3 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h3><p>idea 远程 pull 前提准备</p>
-<p>git pull origin master –allow-unrelated-histories</p>
-<p>推送到上游其它分支</p>
-<p>git push –set-upstream origin myblog（分支）</p>
+                                                                    <h1 id="应用开发的理解及效率的提升？换语言如何开发？"><a href="#应用开发的理解及效率的提升？换语言如何开发？" class="headerlink" title="应用开发的理解及效率的提升？换语言如何开发？"></a>应用开发的理解及效率的提升？换语言如何开发？</h1><h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>最近结束了一个比赛的项目开发，做的是人工智能与图像识别相关的。本来是不打算参加的也是受人委托，当时拿到需求确实觉得简单，但是落实起来还是以遇到了许多困难。加上很久没有写大项目了也有些生疏了…虽然最后也完成了任务，但总觉得不够完美，当然此次开发确实是让我跳出了我自己的舒适圈，本来是打算上我最拿手的java,由于某些原因我不得不使用Python来开发后端,开发的过程完全是从0摸索，真的想吐槽一下Python，报错后的错误真的很难定位到…为什么包之间不向下兼容啊。技术实现还是大同小异，本篇博客不会着重描述，只是单纯记录开发历程和一些新get到的方法。我觉得还是蛮有意义的写这样一篇技术性随笔….<br><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000759.png" srcset="/img/loading.gif" lazyload alt="图像识别"><br><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000809.png" srcset="/img/loading.gif" lazyload alt="视频识别"></p>
+<h3 id="为什么选择Python"><a href="#为什么选择Python" class="headerlink" title="为什么选择Python"></a>为什么选择Python</h3><p>起初项目孵化的时候，一些简单的crud我套用的是之前一个老SpringBoot的项目，后来由于项目使用了YoloV8，看了其相关文档，毕竟是Python环境下的项目，用Python直接提供了其调用Demo，如果使用java我查阅到的资料可能最后还是会回到在java中调用Python这种套娃情况。又或者写一个图像识别的Python服务然后采用Java在进程级别进行通信，可是这样的实施成本又太高了，权衡之下最终选择了直接上Python,因为之前老早就想试试Python的fastapi。<br>刚上手的时候确实我非常惊讶于fastapi的项目配置和启动，在以往的JavaWeb开发中光是配一个Tomcat我都弄了好久，加上入门时我还要为一个一个的Servlet配配置文件以及重写方法，当时学的时候就觉得这些好麻烦，而fastapi给我的体验就是一种打开了新世界大门的写法，一行挂载一行注释一个函数一个路由就写好了，这也太便捷了，这简直让web开发的成本一下降低了好几个档次。<br>如果你对fastapi感谢趣不妨去看看他的<a target="_blank" rel="noopener" href="https://fastapi.tiangolo.com/zh/">官方文档</a>，你就会惊叹其便捷之处了！</p>
+<h3 id="简单带来的问题"><a href="#简单带来的问题" class="headerlink" title="简单带来的问题"></a>简单带来的问题</h3><p>上手快的确带来了一时爽，在开发过程中健壮性、易维护性的问题却会逐渐的暴露出来，当然这里仅是一位初级Python web开发者的拙见。在运行时的报错虽然能够利用Pydanic来抑制错误信息的暴露，但在开发过程中错误的定位让我非常难受，有时候一个错误很细节但他的报错却深入到源码底层，不是特别熟悉的玩家还真是头大，其次就是一些包他实现的功能可能和你预期的不太一样，需要细细甄别，然后就是环境问题了，也许就是一个不同的版本的包造成的结果会是一堆爆红，如果你不是老手还真是很难发现其中的奥秘……总而言之我还是非常欣赏这种web开发框架的设计方式，规范问题需要的是程序员自己积累，开发一些小型后台api确实省时省力。</p>
+<h3 id="协程函数"><a href="#协程函数" class="headerlink" title="协程函数"></a>协程函数</h3><p>这是自上次面试背八股在实际开发遇到的有关协程的问题。其实早在JavaScript 就有打过交道的await 和 async。协程不同于线程和进程，他是由程序员自己创建出来的帮我们提高代码IO阻塞代码效率的一种调度方式，当然这样说还是有点牵强的，但是有一点是必须的那就是协程一定是在线程之上的，一个线程的阻塞不会让协程也停止调度，异步IO将会挂起切换到其他协程，是一种分时复用的思想，听起来好像和多线程差不多，但是其实协程的切换是在用户态，他也不需要额外的内存空间，效率非常高。<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/172471249">什么是协程?</a></p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>进程</th>
+<th>线程(特指内核态线程)</th>
+<th>协程</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>切换者</td>
+<td>操作系统</td>
+<td>操作系统</td>
+<td>用户</td>
+</tr>
+<tr>
+<td>切换时机</td>
+<td>根据操作系统自己的切换策略，用户不感知</td>
+<td>根据操作系统自己的切换策略，用户不感知</td>
+<td>用户觉定</td>
+</tr>
+<tr>
+<td>切换内容</td>
+<td>页全局目录、内核栈、硬件上下文</td>
+<td>内核栈、硬件上下文</td>
+<td>硬件上下文</td>
+</tr>
+<tr>
+<td>切换内容的保存</td>
+<td>保存于内核栈中</td>
+<td>保存于内核栈中</td>
+<td>（用户栈/堆）</td>
+</tr>
+<tr>
+<td>切换过程</td>
+<td>用户态-内核态-用户态</td>
+<td>用户态-内核态-用户态</td>
+<td>用户态</td>
+</tr>
+</tbody></table>
+<p><a target="_blank" rel="noopener" href="https://m.elecfans.com/article/1589126.html">浅析Python中异步和同步函数</a></p>
+<h3 id="工程化的项目"><a href="#工程化的项目" class="headerlink" title="工程化的项目"></a>工程化的项目</h3><p>软件开发的一个重要目标就是要容易维护，无论是前端还是后端严格的分层次带来的长期收益是巨大的，例如前端我以前经常会把一个页面的组件、逻辑、数据写到一个文件里，一旦逻辑复杂一点，整个项目就会显得非常臃肿.这次我几乎大改了新版的ant design pro,踩了好多坑也自己实现了许多之前他自带的很多全局方法。最重要的还是<strong>组件化的思想</strong>，组件可以独立的拆分你的UI视图，他们是可以复用的，独立的单元。和函数类似，React中组件接收的输入源称为props，并且返回react元素。react元素是对UI界面的描述。你可以告诉react你期望的UI界面，剩下的工作可以交给react来处理。我们拿乘坐计程车打比方，当你告诉司机你想要去的地方，司机就会按照你期望地点将你安全的送到目的地。而不用你自己亲自开车。<br>在FastApi 我依旧沿用了MVC 的开发模式，当然这里V由react代替了，只不过Python好像大部分也是在写函数式的M和C.<br><strong>函数式编程（Functional Programming）是一种编程方式，它将计算机运算视为数学函数的计算，并且避免了状态变量和可变数据。函数式编程强调函数的纯粹性，即一个函数的返回结果只由输入决定，不受外部环境影响。</strong> 这里要区别于面向过程和面向过程的编程，他们强调的点不一样,在此就不详细讨论了，后续会有专门的文章来讲讲其中的差异.</p>
+<h3 id="人工智能将取代程序员？"><a href="#人工智能将取代程序员？" class="headerlink" title="人工智能将取代程序员？"></a>人工智能将取代程序员？</h3><p>说实话此次开发，chatgpt帮了我很多忙，我甚至让他帮我写了很多组件和工具函数，其中不乏一些核心的yolov8结合opencv的视频视频逻辑，其准确率异常的高，不得不说现在的人工智能的出现对一些行业是会出现一定的冲击。但是他依旧会存在一些问题如果你的需求不够具体，这就像产品经理像程序员提需求一样，不说个清楚，写出来又不满意哈哈◑﹏◐<br>但是要是说人工智能会取代我们程序员还是有待商榷，因为在一个项目中，其业务逻辑还是很复杂的，很有可能不同模块是不同人开发的，你让他完整的写一个程序他考虑的东西还是太少了，你让他写一部分程序，他又不能严格按照我们的代码风格为我们服务，总之用它写一些不需要多模块联动交互的逻辑工具方法还是挺方便的，能够极大提高效率，完全依赖于它也许不是一个很好的办法。我们还是动动脑子的…</p>
+<p><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502001816.png" srcset="/img/loading.gif" lazyload alt="chatgpt帮我写代码">### 前言<br>最近结束了一个比赛的项目开发，做的是人工智能与图像识别相关的。本来是不打算参加的也是受人委托，当时拿到需求确实觉得简单，但是落实起来还是以遇到了许多困难。加上很久没有写大项目了也有些生疏了…虽然最后也完成了任务，但总觉得不够完美，当然此次开发确实是让我跳出了我自己的舒适圈，本来是打算上我最拿手的java,由于某些原因我不得不使用Python来开发后端,开发的过程完全是从0摸索，真的想吐槽一下Python，报错后的错误真的很难定位到…为什么包之间不向下兼容啊。技术实现还是大同小异，本篇博客不会着重描述，只是单纯记录开发历程和一些新get到的方法。我觉得还是蛮有意义的写这样一篇技术性随笔….<br><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000759.png" srcset="/img/loading.gif" lazyload alt="图像识别"><br><img src="https://yilin-1307688338.cos.ap-nanjing.myqcloud.com/blog/20230502000809.png" srcset="/img/loading.gif" lazyload alt="视频识别"></p>
 
                                                                         
                                                             </div>
                                                             
                                                                 <hr/>
                                                                 <div style="text-align: center ">
-                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/hello-git.md" target="_blank">编辑文章✏</a>
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/记一次比赛开发心得.md" target="_blank">编辑文章✏</a>
                                                                 </div>
                                                                 <div>
                                                                     <div class="post-metas my-3">
@@ -354,7 +350,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%B7%A5%E5%85%B7/">#工具</a>
+        <a href="/tags/%E5%BF%83%E5%BE%97/">#心得</a>
       
     </div>
   
@@ -366,8 +362,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Hello Git</div>
-      <div>https://yilinyo.github.io/2023/02/06/hello-git/</div>
+      <div>记一次比赛开发心得</div>
+      <div>https://yilinyo.github.io/2023/05/02/记一次比赛开发心得/</div>
     </div>
     <div class="license-meta">
       
@@ -379,7 +375,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2023年2月6日</div>
+          <div>2023年5月2日</div>
         </div>
       
       
@@ -411,19 +407,13 @@
                                                                                     <article class="post-prev col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2023/03/05/WebSocket%20%E5%AE%9E%E7%8E%B0%E8%81%8A%E5%A4%A9%E5%AE%A4/" title="WebSocket 实现聊天室">
-                                                                                                    <i class="iconfont icon-arrowleft"></i>
-                                                                                                    <span class="hidden-mobile">WebSocket 实现聊天室</span>
-                                                                                                    <span class="visible-mobile">上一篇</span>
-                                                                                                </a>
-                                                                                                
                                                                                     </article>
 
                                                                                     <article class="post-next col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2023/02/05/%E9%B1%BC%E7%9A%AE%E7%94%A8%E6%88%B7%E4%B8%AD%E5%BF%83%E6%94%B6%E8%8E%B7/" title="鱼皮用户中心收获">
-                                                                                                    <span class="hidden-mobile">鱼皮用户中心收获</span>
+                                                                                                <a href="/2023/04/09/Nginx%20%E5%85%A5%E9%97%A8%20server%E5%9D%97%20%E4%B9%A6%E5%86%99%E4%B9%8B%20location%20%E8%A7%84%E5%88%99%20%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Nginx 入门 server块 书写之 location 规则 （二）">
+                                                                                                    <span class="hidden-mobile">Nginx 入门 server块 书写之 location 规则 （二）</span>
                                                                                                     <span class="visible-mobile">下一篇</span>
                                                                                                     <i class="iconfont icon-arrowright"></i>
                                                                                                 </a>
