@@ -799,8 +799,8 @@ gitalk:
 # 注意：下列配置项中的 true/false 不要用引号括起来
 
 valine:
-  appId: 0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI
-  appKey: EnJuvqNfHNeI8d1RbBtG9bXP
+  appId: 
+  appKey: 
   path: window.location.pathname
   placeholder: Nothing but your words...
   avatar: wavatar
@@ -820,7 +820,7 @@ valine:
 # Derived from Valine, with self-hosted service and new features
 # See: https://waline.js.org/
 waline:
-  serverURL: 'https://waline-blog-ej97d9ut3-yilins-projects.vercel.app'
+  serverURL: 'https://waline-blog-kappa-ten.vercel.app'
   path: window.location.pathname
   meta: ['nick', 'mail', 'link']
   requiredMeta: ['nick']
