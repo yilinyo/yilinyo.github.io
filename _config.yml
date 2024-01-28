@@ -11,6 +11,20 @@ author: yilin
 language: zh-CN
 timezone: ""
 
+# valine:
+#   enable: true
+#   appid: 0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI
+#   appkey: EnJuvqNfHNeI8d1RbBtG9bXP
+#   notify: false # mail notifier , https://github.com/xCss/Valine/wiki
+#   verify: false # Verification code
+#   avatar: retro # Gravatar 头像展示方式
+#   meta: ["nick", "mail", "link"] # 评论者相关属性
+#   pageSize: 10 # 评论列表分页，每页条数
+#   lang: zh-CN # zh-CN | zh-TW | en | ja
+#   highlight: true # 代码高亮
+#   recordIP: false # 是否记录评论者IP
+#   serverURLs: https://0ajiqu9u.api.lncldglobal.com # REST API 服务器地址，国际版不填
+
 # URL
 ## Set your site url here. For example, if you use GitHub Page, set url as 'https://username.github.io/project'
 url: https://yilinyo.github.io

@@ -252,15 +252,11 @@ web_analytics:  # 网页访问统计
   # See: https://tongji.baidu.com/sc-web/10000033910/home/site/getjs?siteId=13751376
   baidu:
 
-  # Google 统计的 Tracking ID
-  # Google analytics, set Tracking ID
-  # See: https://developers.google.com/analytics/devguides/collection/analyticsjs
+  # Google Analytics 4 的媒体资源 ID
+  # Google Analytics 4 MEASUREMENT_ID
+  # See: https://support.google.com/analytics/answer/9744165#zippy=%2Cin-this-article
   google:
-
-  # Google gtag.js 的媒体资源 ID
-  # Google gtag.js GA_MEASUREMENT_ID
-  # See: https://developers.google.com/analytics/devguides/collection/gtagjs/
-  gtag:
+    measurement_id:
 
   # 腾讯统计的 H5 App ID，开启高级功能才有cid
   # Tencent analytics, set APP ID
@@ -326,7 +322,7 @@ iconfont: //at.alicdn.com/t/font_1736178_lbnruvf0jn.css
 navbar:
   # 导航栏左侧的标题，为空则按 hexo config 中 `title` 显示
   # The title on the left side of the navigation bar. If empty, it is based on `title` in hexo config
-  blog_title: "YilinPai🥧"
+  blog_title: "Fluid"
 
   # 导航栏毛玻璃特效，实验性功能，可能会造成页面滚动掉帧和抖动，部分浏览器不支持会自动不生效
   # Navigation bar frosted glass special animation. It is an experimental feature
@@ -460,7 +456,7 @@ footer:
 index:
   # 首页 Banner 头图，可以是相对路径或绝对路径，以下相同
   # Path of Banner image, can be a relative path or an absolute path, the same on other pages
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
 
   # 头图高度，屏幕百分比
   # Height ratio of banner image
@@ -479,7 +475,7 @@ index:
 
     # 为空则按 hexo config.subtitle 显示
     # If empty, text based on `subtitle` in hexo config
-    text: "欢迎来到Yilin派🦄"
+    text: "An elegant Material-Design theme for Hexo"
 
     # 通过 API 接口作为首页副标题的内容，必须返回的是 JSON 格式，如果请求失败则按 text 字段显示，该功能必须先开启 typing 打字机功能
     # Subtitle of the homepage through the API, must be returned a JSON. If the request fails, it will be displayed in `text` value. This feature must first enable the typing animation
@@ -532,7 +528,7 @@ index:
 # Post Page
 #---------------------------
 post:
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 70
   banner_mask_alpha: 0.3
 
@@ -727,7 +723,7 @@ post:
     enable: false
     # 指定的插件，需要同时设置对应插件的必要参数
     # The specified plugin needs to set the necessary parameters at the same time
-    # Options: utterances | disqus | gitalk | valine | waline | changyan | livere | remark42 | twikoo | cusdis | giscus
+    # Options: utterances | disqus | gitalk | valine | waline | changyan | livere | remark42 | twikoo | cusdis | giscus | discuss
     type: disqus
 
 
@@ -847,7 +843,7 @@ remark42:
   components: ['embed']
 
 # Twikoo
-# 基于腾讯云开发
+# 支持腾讯云、Vercel、Railway 等多种平台部署
 # Based on Tencent CloudBase
 # See: https://twikoo.js.org
 twikoo:
@@ -881,12 +877,21 @@ giscus:
   input-position: top
   lang: zh-CN
 
+# Discuss
+# 多平台、多数据库、自托管、免费开源评论系统
+# Self-hosted, small size, multi-platform, multi-database, free and open source commenting system
+# See: https://discuss.js.org
+discuss:
+  serverURLs:
+  path: window.location.pathname
+
+
 #---------------------------
 # 归档页
 # Archive Page
 #---------------------------
 archive:
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
 
@@ -897,7 +902,7 @@ archive:
 #---------------------------
 category:
   enable: true
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
 
@@ -926,7 +931,7 @@ category:
 #---------------------------
 tag:
   enable: true
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 80
   banner_mask_alpha: 0.3
   tagcloud:
@@ -943,18 +948,18 @@ tag:
 #---------------------------
 about:
   enable: true
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
-  avatar: /img/touxiang.png
-  name: "Yilin"
-  intro: "一起探索Spring、React"
+  avatar: /img/avatar.png
+  name: "Fluid"
+  intro: "An elegant theme for Hexo"
   # 更多图标可从 https://hexo.fluid-dev.com/docs/icon/ 查找，`class` 代表图标的 css class，添加 `qrcode` 后，图标不再是链接而是悬浮二维码
   # More icons can be found from https://hexo.fluid-dev.com/docs/en/icon/  `class` is the css class of the icon. If adding `qrcode`, The icon is no longer a link, but a hovering QR code
   icons:
-    - { class: "iconfont icon-github-fill", link: "https://github.com/yilinyo", tip: "GitHub" }
-    - { class: "iconfont icon-bilibili-fill", link: "https://space.bilibili.com/177605582", tip: "B站" }
-    - { class: "iconfont icon-wechat-fill", qrcode: "/img/wechatQR.png" }
+    - { class: "iconfont icon-github-fill", link: "https://github.com", tip: "GitHub" }
+    - { class: "iconfont icon-douban-fill", link: "https://douban.com", tip: "豆瓣" }
+    - { class: "iconfont icon-wechat-fill", qrcode: "/img/favicon.png" }
 
 
 #---------------------------
@@ -965,7 +970,7 @@ about:
 # Custom Page through `hexo new page`
 #---------------------------
 page:
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
 
@@ -976,7 +981,7 @@ page:
 #---------------------------
 page404:
   enable: true
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 85
   banner_mask_alpha: 0.3
   # 重定向到首页的延迟(毫秒)
@@ -990,7 +995,7 @@ page404:
 #---------------------------
 links:
   enable: true
-  banner_img: /img/backend.png
+  banner_img: /img/default.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
   # 友链的成员项
@@ -1031,7 +1036,7 @@ links:
     enable: false
     # 指定的插件，需要同时设置对应插件的必要参数
     # The specified plugin needs to set the necessary parameters at the same time
-    # Options: utterances | disqus | gitalk | valine | waline | changyan | livere | remark42 | twikoo | cusdis | giscus
+    # Options: utterances | disqus | gitalk | valine | waline | changyan | livere | remark42 | twikoo | cusdis | giscus | discuss
     type: disqus
 
 
@@ -1056,13 +1061,13 @@ static_prefix:
 
   github_markdown: https://lib.baomitu.com/github-markdown-css/4.0.0/
 
-  jquery: https://lib.baomitu.com/jquery/3.6.0/
+  jquery: https://lib.baomitu.com/jquery/3.6.4/
 
   bootstrap: https://lib.baomitu.com/twitter-bootstrap/4.6.1/
 
-  prismjs: https://lib.baomitu.com/prism/1.28.0/
+  prismjs: https://lib.baomitu.com/prism/1.29.0/
 
-  tocbot: https://lib.baomitu.com/tocbot/4.18.2/
+  tocbot: https://lib.baomitu.com/tocbot/4.20.1/
 
   typed: https://lib.baomitu.com/typed.js/2.0.12/
 
@@ -1082,12 +1087,16 @@ static_prefix:
 
   valine: https://lib.baomitu.com/valine/1.5.1/
 
-  waline: https://lib.baomitu.com/waline/2.6.3/
+  waline: https://cdn.staticfile.org/waline/2.15.5/
 
   gitalk: https://lib.baomitu.com/gitalk/1.8.0/
 
   disqusjs: https://lib.baomitu.com/disqusjs/1.3.0/
 
-  twikoo: https://lib.baomitu.com/twikoo/1.6.7/
+  twikoo: https://lib.baomitu.com/twikoo/1.6.8/
+
+  discuss: https://lib.baomitu.com/discuss/1.2.1/
 
   hint: https://lib.baomitu.com/hint.css/2.7.0/
+
+  moment: https://lib.baomitu.com/moment.js/2.29.4/

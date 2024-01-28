@@ -1,20 +1,18 @@
-
 ---
-title: 非阻塞IO NIO 入门
+title: 非阻塞IO NIO --入门
 tag: NIO
 date: 2024-1-27 15:34:00
 ---
 
 # NIO
 
-非阻塞IO
+非阻塞 IO
 
 > 本笔记资料 来自[黑马程序 Netty 教程 ](https://www.bilibili.com/video/BV1py4y1E7oA/?p=6&share_source=copy_web&vd_source=5c53fad723f9304699742f8633214dd3)及 自己的一些总结
-## ByteBuffer 
 
+## ByteBuffer
 
 **在内存开辟一个缓冲区，大小不宜过大**
-
 
 ### ByteBuffer 的分配和状态
 
@@ -22,6 +20,7 @@ date: 2024-1-27 15:34:00
     FileChannel channel = file.getChannel();
      ByteBuffer buffer = ByteBuffer.allocate(10);
 ```
+
 ##### 一开始 的 状态是**写模式** 也就是分配完空间后
 
 ![](https://s2.loli.net/2024/01/26/8WIijoOlae1JFGk.png)
@@ -46,13 +45,12 @@ compact 方法，是把**未读完的部分向前压缩**，然后切换至**写
 
 ![](https://s2.loli.net/2024/01/26/4LqTp86f1bEiGnz.png)
 
-
 不同类型的空间分配
+
 ```java
     ByteBuffer buf1 = ByteBuffer.allocate(16);  //分配堆内存 会GC调整 读写慢
     ByteBuffer buf2 = ByteBuffer.allocateDirect(16); //分配直接内存 调用操作系统 分配慢
 ```
-
 
 ### ByteBuffer 常见方法
 
@@ -83,7 +81,8 @@ buf.limit(); //获取limit
 buf.limit(16); //设置limit16
 ```
 
-#### 字节数组到ByteBuffer转换
+#### 字节数组到 ByteBuffer 转换
+
 ```java
 // string 到 buffer 完成后自动会变成读模式
 ByteBuffer buffer1 = StandardCharsets.UTF_8.encode("你好");
@@ -99,41 +98,37 @@ System.out.println(buffer3.toString()); //你好
 ## ⚠️ FileChannel 工作模式
 
 > FileChannel 和传统的文件 I/O（例如 FileInputStream、FileOutputStream）之间有几个重要的区别：
-> 
+>
 > 非阻塞 I/O：
-> 
+>
 > FileChannel 支持非阻塞 I/O 操作，这意味着你可以使用 FileChannel 的某些方法进行异步 I/O 操作，而不必等待每个操作完成。
 > 传统的文件 I/O 是阻塞的，即在进行读或写操作时，程序会一直等待直到操作完成。
 > ByteBuffer 使用：
-> 
+>
 > FileChannel 与 ByteBuffer 配合使用，通过将数据存储在 ByteBuffer 中来进行读写操作。
 > 传统的文件 I/O 使用 InputStream 和 OutputStream，并且通常需要在读取或写入数据之前创建一个字节数组。
 > 文件锁定：
-> 
+>
 > FileChannel 具有支持文件锁定的能力，可以通过 FileLock 对象实现对文件的独占或共享锁定。
 > 传统文件 I/O 通常不提供直接的文件锁定机制。
 > 内存映射：
-> 
+>
 > FileChannel 允许将文件的一部分或整个文件映射到内存中，以便直接在内存中进行读写操作，提高性能。
 > 传统文件 I/O 没有内存映射的直接支持。
 > 性能优势：
-> 
+>
 > 由于 FileChannel 允许进行一些底层的优化，因此在某些情况下，它可以提供更好的性能，特别是对于大量数据的读写操作。
 > 传统文件 I/O 可能会在处理大量数据时变得相对较慢。
 
 > FileChannel 只能工作在阻塞模式下
 
-
-
 #### 获取
 
 不能直接打开 FileChannel，必须通过 FileInputStream、FileOutputStream 或者 RandomAccessFile 来获取 FileChannel，它们都有 getChannel 方法
 
-* 通过 FileInputStream 获取的 channel 只能读
-* 通过 FileOutputStream 获取的 channel 只能写
-* 通过 RandomAccessFile 是否能读写根据构造 RandomAccessFile 时的读写模式决定，指定rw
-
-
+- 通过 FileInputStream 获取的 channel 只能读
+- 通过 FileOutputStream 获取的 channel 只能写
+- 通过 RandomAccessFile 是否能读写根据构造 RandomAccessFile 时的读写模式决定，指定 rw
 
 #### 读取
 
@@ -142,8 +137,6 @@ System.out.println(buffer3.toString()); //你好
 ```java
 int readBytes = channel.read(buffer);
 ```
-
-
 
 #### 写入
 
@@ -160,8 +153,6 @@ while(buffer.hasRemaining()) {
 ```
 
 在 while 中调用 channel.write 是因为 write 方法并不能保证一次将 buffer 中的内容全部写入 channel
-
-
 
 #### 关闭
 
@@ -184,22 +175,18 @@ channel.position(newPos);
 
 设置当前位置时，如果设置为文件的末尾
 
-* 这时读取会返回 -1 
-* 这时写入，会追加内容，但要注意如果 position 超过了文件末尾，再写入时在新内容和原末尾之间会有空洞（00）
-
-
+- 这时读取会返回 -1
+- 这时写入，会追加内容，但要注意如果 position 超过了文件末尾，再写入时在新内容和原末尾之间会有空洞（00）
 
 #### 大小
 
 使用 size 方法获取文件的大小
 
-
-
 #### 强制写入 ✨✨
 
-***操作系统出于性能的考虑，会将数据缓存，不是立刻写入磁盘。可以调用 force(true)  方法将文件内容和元数据（文件的权限等信息）立刻写入磁盘***
+**_操作系统出于性能的考虑，会将数据缓存，不是立刻写入磁盘。可以调用 force(true) 方法将文件内容和元数据（文件的权限等信息）立刻写入磁盘_**
 
-#### 两个channel传递数据
+#### 两个 channel 传递数据
 
 ```java
 String FROM = "helloword/data.txt";
@@ -215,9 +202,10 @@ try (FileChannel from = new FileInputStream(FROM).getChannel();
 long end = System.nanoTime();
 System.out.println("transferTo 用时：" + (end - start) / 1000_000.0);
 ```
-### Selector 管理Channel
-![image](https://s2.loli.net/2024/01/26/6jpHGOtM92TJQNS.png)
 
+### Selector 管理 Channel
+
+![image](https://s2.loli.net/2024/01/26/6jpHGOtM92TJQNS.png)
 
 ```java
    //建立Selector
@@ -261,7 +249,7 @@ System.out.println("transferTo 用时：" + (end - start) / 1000_000.0);
                 if(key.isAcceptable()) {
 
                     ServerSocketChannel channel = (ServerSocketChannel) key.channel();
-                    
+
                     SocketChannel sc = channel.accept();
                     //设置非阻塞
                     sc.configureBlocking(false);
