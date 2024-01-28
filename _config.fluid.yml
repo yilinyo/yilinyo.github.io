@@ -286,8 +286,8 @@ web_analytics:  # 网页访问统计
   # LeanCloud 计数统计，可用于 PV UV 展示，如果 `web_analytics: enable` 没有开启，PV UV 展示只会查询不会增加
   # LeanCloud count statistics, which can be used for PV UV display. If `web_analytics: enable` is false, PV UV display will only query and not increase
   leancloud:
-    app_id:
-    app_key:
+    app_id: 0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI
+    app_key: EnJuvqNfHNeI8d1RbBtG9bXP
     # REST API 服务器地址，国际版不填
     # Only the Chinese mainland users need to set
     server_url:
@@ -354,7 +354,7 @@ navbar:
     - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
     - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
     - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
-    #- { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
+    - { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
 
 # 搜索功能，基于 hexo-generator-search 插件，若已安装其他搜索插件请关闭此功能，以避免生成多余的索引文件
 # Search feature, based on hexo-generator-search. If you have installed other search plugins, please disable this feature to avoid generating redundant index files
@@ -431,6 +431,11 @@ footer:
     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a>
     <i class="iconfont icon-love"></i>
     <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a>
+    <div>
+      <span id="timeDate">载入天数...</span>
+      <span id="times">载入时分秒...</span>
+      <script src="/js/duration.js"></script>
+    </div>
   '
 
   # 展示网站的 PV、UV 统计数
@@ -580,11 +585,11 @@ post:
     # 浏览量计数
     # Number of visits
     views:
-      enable: false
+      enable: true
       # 统计数据来源
       # Data Source
       # Options: busuanzi | leancloud
-      source: "busuanzi"
+      source: "leancloud"
 
   # 在文章开头显示文章更新时间，该时间默认是 md 文件更新时间，可通过 front-matter 中 `updated` 手动指定（和 date 一样格式）
   # Update date is displayed at the beginning of the post. The default date is the update date of the md file, which can be manually specified by `updated` in front-matter (same format as date)
@@ -799,8 +804,8 @@ gitalk:
 # 注意：下列配置项中的 true/false 不要用引号括起来
 
 valine:
-  appId: 
-  appKey: 
+  appId: 0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI
+  appKey: EnJuvqNfHNeI8d1RbBtG9bXP
   path: window.location.pathname
   placeholder: Nothing but your words...
   avatar: wavatar
