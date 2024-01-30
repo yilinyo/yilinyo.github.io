@@ -33,8 +33,10 @@ page.comment = theme.links.comments.type
 <% if(theme.links.custom && theme.links.custom.enable && theme.links.custom.content) { %>
   <!-- Custom -->
   <div class="custom mx-auto">
+    <!-- 自定义 -->
     <%- theme.links.custom.content %>
-  </div>
+</div>
+  
 <% } %>
 
 <%- inject_point('linksComments') %>

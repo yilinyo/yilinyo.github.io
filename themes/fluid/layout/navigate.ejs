@@ -1,0 +1,127 @@
+
+<%
+page.layout = "links"
+page.title =  __('navigate.title')
+page.subtitle =  __('navigate.subtitle')
+page.banner_img = theme.links.banner_img
+page.banner_img_height = theme.links.banner_img_height
+page.banner_mask_alpha = theme.links.banner_mask_alpha
+page.comment = theme.links.comments.type
+%>
+
+<div class="custom mx-auto">
+<div class="row links">
+  <% for(const each of theme.links.items || []) { %>
+    <% if (!each.title || !each.link) continue %>
+    <div class="card col-lg-4 col-md-6 col-sm-12">
+      <a href="<%= url_for(each.link) %>" class="card-body hover-with-bg" target="_blank" rel="noopener">
+        <div class="card-content">
+          <% if (each.avatar || each.image) { %>
+            <div class="link-avatar my-auto">
+              <img src="<%= url_for(each.avatar || each.image) %>" alt="<%= each.title %>"
+                   onerror="this.onerror=null; this.src=this.srcset='<%= url_for(theme.links.onerror_avatar) %>'"/>
+            </div>
+          <% } %>
+          <div class="link-text">
+            <div class="link-title"><%- each.title %></div>
+            <div class="link-intro"><%- each.intro || '' %></div>
+          </div>
+        </div>
+      </a>
+    </div>
+  <% } %>
+</div>
+</div>
+<br>
+
+<h>工具🔧:</h>
+<div class="custom mx-auto">
+    <!-- 自定义 -->
+    <div class="row links">
+    
+        <% for(const each of theme.links.tools || []) { %>
+          <% if (!each.title || !each.link) continue %>
+          <div class="card col-lg-4 col-md-6 col-sm-12">
+            <a href="<%= url_for(each.link) %>" class="card-body hover-with-bg" target="_blank" rel="noopener">
+              <div class="card-content">
+                <% if (each.avatar || each.image) { %>
+                  <div class="link-avatar my-auto">
+                    <img src="<%= url_for(each.avatar || each.image) %>" alt="<%= each.title %>"
+                         onerror="this.onerror=null; this.src=this.srcset='<%= url_for(theme.links.onerror_avatar) %>'"/>
+                  </div>
+                <% } %>
+                <div class="link-text">
+                  <div class="link-title"><%- each.title %></div>
+                  <div class="link-intro"><%- each.intro || '' %></div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+
+  <% } %>
+</div>
+<br>
+<h>文档📔:</h>
+<div class="custom mx-auto">
+    <!-- 自定义 -->
+    <div class="row links">
+      
+        <% for(const each of theme.links.docs || []) { %>
+          <% if (!each.title || !each.link) continue %>
+          <div class="card col-lg-4 col-md-6 col-sm-12">
+            <a href="<%= url_for(each.link) %>" class="card-body hover-with-bg" target="_blank" rel="noopener">
+              <div class="card-content">
+                <% if (each.avatar || each.image) { %>
+                  <div class="link-avatar my-auto">
+                    <img src="<%= url_for(each.avatar || each.image) %>" alt="<%= each.title %>"
+                         onerror="this.onerror=null; this.src=this.srcset='<%= url_for(theme.links.onerror_avatar) %>'"/>
+                  </div>
+                <% } %>
+                <div class="link-text">
+                  <div class="link-title"><%- each.title %></div>
+                  <div class="link-intro"><%- each.intro || '' %></div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+
+  <% } %>
+</div>
+</div> 
+<br>
+
+<h>Keep reading...📖:</h>
+<div class="custom mx-auto">
+    <!-- 自定义 -->
+    <div class="row links">
+      
+        <% for(const each of theme.links.readings || []) { %>
+          <% if (!each.title || !each.link) continue %>
+          <div class="card col-lg-4 col-md-6 col-sm-12">
+            <a href="<%= url_for(each.link) %>" class="card-body hover-with-bg" target="_blank" rel="noopener">
+              <div class="card-content">
+                <% if (each.avatar || each.image) { %>
+                  <div class="link-avatar my-auto">
+                    <img src="<%= url_for(each.avatar || each.image) %>" alt="<%= each.title %>"
+                         onerror="this.onerror=null; this.src=this.srcset='<%= url_for(theme.links.onerror_avatar) %>'"/>
+                  </div>
+                <% } %>
+                <div class="link-text">
+                  <div class="link-title"><%- each.title %></div>
+                  <div class="link-intro"><%- each.intro || '' %></div>
+                </div>
+              </div>
+            </a>
+          </div>
+
+
+  <% } %>
+</div>
+</div> 
+
+
+
+<%- inject_point('linksComments') %>
+

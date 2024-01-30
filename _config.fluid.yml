@@ -244,7 +244,7 @@ custom_css:
 # 网页访问统计
 # Analysis of website visitors
 web_analytics:  # 网页访问统计
-  enable: false
+  enable: true
 
   # 遵循访客浏览器"请勿追踪"的设置，如果开启则不统计其访问
   # Follow the "Do Not Track" setting of the visitor's browser
@@ -354,7 +354,8 @@ navbar:
     - { key: "category", link: "/categories/", icon: "iconfont icon-category-fill" }
     - { key: "tag", link: "/tags/", icon: "iconfont icon-tags-fill" }
     - { key: "about", link: "/about/", icon: "iconfont icon-user-fill" }
-    - { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
+    # - { key: "links", link: "/links/", icon: "iconfont icon-link-fill" }
+    - { key: "navigate", link: "/navigate/", icon: "iconfont icon-link-fill" }
 
 # 搜索功能，基于 hexo-generator-search 插件，若已安装其他搜索插件请关闭此功能，以避免生成多余的索引文件
 # Search feature, based on hexo-generator-search. If you have installed other search plugins, please disable this feature to avoid generating redundant index files
@@ -441,12 +442,12 @@ footer:
   # 展示网站的 PV、UV 统计数
   # Display website PV and UV statistics
   statistics:
-    enable: false
+    enable: true
 
     # 统计数据来源，使用 leancloud 需要设置 `web_analytics: leancloud` 中的参数；使用 busuanzi 不需要额外设置，但是有时不稳定，另外本地运行时 busuanzi 显示统计数据很大属于正常现象，部署后会正常
     # Data source. If use leancloud, you need to set the parameter in `web_analytics: leancloud`
     # Options: busuanzi | leancloud
-    source: "busuanzi"
+    source: "leancloud"
 
   # 国内大陆服务器的备案信息
   # For Chinese mainland website policy, other areas keep disable
@@ -1004,13 +1005,39 @@ page404:
 # Links Page
 #---------------------------
 links:
-  enable: true
+  enable: flase
   banner_img: /img/backend.png
   banner_img_height: 60
   banner_mask_alpha: 0.3
   # 友链的成员项
   # Member item of page
   items:
+    - {
+      title: "GitHub",
+      intro: "github 程序员的home",
+      link: "https://github.com/",
+      avatar: "https://s2.loli.net/2024/01/31/mxAyeW3rcnXJDgQ.png"
+    }
+    - {
+      title: "LeetCode",
+      intro: "力扣刷题把~~~",
+      link: "https://hexo.fluid-dev.com/docs/",
+      avatar: "https://s2.loli.net/2024/01/31/r6XGjJpe2NuzYv5.png"
+    }
+    - {
+      title: "Fluid Repo",
+      intro: "主题 GitHub 仓库",
+      link: "https://github.com/fluid-dev/hexo-theme-fluid",
+      avatar: "/img/favicon.png"
+    }
+  #工具
+  tools:
+    - {
+      title: "smms图床",
+      intro: "主题 GitHub 仓库",
+      link: "https://smms.app/",
+      avatar: "https://s2.loli.net/2024/01/29/vfksTDeI4SWNliM.webp"
+    }
     - {
       title: "Fluid Blog",
       intro: "主题博客",
@@ -1024,11 +1051,40 @@ links:
       avatar: "/img/favicon.png"
     }
     - {
-      title: "Fluid Repo",
-      intro: "主题 GitHub 仓库",
-      link: "https://github.com/fluid-dev/hexo-theme-fluid",
+      title: "Fluid Docs",
+      intro: "主题使用指南",
+      link: "https://hexo.fluid-dev.com/docs/",
       avatar: "/img/favicon.png"
     }
+  #文档
+  docs:
+    - {
+      title: "docker 文档",
+      intro: "docker 中文文档",
+      link: "https://www.dockerdocs.cn/index.html",
+      avatar: "https://files.codelife.cc/icons/5ac2f6b9300ccb05a7483b09.png?x-oss-process=image/resize,limit_0,m_fill,w_70,h_70/quality,q_92/format,webp"
+    }
+    - {
+      title: "Java Guide 面试",
+      intro: "八股文面试",
+      link: "https://javaguide.cn/home.html",
+      avatar: "https://javaguide.cn/logo.png"
+    }
+    - {
+      title: "代码随想录",
+      intro: "算法与数据结构面试",
+      link: "https://programmercarl.com/",
+      avatar: "https://code-thinking-1253855093.file.myqcloud.com/pics/20210614201246512.png"
+    }     
+  #阅读
+  readings:
+    - {
+      title: "我的网盘",
+      intro: "Powerd By ZFILE",
+      link: "https:/www.yctor.icu",
+      avatar: "/img/touxiang.png"
+    }
+
 
   # 当成员头像加载失败时，替换为指定图片
   # When the member avatar fails to load, replace the specified image
@@ -1037,8 +1093,9 @@ links:
   # 友链下方自定义区域，支持 HTML，可插入例如申请友链的文字
   # Custom content at the bottom of the links
   custom:
-    enable: false
+    enable: true
     content: '<hr><p>在下方留言申请加入我的友链，按如下格式提供信息：</p><ul><li>博客名：Fluid</li><li>简介：Fluid 主题官方博客</li><li>链接：https://hexo.fluid-dev.com</li><li>图片：https://hexo.fluid-dev.com/img/favicon.png</li></ul>'
+   
 
   # 评论插件
   # Comment plugin

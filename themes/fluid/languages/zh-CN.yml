@@ -29,6 +29,11 @@ about:
   subtitle: "关于"
 
 links:
+  menu: "友链"
+  title: "友链"
+  subtitle: "友链"
+
+navigate:
   menu: "资源仓库"
   title: "资源仓库"
   subtitle: "资源仓库"
