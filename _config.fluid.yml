@@ -1021,7 +1021,7 @@ links:
     - {
       title: "LeetCode",
       intro: "力扣刷题把~~~",
-      link: "https://hexo.fluid-dev.com/docs/",
+      link: "https://leetcode.cn/",
       avatar: "https://s2.loli.net/2024/01/31/r6XGjJpe2NuzYv5.png"
     }
     - {
@@ -1039,21 +1039,21 @@ links:
       avatar: "https://s2.loli.net/2024/01/29/vfksTDeI4SWNliM.webp"
     }
     - {
-      title: "Fluid Blog",
-      intro: "主题博客",
-      link: "https://hexo.fluid-dev.com/",
-      avatar: "/img/favicon.png"
+      title: "AI 镜像",
+      intro: "个人自搭",
+      link: "https://chat-gpt-next-web-4snf.vercel.app/",
+      avatar: "https://s2.loli.net/2024/01/31/oKgEsec4yYGB982.png"
     }
     - {
-      title: "Fluid Docs",
-      intro: "主题使用指南",
-      link: "https://hexo.fluid-dev.com/docs/",
-      avatar: "/img/favicon.png"
+      title: "Chat GPT官方",
+      intro: "是官方哟，记得开魔法",
+      link: "https://chat.openai.com/",
+      avatar: "https://s2.loli.net/2024/01/31/6x84RolIPgWpE2O.png"
     }
     - {
-      title: "Fluid Docs",
-      intro: "主题使用指南",
-      link: "https://hexo.fluid-dev.com/docs/",
+      title: "icons 图标",
+      intro: "收集海量图标",
+      link: "https://igoutu.cn/",
       avatar: "/img/favicon.png"
     }
   #文档
