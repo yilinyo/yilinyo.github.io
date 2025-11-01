@@ -92,7 +92,7 @@ func main() {
 
 在go1.18版本后扩容机制大概如下，[可以参考 Go 语言切片如何扩容？（全面解析原理和过程）](https://developer.aliyun.com/article/1509760)
 
-![.png](https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png?x-oss-process=image%2Fresize%2Cw_1400%2Cm_lfit%2Fformat%2Cwebp)
+![.png](https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png)
 
 所以可见，切片的一次扩容会进行数组的一次全值复制，所以在初始化切片的时候尽可能制定第三个参数估计一个恰当的容量，提前在内存分配合适的空间能够减少扩容时带来的开销。
 
