@@ -1,0 +1,782 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="langchain 1.0 agent 开发实战调取大模型1234567891011121314151617181920212223import osimport dotenvfrom langchain_core.prompts import ChatPromptTemplatefrom langchain_openai import ChatOpenAIdotenv.load_dotenv()">
+<meta property="og:type" content="article">
+<meta property="og:title" content="langchain 1.0 agent 开发实战">
+<meta property="og:url" content="https://yilinyo.github.io/2025/11/24/langchain%201.0%20agent%20%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="langchain 1.0 agent 开发实战调取大模型1234567891011121314151617181920212223import osimport dotenvfrom langchain_core.prompts import ChatPromptTemplatefrom langchain_openai import ChatOpenAIdotenv.load_dotenv()">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-11-24T11:48:00.000Z">
+<meta property="article:modified_time" content="2025-11-24T15:50:01.302Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="LangChain">
+<meta property="article:tag" content="Agent">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>langchain 1.0 agent 开发实战 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="langchain 1.0 agent 开发实战"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2025-11-24 11:48" pubdate>
+          2025年11月24日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.8k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          24 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                langchain 1.0 agent 开发实战
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="langchain-1-0-agent-开发实战"><a href="#langchain-1-0-agent-开发实战" class="headerlink" title="langchain 1.0 agent 开发实战"></a>langchain 1.0 agent 开发实战</h1><h2 id="调取大模型"><a href="#调取大模型" class="headerlink" title="调取大模型"></a>调取大模型</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> os<br><br><span class="hljs-keyword">import</span> dotenv<br><span class="hljs-keyword">from</span> langchain_core.prompts <span class="hljs-keyword">import</span> ChatPromptTemplate<br><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><br>dotenv.load_dotenv() <span class="hljs-comment">#加载当前目录下的 .env 文件</span><br>os.environ[<span class="hljs-string">&#x27;OPENAI_API_KEY&#x27;</span>] = os.getenv(<span class="hljs-string">&quot;OPENAI_API_KEY2&quot;</span>)<br><br>os.environ[<span class="hljs-string">&#x27;OPENAI_BASE_URL&#x27;</span>] = os.getenv(<span class="hljs-string">&quot;OPENAI_BASE_URL2&quot;</span>)<br><span class="hljs-comment"># 创建大模型实例</span><br>llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>) <span class="hljs-comment"># 默认使用 gpt-3.5-turbo</span><br><span class="hljs-comment"># 使用提示词调用</span><br><br>prompt = ChatPromptTemplate.from_messages([<br>(<span class="hljs-string">&quot;system&quot;</span>, <span class="hljs-string">&quot;你是世界级的技术文档编写者&quot;</span>),<br>(<span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;&#123;input&#125;&quot;</span>) <span class="hljs-comment"># &#123;input&#125;为变量</span><br>])<br><span class="hljs-comment"># 我们可以把prompt和具体llm的调用和在一起。</span><br>chain = prompt | llm<br>message = chain.invoke(&#123;<span class="hljs-string">&quot;input&quot;</span>: <span class="hljs-string">&quot;大模型中的LangChain是什么?&quot;</span>&#125;)<br><span class="hljs-built_in">print</span>(message)<br><br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">content=&#39;LangChain 是一个开源框架，旨在帮助开发者构建与大语言模型（LLMs）相关的应用程序。它提供了一系列工具和组件，使得用户能够更容易地集成和使用语言模型，比如 OpenAI 的 GPT 系列、Anthropic 的 Claude 等，从而简化自然语言处理（NLP）应用的开发过程。\n\nLangChain 的核心理念是将语言模型与其他数据源、工具和上下文结合起来，使其能够执行更复杂的任务。其主要组件包括：\n\n1. **链（Chains）**：将多个操作串联在一起，以实现复杂的逻辑。例如，可以将文本生成与数据检索结合起来，先从数据库中检索信息，然后再使用语言模型生成总结。\n\n2. **代理（Agents）**：通过实时决策，使得应用程序能够根据用户的输入动态调整其行为。它可以在多个操作（如API调用、数据库查询等）之间进行选择，以提供最佳响应。\n\n3. **内存（Memory）**：允许应用程序记住用户的上下文和会话历史，以便在后续的交互中提供更个性化和相关的回答。 \n\n4. **数据连接（Data Connectors）**：方便与外部数据源（如文档、数据库、API等）进行交互，使得大型语言模型能够基于最新和相关的数据提供信息。\n\nLangChain 的设计使得开发者能够快速构建从聊天机器人到智能助手等多种基于语言模型的应用，同时也提供了灵活性以满足不同场景的需求。通过组合这些组件，开发者可以创建出具有更高实用性和智能的应用。&#39; additional_kwargs=&#123;&#39;refusal&#39;: None&#125; response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 363, &#39;prompt_tokens&#39;: 29, &#39;total_tokens&#39;: 392, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-mini-2024-07-18&#39;, &#39;system_fingerprint&#39;: &#39;fp_efad92c60b&#39;, &#39;id&#39;: &#39;chatcmpl-CfSzQigYp8TeDSNrUVdfEVFOyj30H&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125; id=&#39;lc_run--bb7594a8-1658-4da8-b14c-6a131d2c1d8a-0&#39; usage_metadata=&#123;&#39;input_tokens&#39;: 29, &#39;output_tokens&#39;: 363, &#39;total_tokens&#39;: 392, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;
+</code></pre>
+<h3 id="静态模型使用"><a href="#静态模型使用" class="headerlink" title="静态模型使用"></a>静态模型使用</h3><p>Static models are configured once when creating the agent and remain unchanged throughout execution. This is the most common and straightforward approach.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><br>agent = create_agent(<br>    <span class="hljs-string">&quot;gpt-5&quot;</span>,<br>    tools=<span class="hljs-literal">None</span><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p>直接使用模型提供商提供的包<br>provider:model</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><br><br>model = ChatOpenAI(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>)<br>agent = create_agent(model)<br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>:<span class="hljs-string">&quot;user&quot;</span>,<br>         <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;what is the weather in Beijing?&quot;</span>,<br>         &#125;<br>    ],<br>&#125;)<br><span class="hljs-built_in">print</span>(result)<br><br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">&#123;&#39;messages&#39;: [HumanMessage(content=&#39;what is the weather in Beijing?&#39;, additional_kwargs=&#123;&#125;, response_metadata=&#123;&#125;, id=&#39;3d1cb7b0-74d6-403d-b262-c1440896984b&#39;), AIMessage(content=&quot;I don&#39;t have real-time data access to provide current weather conditions. To find the latest weather information for Beijing, I recommend checking a reliable weather website or using a weather app.&quot;, additional_kwargs=&#123;&#39;refusal&#39;: None&#125;, response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 36, &#39;prompt_tokens&#39;: 14, &#39;total_tokens&#39;: 50, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-mini-2024-07-18&#39;, &#39;system_fingerprint&#39;: &#39;fp_efad92c60b&#39;, &#39;id&#39;: &#39;chatcmpl-CfSziNl4bwdbUE2fWR3PPxJ0igsdJ&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125;, id=&#39;lc_run--d1053709-33ce-46da-872a-ccc6e8f09ab4-0&#39;, usage_metadata=&#123;&#39;input_tokens&#39;: 14, &#39;output_tokens&#39;: 36, &#39;total_tokens&#39;: 50, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;)]&#125;
+</code></pre>
+<p>一种统一的方式</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.chat_models <span class="hljs-keyword">import</span> init_chat_model<br>gpt_4o = init_chat_model(<span class="hljs-string">&quot;gpt-4o&quot;</span>,temperature=<span class="hljs-number">0.5</span>)<br>res = gpt_4o.invoke(<span class="hljs-string">&quot;hello&quot;</span>)<br><span class="hljs-built_in">print</span>(res)<br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">content=&#39;Hello! How can I assist you today?&#39; additional_kwargs=&#123;&#39;refusal&#39;: None&#125; response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 10, &#39;prompt_tokens&#39;: 8, &#39;total_tokens&#39;: 18, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-2024-11-20&#39;, &#39;system_fingerprint&#39;: &#39;fp_b54fe76834&#39;, &#39;id&#39;: &#39;chatcmpl-CfSXlu8P0yIQ4rLb5b27DsXmt3PyO&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125; id=&#39;lc_run--6121df78-28d2-497d-879f-0c7dfd5bc131-0&#39; usage_metadata=&#123;&#39;input_tokens&#39;: 8, &#39;output_tokens&#39;: 10, &#39;total_tokens&#39;: 18, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;
+</code></pre>
+<h3 id="动态模型使用"><a href="#动态模型使用" class="headerlink" title="动态模型使用"></a>动态模型使用</h3><p>Dynamic models are selected at runtime based on the current state and context. This enables sophisticated routing logic and cost optimization.</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><span class="hljs-keyword">from</span> langchain.agents.middleware <span class="hljs-keyword">import</span> wrap_model_call, ModelRequest, ModelResponse<br><br>basic_model = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-3.5-turbo&quot;</span>)<br>advanced_model = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4o&quot;</span>)<br><br><span class="hljs-meta">@wrap_model_call</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">dynamic_model_selection</span>(<span class="hljs-params">request: ModelRequest, handler</span>) -&gt; ModelResponse:<br>    <span class="hljs-string">&quot;&quot;&quot;Choose model based on conversation complexity.&quot;&quot;&quot;</span><br>    message_count = <span class="hljs-built_in">len</span>(request.state[<span class="hljs-string">&quot;messages&quot;</span>])<br><br>    <span class="hljs-keyword">if</span> message_count &gt; <span class="hljs-number">0</span>:<br>        <span class="hljs-comment"># Use an advanced model for longer conversations</span><br>        model = advanced_model<br>    <span class="hljs-keyword">else</span>:<br>        model = basic_model<br><br>    <span class="hljs-keyword">return</span> handler(request.override(model=model))<br><br>agent = create_agent(<br>    model=basic_model,  <span class="hljs-comment"># Default model</span><br>    tools=<span class="hljs-literal">None</span>,<br>    middleware=[dynamic_model_selection]<br>)<br><br><br>result = agent.invoke( &#123;<span class="hljs-string">&quot;messages&quot;</span>: [<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>:<span class="hljs-string">&quot;user&quot;</span>,<br>         <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;你具体是openai 那个模型 &quot;</span>,<br>         &#125;,<br><br>    ],<br>&#125;)<br><br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>])<br><br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">content=&#39;我是 OpenAI 的 GPT-4 模型。具体版本是基于 GPT-4 架构的一个实例，我的知识截截止到 2023 年 10 月，能帮助你解决问题、提供建议或回答你的问题！如果你有任何需要，欢迎随时问我！&#39; additional_kwargs=&#123;&#39;refusal&#39;: None&#125; response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 64, &#39;prompt_tokens&#39;: 16, &#39;total_tokens&#39;: 80, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-2024-11-20&#39;, &#39;system_fingerprint&#39;: &#39;fp_b54fe76834&#39;, &#39;id&#39;: &#39;chatcmpl-CfT0CmGTUkaVvQgAdN5LmXPHk3pwr&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125; id=&#39;lc_run--bddfac84-3715-44c3-b7bd-b96987355c1e-0&#39; usage_metadata=&#123;&#39;input_tokens&#39;: 16, &#39;output_tokens&#39;: 64, &#39;total_tokens&#39;: 80, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;
+</code></pre>
+<h2 id="创建一个可以调用函数的agent智能体"><a href="#创建一个可以调用函数的agent智能体" class="headerlink" title="创建一个可以调用函数的agent智能体"></a>创建一个可以调用函数的agent智能体</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_weather</span>(<span class="hljs-params">city: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;return the weather for a city&quot;&quot;&quot;</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;getting weather for <span class="hljs-subst">&#123;city&#125;</span>&quot;</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;Sunny ,30 degree&quot;</span><br><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>    tools=[get_weather],<br>    system_prompt=<span class="hljs-string">&quot;You are a helpful research assistant&quot;</span><br>)<br><br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>:<span class="hljs-string">&quot;user&quot;</span>,<br>         <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;what is the weather in Beijing?&quot;</span>,<br>         &#125;<br>    ],<br>&#125;)<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>])<br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">getting weather for Beijing
+content=&#39;The weather in Beijing is sunny with a temperature of 30 degrees Celsius.&#39; additional_kwargs=&#123;&#39;refusal&#39;: None&#125; response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 17, &#39;prompt_tokens&#39;: 85, &#39;total_tokens&#39;: 102, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-mini-2024-07-18&#39;, &#39;system_fingerprint&#39;: &#39;fp_efad92c60b&#39;, &#39;id&#39;: &#39;chatcmpl-CfT0MQq6Qdmqk1lXU12to4jmyyFQB&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125; id=&#39;lc_run--4299b8d5-423f-4da0-b29e-11eb8eeef565-0&#39; usage_metadata=&#123;&#39;input_tokens&#39;: 85, &#39;output_tokens&#39;: 17, &#39;total_tokens&#39;: 102, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;
+</code></pre>
+<h2 id="middleware-中间件的使用"><a href="#middleware-中间件的使用" class="headerlink" title="middleware 中间件的使用"></a>middleware 中间件的使用</h2><p>用于智能体的高度个性化</p>
+<p> HumanInTheLoopMiddleware 函数调用询问</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><span class="hljs-keyword">from</span> langgraph.checkpoint.memory <span class="hljs-keyword">import</span> InMemorySaver<br><span class="hljs-keyword">from</span> langchain.agents.middleware <span class="hljs-keyword">import</span> HumanInTheLoopMiddleware<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_weather</span>(<span class="hljs-params">city: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;return the weather for a city&quot;&quot;&quot;</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;getting weather for <span class="hljs-subst">&#123;city&#125;</span>&quot;</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;Sunny ,30 degree&quot;</span><br><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>    tools=[get_weather],<br>    middleware=[<br>        HumanInTheLoopMiddleware(<br>            interrupt_on=&#123;<br>                <span class="hljs-string">&quot;get_weather&quot;</span>: &#123;<br>                    <span class="hljs-string">&quot;allowed_decisions&quot;</span>:[<span class="hljs-string">&quot;approve&quot;</span>,<span class="hljs-string">&quot;edit&quot;</span>,<span class="hljs-string">&quot;reject&quot;</span>]<br>                &#125;<br>            &#125;<br>        )<br>    ],<br>    checkpointer=InMemorySaver(),<br>    system_prompt=<span class="hljs-string">&quot;You are a helpful research assistant&quot;</span><br>)<br><br>config = &#123;<span class="hljs-string">&quot;configurable&quot;</span> :&#123;<span class="hljs-string">&quot;thread_id&quot;</span>:<span class="hljs-string">&quot;some_other_id&quot;</span>&#125;&#125;<br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>:<span class="hljs-string">&quot;user&quot;</span>,<br>         <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;what is the weather in Beijing?&quot;</span>,<br>         &#125;<br>    ],<br>&#125;,config=config)<br><span class="hljs-comment">#print(result[&quot;__interrupt__&quot;])</span><br><br><span class="hljs-keyword">from</span> langgraph.types <span class="hljs-keyword">import</span> Command<br>result = agent.invoke(<br>    Command(resume=&#123;<span class="hljs-string">&quot;decisions&quot;</span>:[&#123;<span class="hljs-string">&quot;type&quot;</span>:<span class="hljs-string">&quot;approve&quot;</span>&#125;]&#125;),<br>    config=config<br>)<br><br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&#x27;messages&#x27;</span>][-<span class="hljs-number">1</span>])<br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">getting weather for Beijing
+content=&#39;The weather in Beijing is sunny with a temperature of 30 degrees Celsius.&#39; additional_kwargs=&#123;&#39;refusal&#39;: None&#125; response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 17, &#39;prompt_tokens&#39;: 85, &#39;total_tokens&#39;: 102, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-mini-2024-07-18&#39;, &#39;system_fingerprint&#39;: &#39;fp_efad92c60b&#39;, &#39;id&#39;: &#39;chatcmpl-CfSIkuYVg7TxtNZJia90lfZUJVk6p&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125; id=&#39;lc_run--5d32a14d-2be2-418b-827e-2b27e0406a8a-0&#39; usage_metadata=&#123;&#39;input_tokens&#39;: 85, &#39;output_tokens&#39;: 17, &#39;total_tokens&#39;: 102, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;
+</code></pre>
+<p>函数调用 异常处理中间件</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><span class="hljs-keyword">from</span> langchain.agents.middleware <span class="hljs-keyword">import</span> wrap_tool_call<br><span class="hljs-keyword">from</span> langchain.messages <span class="hljs-keyword">import</span> ToolMessage<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">search</span>(<span class="hljs-params">query: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;Search for information.&quot;&quot;&quot;</span><br>    <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;searching for <span class="hljs-subst">&#123;query&#125;</span>&quot;</span>)<br>    a = <span class="hljs-number">10</span><br>    b = <span class="hljs-number">0</span><br>    <span class="hljs-built_in">print</span>(a / b)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;Results for: <span class="hljs-subst">&#123;query&#125;</span>&quot;</span><br><br><span class="hljs-meta">@wrap_tool_call</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">handle_tool_errors</span>(<span class="hljs-params">request, handler</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;Handle tool execution errors with custom messages.&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">try</span>:<br>        <span class="hljs-keyword">return</span> handler(request)<br>    <span class="hljs-keyword">except</span> Exception <span class="hljs-keyword">as</span> e:<br>        <span class="hljs-comment"># Return a custom error message to the model</span><br>        <span class="hljs-keyword">return</span> ToolMessage(<br>            content=<span class="hljs-string">f&quot;Tool error: Please check your input and try again. (<span class="hljs-subst">&#123;<span class="hljs-built_in">str</span>(e)&#125;</span>)&quot;</span>,<br>            tool_call_id=request.tool_call[<span class="hljs-string">&quot;id&quot;</span>]<br>        )<br><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o&quot;</span>,<br>    tools=[search, get_weather],<br>    middleware=[handle_tool_errors]<br>)<br><br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [<br>        &#123;<span class="hljs-string">&quot;role&quot;</span>:<span class="hljs-string">&quot;user&quot;</span>,<br>         <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;调用search 函数搜索langchain&quot;</span>,<br>         &#125;<br>    ],<br>&#125;)<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>])<br></code></pre></td></tr></table></figure>
+
+<pre><code class="hljs">searching for langchain
+searching for langchain
+[HumanMessage(content=&#39;调用search 函数搜索langchain&#39;, additional_kwargs=&#123;&#125;, response_metadata=&#123;&#125;, id=&#39;322da991-4e81-4528-8271-cd80820e5efa&#39;), AIMessage(content=&#39;&#39;, additional_kwargs=&#123;&#39;refusal&#39;: None&#125;, response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 15, &#39;prompt_tokens&#39;: 69, &#39;total_tokens&#39;: 84, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-2024-11-20&#39;, &#39;system_fingerprint&#39;: &#39;fp_b54fe76834&#39;, &#39;id&#39;: &#39;chatcmpl-CfSt6ihYG2dQiIeR506Pe7t7WHQaM&#39;, &#39;finish_reason&#39;: &#39;tool_calls&#39;, &#39;logprobs&#39;: None&#125;, id=&#39;lc_run--08d81b55-c001-46a3-b0f9-225963f15d6a-0&#39;, tool_calls=[&#123;&#39;name&#39;: &#39;search&#39;, &#39;args&#39;: &#123;&#39;query&#39;: &#39;langchain&#39;&#125;, &#39;id&#39;: &#39;call_VLZKXRNtupHGy98ekl9hFeeF&#39;, &#39;type&#39;: &#39;tool_call&#39;&#125;], usage_metadata=&#123;&#39;input_tokens&#39;: 69, &#39;output_tokens&#39;: 15, &#39;total_tokens&#39;: 84, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;), ToolMessage(content=&#39;Tool error: Please check your input and try again. (division by zero)&#39;, id=&#39;d8c52ac4-0a4e-4951-bab1-d8c043704eb4&#39;, tool_call_id=&#39;call_VLZKXRNtupHGy98ekl9hFeeF&#39;), AIMessage(content=&#39;It seems there was an issue when trying to search for &quot;langchain.&quot; Let me try again.&#39;, additional_kwargs=&#123;&#39;refusal&#39;: None&#125;, response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 37, &#39;prompt_tokens&#39;: 106, &#39;total_tokens&#39;: 143, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-2024-11-20&#39;, &#39;system_fingerprint&#39;: &#39;fp_b54fe76834&#39;, &#39;id&#39;: &#39;chatcmpl-CfSt7mSmbAH41fjknxZhOMfDnCKRR&#39;, &#39;finish_reason&#39;: &#39;tool_calls&#39;, &#39;logprobs&#39;: None&#125;, id=&#39;lc_run--cc9586f4-dd26-41b7-ae90-327cbe206409-0&#39;, tool_calls=[&#123;&#39;name&#39;: &#39;search&#39;, &#39;args&#39;: &#123;&#39;query&#39;: &#39;langchain&#39;&#125;, &#39;id&#39;: &#39;call_aoYrhP3MVrt0AHRUVtYr6bG7&#39;, &#39;type&#39;: &#39;tool_call&#39;&#125;], usage_metadata=&#123;&#39;input_tokens&#39;: 106, &#39;output_tokens&#39;: 37, &#39;total_tokens&#39;: 143, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;), ToolMessage(content=&#39;Tool error: Please check your input and try again. (division by zero)&#39;, id=&#39;0797ce72-23f6-4825-9bbc-3efa4cbf4f41&#39;, tool_call_id=&#39;call_aoYrhP3MVrt0AHRUVtYr6bG7&#39;), AIMessage(content=&#39;There seems to be a persistent issue with the search function when trying to look up &quot;langchain&quot;. Would you like me to help with anything else or try an alternative query?&#39;, additional_kwargs=&#123;&#39;refusal&#39;: None&#125;, response_metadata=&#123;&#39;token_usage&#39;: &#123;&#39;completion_tokens&#39;: 37, &#39;prompt_tokens&#39;: 167, &#39;total_tokens&#39;: 204, &#39;completion_tokens_details&#39;: &#123;&#39;accepted_prediction_tokens&#39;: 0, &#39;audio_tokens&#39;: 0, &#39;reasoning_tokens&#39;: 0, &#39;rejected_prediction_tokens&#39;: 0&#125;, &#39;prompt_tokens_details&#39;: &#123;&#39;audio_tokens&#39;: 0, &#39;cached_tokens&#39;: 0&#125;&#125;, &#39;model_provider&#39;: &#39;openai&#39;, &#39;model_name&#39;: &#39;gpt-4o-2024-11-20&#39;, &#39;system_fingerprint&#39;: &#39;fp_b54fe76834&#39;, &#39;id&#39;: &#39;chatcmpl-CfSt96oY70Bv6BLKjvQ97MeqTnKIm&#39;, &#39;finish_reason&#39;: &#39;stop&#39;, &#39;logprobs&#39;: None&#125;, id=&#39;lc_run--c6a8fcf9-b8a3-4f40-b6cd-8575f08dfdd0-0&#39;, usage_metadata=&#123;&#39;input_tokens&#39;: 167, &#39;output_tokens&#39;: 37, &#39;total_tokens&#39;: 204, &#39;input_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;cache_read&#39;: 0&#125;, &#39;output_token_details&#39;: &#123;&#39;audio&#39;: 0, &#39;reasoning&#39;: 0&#125;&#125;)]
+</code></pre>
+
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/langchain 1.0 agent 开发实战.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/LangChain/" class="print-no-link">#LangChain</a>
+      
+        <a href="/tags/Agent/" class="print-no-link">#Agent</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>langchain 1.0 agent 开发实战</div>
+      <div>https://yilinyo.github.io/2025/11/24/langchain 1.0 agent 开发实战/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2025年11月24日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2025/11/05/Makefile%20%E4%BB%A5%E5%8F%8A%20Dockfile%20%E8%AF%A6%E8%A7%A3%E5%8F%8A%E7%94%A8%E6%B3%95/" title="Makefile 以及 Dockfile 详解及用法.">
+                                                                                                    <span class="hidden-mobile">Makefile 以及 Dockfile 详解及用法.</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
