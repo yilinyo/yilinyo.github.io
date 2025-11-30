@@ -24,27 +24,22 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+    <meta name="description" content="为什么需要提示词工程？好的提示词能够让AI回复更加准确，跟满足提问者的需求， 要实现这一点，提示词工程应运而生。作为连接人类意图与大模型能力之间的关键桥梁，它不仅关注“说什么”，更强调“如何说”。随着模型能力不断增强，提示词的设计逐渐从简单的指令扩展为一种系统化的方法论——其中包括对任务背景的描述、角色设定、输入输出格式的规范化、约束条件的给定，以及对模型行为的逐步引导。一个精心构建的提示词能够显">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go 语言的 slice 详解">
-<meta property="og:url" content="https://yilinyo.github.io/2025/11/01/Go%20%E8%AF%AD%E8%A8%80%E7%9A%84%20slice%20%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:title" content="提示词工程">
+<meta property="og:url" content="https://yilinyo.github.io/2025/11/30/%E6%8F%90%E7%A4%BA%E8%AF%8D%E5%B7%A5%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+<meta property="og:description" content="为什么需要提示词工程？好的提示词能够让AI回复更加准确，跟满足提问者的需求， 要实现这一点，提示词工程应运而生。作为连接人类意图与大模型能力之间的关键桥梁，它不仅关注“说什么”，更强调“如何说”。随着模型能力不断增强，提示词的设计逐渐从简单的指令扩展为一种系统化的方法论——其中包括对任务背景的描述、角色设定、输入输出格式的规范化、约束条件的给定，以及对模型行为的逐步引导。一个精心构建的提示词能够显">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png">
-<meta property="og:image" content="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png">
-<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png">
-<meta property="article:published_time" content="2025-11-01T01:34:00.000Z">
-<meta property="article:modified_time" content="2025-11-30T13:14:53.116Z">
+<meta property="article:published_time" content="2025-11-30T21:11:00.000Z">
+<meta property="article:modified_time" content="2025-11-30T13:14:53.117Z">
 <meta property="article:author" content="yilin">
-<meta property="article:tag" content="Go语言进阶">
+<meta property="article:tag" content="ai">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
   
   
   
-  <title>Go 语言的 slice 详解 - Yilin派哟yoo🥧</title>
+  <title>提示词工程 - Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -237,7 +232,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Go 语言的 slice 详解"></span>
+            <span id="subtitle" data-typed-text="提示词工程"></span>
           
         </div>
 
@@ -248,8 +243,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-11-01 01:34" pubdate>
-          2025年11月1日 凌晨
+        <time datetime="2025-11-30 21:11" pubdate>
+          2025年11月30日 晚上
         </time>
       </span>
     
@@ -260,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          784 字
         
       </span>
     
@@ -271,7 +266,7 @@
         
         
         
-          12 分钟
+          7 分钟
         
       </span>
     
@@ -324,49 +319,66 @@
                         <article class="post-content mx-auto">
                             <!-- SEO header -->
                             <h1 style="display: none">
-                                Go 语言的 slice 详解
+                                提示词工程
                             </h1>
                             
                                     
                                                             <div class="markdown-body">
                                                                 
-                                                                    <h1 id="Go-语言的-slice-详解"><a href="#Go-语言的-slice-详解" class="headerlink" title="Go 语言的 slice 详解"></a>Go 语言的 slice 详解</h1><h2 id="go语言切片底层结构"><a href="#go语言切片底层结构" class="headerlink" title="go语言切片底层结构"></a>go语言切片底层结构</h2><p>slice 是 go 语言的可变数组，维护了 一个 结构体 如下</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> slice <span class="hljs-keyword">struct</span> &#123;<br>   array unsafe.Pointer<br>   <span class="hljs-built_in">len</span>   <span class="hljs-type">int</span><br>   <span class="hljs-built_in">cap</span>   <span class="hljs-type">int</span><br>&#125;<br></code></pre></td></tr></table></figure>
-
-<p>slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际长度，cap标识底层数组的最大长度，若len&lt;cap，则数组中属于切片的只有 len长度，如下图示意图，slice1只有[0,1] 两个元素,后面的2，3，4非切片的元素</p>
-<p><img src="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<h2 id="切片的复制与截取"><a href="#切片的复制与截取" class="headerlink" title="切片的复制与截取"></a>切片的复制与截取</h2><p>将切片进行复制（赋值一个新变量），其实就是创建一个新的slice结构体，其中array指针指向被复制的结构体指向的底层数组</p>
-<p><img src="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>显然，当底层数组指向相同那么修改slice2的某个元素，同样也会影响到slice1，如下列代码所示</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>	arr2 := arr1<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Println(arr1, arr2)<br>	&#125;<br>    <span class="hljs-comment">// [-1,1] [-1,1]</span><br></code></pre></td></tr></table></figure>
-
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)<br>	arr2 := arr1[<span class="hljs-number">1</span>:<span class="hljs-number">3</span>]<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p, len1=%d, cap1 = %d\n&quot;</span>, arr1, arr1, <span class="hljs-built_in">len</span>(arr1), <span class="hljs-built_in">cap</span>(arr1))<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p, len1=%d, cap2 = %d\n&quot;</span>, arr2, arr2, <span class="hljs-built_in">len</span>(arr2), <span class="hljs-built_in">cap</span>(arr2))<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, arr2)<br>&#125;<br>	<span class="hljs-comment">//arr1=[0 1 2 3 4], addr1=0x1400001e180, len1=5, cap1 = 5</span><br>	<span class="hljs-comment">//arr2=[1 2], addr2=0x1400001e188, len1=2, cap2 = 4     容量是原容量减去被截取的元素数量</span><br>	<span class="hljs-comment">//arr1=[0 -1 2 3 4], addr1=0x1400001e180</span><br>	<span class="hljs-comment">//arr2=[-1 2], addr2=0x1400001e188</span><br></code></pre></td></tr></table></figure>
-
-<p>同样的当进行切片截取，底层的数组是不会变的，新的slice结构体的array指针会指向被截取的数组的开始位置的地址</p>
-<h2 id="追加元素到切片当中"><a href="#追加元素到切片当中" class="headerlink" title="追加元素到切片当中"></a>追加元素到切片当中</h2><p>向切片中追加元素，使用append(slice,i),Go 会检查底层数组是否有足够的容量来容纳新的元素。如果有足够的容量，新元素会被添加到底层数组的末尾，切片的长度会增加。如果没有足够的容量，就需要进行扩容。</p>
-<p>如果容量满足：</p>
-<p>则不会进行扩容，那么append操作会直接修改slice 的len，以及在<strong>指向底层数组后直接追加元素</strong></p>
-<p>如果容量不满足：</p>
-<p>则会进行扩容，首先会在<strong>底层创建一个新的数组（数组大小由此次追加元素和现有容量决定），将原底层数组的值全部拷贝到新的数组里</strong>，然后再修改slice结构体里的array指向新的数组以及len以及cap容量。</p>
-<p><img src="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png" srcset="/img/loading.gif" lazyload alt="append.png"></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>)<br>	<span class="hljs-comment">//打印arr1 底层数组的地址，如果填&amp;arr1 打印的是 结构体的地址</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>&#125;<br><span class="hljs-comment">//arr1=[0], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1 2], addr1=0x14000016040</span><br></code></pre></td></tr></table></figure>
-
-<p>在go1.18版本后扩容机制大概如下，<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1509760">可以参考 Go 语言切片如何扩容？（全面解析原理和过程）</a></p>
-<p><img src="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>所以可见，切片的一次扩容会进行数组的一次全值复制，所以在初始化切片的时候尽可能制定第三个参数估计一个恰当的容量，提前在内存分配合适的空间能够减少扩容时带来的开销。</p>
-<p>下面我可以看一个例子看我们是否真的理解了。以下代码会打印的是一样的吗？</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>   arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>   arr2 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>   arr3 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, &amp;arr1)<br>   fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, &amp;arr2)<br>   fmt.Printf(<span class="hljs-string">&quot;arr3=%v, addr3=%p\n&quot;</span>, arr3, &amp;arr3)<br>   arr0 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>   arr0 = <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">1</span>)<br>   arr4 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">2</span>)<br>   arr5 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr0=%v, addr0=%p\n&quot;</span>, arr0, &amp;arr0)<br>   fmt.Printf(<span class="hljs-string">&quot;arr4=%v, addr4=%p\n&quot;</span>, arr4, &amp;arr4)<br>   fmt.Printf(<span class="hljs-string">&quot;arr5=%v, addr5=%p\n&quot;</span>, arr5, &amp;arr5)<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment">arr1=[1], addr1=0x140000ba000</span><br><span class="hljs-comment">arr2=[1 3], addr2=0x140000ba018</span><br><span class="hljs-comment">arr3=[1 3], addr3=0x140000ba030</span><br><span class="hljs-comment">arr0=[1], addr0=0x140000ba090</span><br><span class="hljs-comment">arr4=[1 2], addr4=0x140000ba0a8</span><br><span class="hljs-comment">arr5=[1 3], addr5=0x140000ba0c0</span><br><span class="hljs-comment">**/</span><br></code></pre></td></tr></table></figure>
-<p>arr2 和 arr3 为什么都是[1,3];因为在进行对arr1追加元素2其实只是在原来的底层数组里面增加元素，因为初始的容量是4，append一个元素满足最大容量，所以实际上arr1、arr2、arr3结构体的数组指针指向的地址是同一个，但由于arr1的len是1，所以后续相对arr1进行append，其实都是加载底层数组array[1]上，则最后的arr3 会覆盖掉arr2 的append；但是第二种场景由于一开始的容量是1，进行append后容量是不够的需要扩容，扩容底层数组会构造新的所以arr0，arr4，arr5其实结构体指针指向的是不同数组，所以也不会发生覆盖</p>
-<h2 id="切片在底层数组基础上的完全复制"><a href="#切片在底层数组基础上的完全复制" class="headerlink" title="切片在底层数组基础上的完全复制"></a>切片在底层数组基础上的完全复制</h2><p>基于相同底层数组的复制有时候会不小心修改错数据，其实go 也提供了一个copy函数支持将切片复制是在内存空间直接复制一个一模一样的数组，来隔离切片复制后的数组共享。如果复制时长度溢出则会截断</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>   arr := []<span class="hljs-type">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>&#125;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">3</span>)<br>   cnt := <span class="hljs-built_in">copy</span>(arr1, arr)<br>   fmt.Printf(<span class="hljs-string">&quot;cnt=%d\n&quot;</span>, cnt)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v\n&quot;</span>, arr1)<br>&#125;<br><span class="hljs-comment">//cnt=3</span><br><span class="hljs-comment">//arr1=[1 2 3]</span><br></code></pre></td></tr></table></figure>
-
+                                                                    <h2 id="为什么需要提示词工程？"><a href="#为什么需要提示词工程？" class="headerlink" title="为什么需要提示词工程？"></a>为什么需要提示词工程？</h2><p>好的提示词能够让AI回复更加准确，跟满足提问者的需求，</p>
+<p>要实现这一点，提示词工程应运而生。作为连接人类意图与大模型能力之间的关键桥梁，它不仅关注“说什么”，更强调“如何说”。随着模型能力不断增强，提示词的设计逐渐从简单的指令扩展为一种系统化的方法论——其中包括对任务背景的描述、角色设定、输入输出格式的规范化、约束条件的给定，以及对模型行为的逐步引导。一个精心构建的提示词能够显著提高模型的生成质量，减少偏差与歧义，并提升模型在复杂场景下的可控性和可解释性。因此，提示词工程已成为运用大模型能力的基础技能，也是人机协作时代不可或缺的技术之一。</p>
+<h2 id="写prompt的原则"><a href="#写prompt的原则" class="headerlink" title="写prompt的原则"></a>写prompt的原则</h2><p>1.表述尽可能清晰，指令完整</p>
+<p>2.给大模型足够的时间思考输出</p>
+<p>基于以上的原则再编写简单的prompt 可以采用以下几个优化方法</p>
+<p><a target="_blank" rel="noopener" href="https://ai.feishu.cn/wiki/Zrf6wn3ZQiJs8Dk7af2cqBXNnah?from=from_copylink">https://ai.feishu.cn/wiki/Zrf6wn3ZQiJs8Dk7af2cqBXNnah?from=from_copylink</a></p>
+<p>1.采用角色扮演的方式进行提问</p>
+<p>如： 你是xxxx角色，请帮我生成xxxx</p>
+<p>2.描述任务更加详细、清晰</p>
+<p>如：帮我生成一个今天下午的请假条，具体的事项是看病，生成内容要书面化，包含具体事项和请假时间</p>
+<p>3. 以思维链的方式引导llm 思考并回答</p>
+<p>如：假设树上有5只鸟，开枪打死了一只h，还剩多少只？请一步一步思考回答</p>
+<p>4. 使用分隔符号 分隔提示词的 目标句子</p>
+<p>如：翻译下面问题为英文： ‘’’ 现在开始将后面的字翻译为日文：提示词工程’’’</p>
+<p>5. 为输出结果举例子</p>
+<p>如：请给出10个城市的特色美食，结果以json格式输出。下面给出一个输出例子{“北京”:”北京烤鸭”}</p>
+<h2 id="结构化提示词"><a href="#结构化提示词" class="headerlink" title="结构化提示词"></a>结构化提示词</h2><p>以上的prompt 仅仅是对单一提示词的优化或者任务的详细补充，如果遇到复杂的写作要求可能并不能完全胜任，于是乎我们可以采取结构化的prompt 来进行描述，如<a target="_blank" rel="noopener" href="https://langgptai.feishu.cn/wiki/RXdbwRyASiShtDky381ciwFEnpe">langgpt社区</a>提到的结构中的信息, 可以根据自己需要进行增减, 从中总结的常用模块包括:</p>
+<ul>
+<li>  <code># Role: :</code></li>
+</ul>
+<p><code> 指定角色会让 GPT 聚焦在对应领域进行信息输出</code></p>
+<ul>
+<li>  <code>## Profile author/version/description :</code></li>
+</ul>
+<p><code> Credit 和 迭代版本记录</code></p>
+<ul>
+<li>  <code>## Goals:</code></li>
+</ul>
+<p><code> 一句话描述 Prompt 目标, 让 GPT Attention 聚焦起来a</code></p>
+<ul>
+<li>  <code>## Constrains:</code></li>
+</ul>
+<p><code> 描述限制条件, 其实是在帮 GPT 进行剪枝, 减少不必要分支的计算</code></p>
+<ul>
+<li>  <code>## Skills:</code></li>
+</ul>
+<p><code> 描述技能项, 强化对应领域的信息权重</code></p>
+<ul>
+<li>  <code>## Workflow:</code></li>
+</ul>
+<p><code> 重点中的重点, 你希望 Prompt 按什么方式来对话和输出</code></p>
+<ul>
+<li>  <code># Initialization:</code></li>
+</ul>
+<p><code> 冷启动时的对白, 也是一个强调需注意重点的机会</code></p>
+<p>参考：</p>
+<p><a target="_blank" rel="noopener" href="https://www.lijigang.com/posts/chatgpt-prompt-structure/">https://www.lijigang.com/posts/chatgpt-prompt-structure/</a></p>
 
                                                                         
                                                             </div>
                                                             
                                                                 <hr/>
                                                                 <div style="text-align: center ">
-                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/Go 语言的 slice 详解.md" target="_blank">编辑文章✏</a>
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/提示词工程.md" target="_blank">编辑文章✏</a>
                                                                 </div>
                                                                 <div>
                                                                     <div class="post-metas my-3">
@@ -375,7 +387,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6/" class="print-no-link">#Go语言进阶</a>
+        <a href="/tags/ai/" class="print-no-link">#ai</a>
       
     </div>
   
@@ -387,8 +399,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Go 语言的 slice 详解</div>
-      <div>https://yilinyo.github.io/2025/11/01/Go 语言的 slice 详解/</div>
+      <div>提示词工程</div>
+      <div>https://yilinyo.github.io/2025/11/30/提示词工程/</div>
     </div>
     <div class="license-meta">
       
@@ -400,7 +412,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年11月1日</div>
+          <div>2025年11月30日</div>
         </div>
       
       
@@ -432,19 +444,13 @@
                                                                                     <article class="post-prev col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2025/11/05/Makefile%20%E4%BB%A5%E5%8F%8A%20Dockfile%20%E8%AF%A6%E8%A7%A3%E5%8F%8A%E7%94%A8%E6%B3%95/" title="Makefile 以及 Dockfile 详解及用法.">
-                                                                                                    <i class="iconfont icon-arrowleft"></i>
-                                                                                                    <span class="hidden-mobile">Makefile 以及 Dockfile 详解及用法.</span>
-                                                                                                    <span class="visible-mobile">上一篇</span>
-                                                                                                </a>
-                                                                                                
                                                                                     </article>
 
                                                                                     <article class="post-next col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2024/01/29/Docker%20%E8%BF%9B%E9%98%B6/" title="Docker 进阶">
-                                                                                                    <span class="hidden-mobile">Docker 进阶</span>
+                                                                                                <a href="/2025/11/24/langchain%201.0%20agent%20%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98/" title="langchain 1.0 agent 开发实战">
+                                                                                                    <span class="hidden-mobile">langchain 1.0 agent 开发实战</span>
                                                                                                     <span class="visible-mobile">下一篇</span>
                                                                                                     <i class="iconfont icon-arrowright"></i>
                                                                                                 </a>
