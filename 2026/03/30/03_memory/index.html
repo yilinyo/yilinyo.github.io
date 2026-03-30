@@ -24,27 +24,22 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+    <meta name="description" content="🧠 Memory 记忆模块 —— 让 AI 记住过去的对话 所在目录：memory&#x2F;short_memory.ipynb核心依赖：langgraph.checkpoint、langgraph.store、langchain.agents   前言一个没有记忆的 AI 助手，每次对话都像是第一次见面。它不知道你叫什么名字，不知道你上次讲过什么，更别说积累对你的了解。 LangChain&#x2F;LangG">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go 语言的 slice 详解">
-<meta property="og:url" content="https://yilinyo.github.io/2025/11/01/Go%20%E8%AF%AD%E8%A8%80%E7%9A%84%20slice%20%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:title" content="langchain models 实战 Memory 记忆模块">
+<meta property="og:url" content="https://yilinyo.github.io/2026/03/30/03_memory/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+<meta property="og:description" content="🧠 Memory 记忆模块 —— 让 AI 记住过去的对话 所在目录：memory&#x2F;short_memory.ipynb核心依赖：langgraph.checkpoint、langgraph.store、langchain.agents   前言一个没有记忆的 AI 助手，每次对话都像是第一次见面。它不知道你叫什么名字，不知道你上次讲过什么，更别说积累对你的了解。 LangChain&#x2F;LangG">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png">
-<meta property="og:image" content="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png">
-<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png">
-<meta property="article:published_time" content="2025-11-01T01:34:00.000Z">
+<meta property="article:published_time" content="2026-03-30T22:12:00.000Z">
 <meta property="article:modified_time" content="2026-03-30T14:15:13.550Z">
 <meta property="article:author" content="yilin">
-<meta property="article:tag" content="Go语言进阶">
+<meta property="article:tag" content="langchain">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
   
   
   
-  <title>Go 语言的 slice 详解 - Yilin派哟yoo🥧</title>
+  <title>langchain models 实战 Memory 记忆模块 - Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -237,7 +232,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Go 语言的 slice 详解"></span>
+            <span id="subtitle" data-typed-text="langchain models 实战 Memory 记忆模块"></span>
           
         </div>
 
@@ -248,8 +243,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-11-01 01:34" pubdate>
-          2025年11月1日 凌晨
+        <time datetime="2026-03-30 22:12" pubdate>
+          2026年3月30日 晚上
         </time>
       </span>
     
@@ -260,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          1k 字
         
       </span>
     
@@ -271,7 +266,7 @@
         
         
         
-          12 分钟
+          9 分钟
         
       </span>
     
@@ -324,49 +319,113 @@
                         <article class="post-content mx-auto">
                             <!-- SEO header -->
                             <h1 style="display: none">
-                                Go 语言的 slice 详解
+                                langchain models 实战 Memory 记忆模块
                             </h1>
                             
                                     
                                                             <div class="markdown-body">
                                                                 
-                                                                    <h1 id="Go-语言的-slice-详解"><a href="#Go-语言的-slice-详解" class="headerlink" title="Go 语言的 slice 详解"></a>Go 语言的 slice 详解</h1><h2 id="go语言切片底层结构"><a href="#go语言切片底层结构" class="headerlink" title="go语言切片底层结构"></a>go语言切片底层结构</h2><p>slice 是 go 语言的可变数组，维护了 一个 结构体 如下</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> slice <span class="hljs-keyword">struct</span> &#123;<br>   array unsafe.Pointer<br>   <span class="hljs-built_in">len</span>   <span class="hljs-type">int</span><br>   <span class="hljs-built_in">cap</span>   <span class="hljs-type">int</span><br>&#125;<br></code></pre></td></tr></table></figure>
+                                                                    <h1 id="🧠-Memory-记忆模块-——-让-AI-记住过去的对话"><a href="#🧠-Memory-记忆模块-——-让-AI-记住过去的对话" class="headerlink" title="🧠 Memory 记忆模块 —— 让 AI 记住过去的对话"></a>🧠 Memory 记忆模块 —— 让 AI 记住过去的对话</h1><blockquote>
+<p><strong>所在目录</strong>：<code>memory/short_memory.ipynb</code><br><strong>核心依赖</strong>：<code>langgraph.checkpoint</code>、<code>langgraph.store</code>、<code>langchain.agents</code></p>
+</blockquote>
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>一个没有记忆的 AI 助手，每次对话都像是第一次见面。它不知道你叫什么名字，不知道你上次讲过什么，更别说积累对你的了解。</p>
+<p>LangChain/LangGraph 的 <strong>Memory（记忆）系统</strong> 解决了这个问题，并且区分了两个维度：</p>
+<ul>
+<li><strong>短期记忆（Short-term Memory）</strong>：单次对话或跨对话的消息历史，通过 <strong>Checkpointer（检查点）</strong> 实现</li>
+<li><strong>长期记忆（Long-term Memory）</strong>：跨会话持久化的用户偏好、知识库，通过 <strong>Store（存储）</strong> 实现</li>
+</ul>
+<hr>
+<h2 id="短期记忆：Checkpointer"><a href="#短期记忆：Checkpointer" class="headerlink" title="短期记忆：Checkpointer"></a>短期记忆：Checkpointer</h2><h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>Checkpointer 的本质是<strong>状态快照</strong>。每次 Agent 运行时，LangGraph 都会把当前的完整状态（包括所有消息）保存到 Checkpointer 中。下次使用相同的 <code>thread_id</code> 调用时，自动从上次的状态恢复。</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs css">第一次调用 ──► <span class="hljs-selector-attr">[保存状态到 Checkpointer]</span><br>                      │<br>                      ▼<br>第二次调用 ──► <span class="hljs-selector-attr">[从 Checkpointer 恢复状态]</span> ──► 继续对话<br></code></pre></td></tr></table></figure>
 
-<p>slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际长度，cap标识底层数组的最大长度，若len&lt;cap，则数组中属于切片的只有 len长度，如下图示意图，slice1只有[0,1] 两个元素,后面的2，3，4非切片的元素</p>
-<p><img src="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<h2 id="切片的复制与截取"><a href="#切片的复制与截取" class="headerlink" title="切片的复制与截取"></a>切片的复制与截取</h2><p>将切片进行复制（赋值一个新变量），其实就是创建一个新的slice结构体，其中array指针指向被复制的结构体指向的底层数组</p>
-<p><img src="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>显然，当底层数组指向相同那么修改slice2的某个元素，同样也会影响到slice1，如下列代码所示</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>	arr2 := arr1<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Println(arr1, arr2)<br>	&#125;<br>    <span class="hljs-comment">// [-1,1] [-1,1]</span><br></code></pre></td></tr></table></figure>
+<h3 id="InMemorySaver-——-内存存储（开发调试用）"><a href="#InMemorySaver-——-内存存储（开发调试用）" class="headerlink" title="InMemorySaver —— 内存存储（开发调试用）"></a>InMemorySaver —— 内存存储（开发调试用）</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langgraph.checkpoint.memory <span class="hljs-keyword">import</span> InMemorySaver<br><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><br><span class="hljs-comment"># 创建内存检查点</span><br>checkpointer = InMemorySaver()<br><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>    checkpointer=checkpointer  <span class="hljs-comment"># 注入记忆</span><br>)<br><br><span class="hljs-comment"># 第一轮对话：告诉 AI 我的名字</span><br>config = &#123;<span class="hljs-string">&quot;configurable&quot;</span>: &#123;<span class="hljs-string">&quot;thread_id&quot;</span>: <span class="hljs-string">&quot;session_001&quot;</span>&#125;&#125;<br>agent.invoke(<br>    &#123;<span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;我叫小明&quot;</span>&#125;]&#125;,<br>    config=config<br>)<br><br><span class="hljs-comment"># 第二轮对话：AI 还记得</span><br>result = agent.invoke(<br>    &#123;<span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;我叫什么名字？&quot;</span>&#125;]&#125;,<br>    config=config  <span class="hljs-comment"># 相同的 thread_id！</span><br>)<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>].content)  <span class="hljs-comment"># → &quot;你叫小明&quot;</span><br></code></pre></td></tr></table></figure>
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)<br>	arr2 := arr1[<span class="hljs-number">1</span>:<span class="hljs-number">3</span>]<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p, len1=%d, cap1 = %d\n&quot;</span>, arr1, arr1, <span class="hljs-built_in">len</span>(arr1), <span class="hljs-built_in">cap</span>(arr1))<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p, len1=%d, cap2 = %d\n&quot;</span>, arr2, arr2, <span class="hljs-built_in">len</span>(arr2), <span class="hljs-built_in">cap</span>(arr2))<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, arr2)<br>&#125;<br>	<span class="hljs-comment">//arr1=[0 1 2 3 4], addr1=0x1400001e180, len1=5, cap1 = 5</span><br>	<span class="hljs-comment">//arr2=[1 2], addr2=0x1400001e188, len1=2, cap2 = 4     容量是原容量减去被截取的元素数量</span><br>	<span class="hljs-comment">//arr1=[0 -1 2 3 4], addr1=0x1400001e180</span><br>	<span class="hljs-comment">//arr2=[-1 2], addr2=0x1400001e188</span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>💡 <strong>关键</strong>：相同的 <code>thread_id</code> = 同一个会话。不同的 <code>thread_id</code> = 全新对话，互不干扰。</p>
+</blockquote>
+<hr>
+<h3 id="PostgresSaver-——-数据库持久化（生产环境用）"><a href="#PostgresSaver-——-数据库持久化（生产环境用）" class="headerlink" title="PostgresSaver —— 数据库持久化（生产环境用）"></a>PostgresSaver —— 数据库持久化（生产环境用）</h3><p><code>InMemorySaver</code> 在进程重启后数据丢失，生产环境需要用数据库持久化：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langgraph.checkpoint.postgres <span class="hljs-keyword">import</span> PostgresSaver<br><br>DB_URI = <span class="hljs-string">&quot;postgresql://user:password@localhost:5432/mydb?sslmode=disable&quot;</span><br><br><span class="hljs-keyword">with</span> PostgresSaver.from_conn_string(DB_URI) <span class="hljs-keyword">as</span> checkpointer:<br>    checkpointer.setup()  <span class="hljs-comment"># 自动创建所需数据表</span><br><br>    agent = create_agent(<br>        model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>        checkpointer=checkpointer<br>    )<br>    <span class="hljs-comment"># ... 正常使用</span><br></code></pre></td></tr></table></figure>
 
-<p>同样的当进行切片截取，底层的数组是不会变的，新的slice结构体的array指针会指向被截取的数组的开始位置的地址</p>
-<h2 id="追加元素到切片当中"><a href="#追加元素到切片当中" class="headerlink" title="追加元素到切片当中"></a>追加元素到切片当中</h2><p>向切片中追加元素，使用append(slice,i),Go 会检查底层数组是否有足够的容量来容纳新的元素。如果有足够的容量，新元素会被添加到底层数组的末尾，切片的长度会增加。如果没有足够的容量，就需要进行扩容。</p>
-<p>如果容量满足：</p>
-<p>则不会进行扩容，那么append操作会直接修改slice 的len，以及在<strong>指向底层数组后直接追加元素</strong></p>
-<p>如果容量不满足：</p>
-<p>则会进行扩容，首先会在<strong>底层创建一个新的数组（数组大小由此次追加元素和现有容量决定），将原底层数组的值全部拷贝到新的数组里</strong>，然后再修改slice结构体里的array指向新的数组以及len以及cap容量。</p>
-<p><img src="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png" srcset="/img/loading.gif" lazyload alt="append.png"></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>)<br>	<span class="hljs-comment">//打印arr1 底层数组的地址，如果填&amp;arr1 打印的是 结构体的地址</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>&#125;<br><span class="hljs-comment">//arr1=[0], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1 2], addr1=0x14000016040</span><br></code></pre></td></tr></table></figure>
+<p><strong>PostgresSaver vs InMemorySaver 对比：</strong></p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>InMemorySaver</th>
+<th>PostgresSaver</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>持久化</td>
+<td>❌ 进程重启后丢失</td>
+<td>✅ 永久保存</td>
+</tr>
+<tr>
+<td>性能</td>
+<td>🚀 极快</td>
+<td>⚡ 较快（有 I/O）</td>
+</tr>
+<tr>
+<td>适用场景</td>
+<td>开发、测试</td>
+<td>生产环境</td>
+</tr>
+<tr>
+<td>配置复杂度</td>
+<td>零配置</td>
+<td>需要数据库</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="长期记忆：Store"><a href="#长期记忆：Store" class="headerlink" title="长期记忆：Store"></a>长期记忆：Store</h2><p>Checkpointer 保存的是”消息历史”，而 <strong>Store</strong> 是一个<strong>跨会话的键值存储</strong>，更适合保存用户偏好、个性化设置等长期知识。</p>
+<h3 id="InMemoryStore-——-基础使用"><a href="#InMemoryStore-——-基础使用" class="headerlink" title="InMemoryStore —— 基础使用"></a>InMemoryStore —— 基础使用</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langgraph.store.memory <span class="hljs-keyword">import</span> InMemoryStore<br><span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> tool, ToolRuntime<br><br>store = InMemoryStore()<br><br><span class="hljs-meta">@tool</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">save_preference</span>(<span class="hljs-params">key: <span class="hljs-built_in">str</span>, value: <span class="hljs-built_in">str</span>, runtime: ToolRuntime</span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;保存用户偏好设置&quot;&quot;&quot;</span><br>    user_id = runtime.context.user_id<br>    namespace = (<span class="hljs-string">&quot;preferences&quot;</span>, user_id)  <span class="hljs-comment"># 按用户 ID 隔离数据</span><br>    runtime.store.put(namespace, key, &#123;<span class="hljs-string">&quot;value&quot;</span>: value&#125;)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;✅ 已保存：<span class="hljs-subst">&#123;key&#125;</span> = <span class="hljs-subst">&#123;value&#125;</span>&quot;</span><br><br><span class="hljs-meta">@tool</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_preference</span>(<span class="hljs-params">key: <span class="hljs-built_in">str</span>, runtime: ToolRuntime</span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;获取用户偏好设置&quot;&quot;&quot;</span><br>    user_id = runtime.context.user_id<br>    namespace = (<span class="hljs-string">&quot;preferences&quot;</span>, user_id)<br>    item = runtime.store.get(namespace, key)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;您的偏好：<span class="hljs-subst">&#123;key&#125;</span> = <span class="hljs-subst">&#123;item.value[<span class="hljs-string">&#x27;value&#x27;</span>]&#125;</span>&quot;</span> <span class="hljs-keyword">if</span> item <span class="hljs-keyword">else</span> <span class="hljs-string">&quot;未找到&quot;</span><br></code></pre></td></tr></table></figure>
 
-<p>在go1.18版本后扩容机制大概如下，<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1509760">可以参考 Go 语言切片如何扩容？（全面解析原理和过程）</a></p>
-<p><img src="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>所以可见，切片的一次扩容会进行数组的一次全值复制，所以在初始化切片的时候尽可能制定第三个参数估计一个恰当的容量，提前在内存分配合适的空间能够减少扩容时带来的开销。</p>
-<p>下面我可以看一个例子看我们是否真的理解了。以下代码会打印的是一样的吗？</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>   arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>   arr2 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>   arr3 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, &amp;arr1)<br>   fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, &amp;arr2)<br>   fmt.Printf(<span class="hljs-string">&quot;arr3=%v, addr3=%p\n&quot;</span>, arr3, &amp;arr3)<br>   arr0 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>   arr0 = <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">1</span>)<br>   arr4 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">2</span>)<br>   arr5 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr0=%v, addr0=%p\n&quot;</span>, arr0, &amp;arr0)<br>   fmt.Printf(<span class="hljs-string">&quot;arr4=%v, addr4=%p\n&quot;</span>, arr4, &amp;arr4)<br>   fmt.Printf(<span class="hljs-string">&quot;arr5=%v, addr5=%p\n&quot;</span>, arr5, &amp;arr5)<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment">arr1=[1], addr1=0x140000ba000</span><br><span class="hljs-comment">arr2=[1 3], addr2=0x140000ba018</span><br><span class="hljs-comment">arr3=[1 3], addr3=0x140000ba030</span><br><span class="hljs-comment">arr0=[1], addr0=0x140000ba090</span><br><span class="hljs-comment">arr4=[1 2], addr4=0x140000ba0a8</span><br><span class="hljs-comment">arr5=[1 3], addr5=0x140000ba0c0</span><br><span class="hljs-comment">**/</span><br></code></pre></td></tr></table></figure>
-<p>arr2 和 arr3 为什么都是[1,3];因为在进行对arr1追加元素2其实只是在原来的底层数组里面增加元素，因为初始的容量是4，append一个元素满足最大容量，所以实际上arr1、arr2、arr3结构体的数组指针指向的地址是同一个，但由于arr1的len是1，所以后续相对arr1进行append，其实都是加载底层数组array[1]上，则最后的arr3 会覆盖掉arr2 的append；但是第二种场景由于一开始的容量是1，进行append后容量是不够的需要扩容，扩容底层数组会构造新的所以arr0，arr4，arr5其实结构体指针指向的是不同数组，所以也不会发生覆盖</p>
-<h2 id="切片在底层数组基础上的完全复制"><a href="#切片在底层数组基础上的完全复制" class="headerlink" title="切片在底层数组基础上的完全复制"></a>切片在底层数组基础上的完全复制</h2><p>基于相同底层数组的复制有时候会不小心修改错数据，其实go 也提供了一个copy函数支持将切片复制是在内存空间直接复制一个一模一样的数组，来隔离切片复制后的数组共享。如果复制时长度溢出则会截断</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>   arr := []<span class="hljs-type">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>&#125;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">3</span>)<br>   cnt := <span class="hljs-built_in">copy</span>(arr1, arr)<br>   fmt.Printf(<span class="hljs-string">&quot;cnt=%d\n&quot;</span>, cnt)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v\n&quot;</span>, arr1)<br>&#125;<br><span class="hljs-comment">//cnt=3</span><br><span class="hljs-comment">//arr1=[1 2 3]</span><br></code></pre></td></tr></table></figure>
+<h3 id="跨会话读取演示"><a href="#跨会话读取演示" class="headerlink" title="跨会话读取演示"></a>跨会话读取演示</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs python">agent = create_agent(model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>, tools=[save_preference, get_preference], store=store)<br><br><span class="hljs-comment"># 会话 1：保存偏好</span><br>agent.invoke(<br>    &#123;<span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;帮我保存偏好：language=Chinese&quot;</span>&#125;]&#125;,<br>    context=CustomContext(user_id=<span class="hljs-string">&quot;user_001&quot;</span>)<br>)<br><br><span class="hljs-comment"># 会话 2（全新 thread）：读取上次保存的偏好</span><br>result = agent.invoke(<br>    &#123;<span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;我的 language 偏好是什么？&quot;</span>&#125;]&#125;,<br>    context=CustomContext(user_id=<span class="hljs-string">&quot;user_001&quot;</span>)  <span class="hljs-comment"># 相同用户 ID</span><br>)<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>].content)  <span class="hljs-comment"># → &quot;您的偏好：language = Chinese&quot;</span><br></code></pre></td></tr></table></figure>
 
+<hr>
+<h2 id="两种记忆的定位"><a href="#两种记忆的定位" class="headerlink" title="两种记忆的定位"></a>两种记忆的定位</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs arduino">Checkpointer（短期/对话级记忆）<br>└── 存储：完整的消息历史<br>└── 范围：同一个 thread_id 内<br>└── 用途：让 AI 记住<span class="hljs-string">&quot;这次对话说了什么&quot;</span><br><br>Store（长期/用户级记忆）<br>└── 存储：任意键值数据（偏好、笔记、知识点）<br>└── 范围：跨 thread，按用户 ID 隔离<br>└── 用途：让 AI 记住<span class="hljs-string">&quot;这个用户的个性化信息&quot;</span><br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><table>
+<thead>
+<tr>
+<th>组件</th>
+<th>类型</th>
+<th>生命周期</th>
+<th>典型数据</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>InMemorySaver</code></td>
+<td>短期记忆</td>
+<td>进程级</td>
+<td>对话消息历史</td>
+</tr>
+<tr>
+<td><code>PostgresSaver</code></td>
+<td>短期记忆</td>
+<td>永久</td>
+<td>对话消息历史</td>
+</tr>
+<tr>
+<td><code>InMemoryStore</code></td>
+<td>长期记忆</td>
+<td>进程级</td>
+<td>用户偏好、设置</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🚀 <strong>下一步</strong>：学习 <code>struct_output</code> 模块，了解如何让模型输出结构化数据（JSON / Pydantic 对象），而不是随意的文本。</p>
+</blockquote>
 
                                                                         
                                                             </div>
                                                             
                                                                 <hr/>
                                                                 <div style="text-align: center ">
-                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/Go 语言的 slice 详解.md" target="_blank">编辑文章✏</a>
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/03_memory.md" target="_blank">编辑文章✏</a>
                                                                 </div>
                                                                 <div>
                                                                     <div class="post-metas my-3">
@@ -375,7 +434,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6/" class="print-no-link">#Go语言进阶</a>
+        <a href="/tags/langchain/" class="print-no-link">#langchain</a>
       
     </div>
   
@@ -387,8 +446,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Go 语言的 slice 详解</div>
-      <div>https://yilinyo.github.io/2025/11/01/Go 语言的 slice 详解/</div>
+      <div>langchain models 实战 Memory 记忆模块</div>
+      <div>https://yilinyo.github.io/2026/03/30/03_memory/</div>
     </div>
     <div class="license-meta">
       
@@ -400,7 +459,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年11月1日</div>
+          <div>2026年3月30日</div>
         </div>
       
       
@@ -432,9 +491,9 @@
                                                                                     <article class="post-prev col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2025/11/05/Makefile%20%E4%BB%A5%E5%8F%8A%20Dockfile%20%E8%AF%A6%E8%A7%A3%E5%8F%8A%E7%94%A8%E6%B3%95/" title="Makefile 以及 Dockfile 详解及用法.">
+                                                                                                <a href="/2026/03/30/02_message/" title="langchain models 实战 消息系统详解">
                                                                                                     <i class="iconfont icon-arrowleft"></i>
-                                                                                                    <span class="hidden-mobile">Makefile 以及 Dockfile 详解及用法.</span>
+                                                                                                    <span class="hidden-mobile">langchain models 实战 消息系统详解</span>
                                                                                                     <span class="visible-mobile">上一篇</span>
                                                                                                 </a>
                                                                                                 
@@ -443,8 +502,8 @@
                                                                                     <article class="post-next col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2024/01/29/Docker%20%E8%BF%9B%E9%98%B6/" title="Docker 进阶">
-                                                                                                    <span class="hidden-mobile">Docker 进阶</span>
+                                                                                                <a href="/2026/03/30/04_struct_output/" title="langchain models 实战 结构化输出">
+                                                                                                    <span class="hidden-mobile">langchain models 实战 结构化输出</span>
                                                                                                     <span class="visible-mobile">下一篇</span>
                                                                                                     <i class="iconfont icon-arrowright"></i>
                                                                                                 </a>

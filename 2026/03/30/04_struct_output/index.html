@@ -24,27 +24,22 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+    <meta name="description" content="📦 结构化输出 —— 让 AI 说”机器能懂的语言” 所在目录：struct_output&#x2F;struct_op_test.ipynb核心依赖：langchain_core、pydantic   前言大模型的默认输出是自由格式的文本，但在实际开发中，我们经常需要模型返回固定格式的数据：  从简历中提取姓名、邮箱、工作经历 分析情感，返回 &amp;#123;&quot;sentiment&quot;: &amp;">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Go 语言的 slice 详解">
-<meta property="og:url" content="https://yilinyo.github.io/2025/11/01/Go%20%E8%AF%AD%E8%A8%80%E7%9A%84%20slice%20%E8%AF%A6%E8%A7%A3/index.html">
+<meta property="og:title" content="langchain models 实战 结构化输出">
+<meta property="og:url" content="https://yilinyo.github.io/2026/03/30/04_struct_output/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="Go 语言的 slice 详解go语言切片底层结构slice 是 go 语言的可变数组，维护了 一个 结构体 如下 12345type slice struct &amp;#123;   array unsafe.Pointer   len   int   cap   int&amp;#125;  slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际">
+<meta property="og:description" content="📦 结构化输出 —— 让 AI 说”机器能懂的语言” 所在目录：struct_output&#x2F;struct_op_test.ipynb核心依赖：langchain_core、pydantic   前言大模型的默认输出是自由格式的文本，但在实际开发中，我们经常需要模型返回固定格式的数据：  从简历中提取姓名、邮箱、工作经历 分析情感，返回 &amp;#123;&quot;sentiment&quot;: &amp;">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
-<meta property="og:image" content="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png">
-<meta property="og:image" content="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png">
-<meta property="og:image" content="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png">
-<meta property="article:published_time" content="2025-11-01T01:34:00.000Z">
+<meta property="article:published_time" content="2026-03-30T22:12:00.000Z">
 <meta property="article:modified_time" content="2026-03-30T14:15:13.550Z">
 <meta property="article:author" content="yilin">
-<meta property="article:tag" content="Go语言进阶">
+<meta property="article:tag" content="langchain">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png">
   
   
   
-  <title>Go 语言的 slice 详解 - Yilin派哟yoo🥧</title>
+  <title>langchain models 实战 结构化输出 - Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -237,7 +232,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Go 语言的 slice 详解"></span>
+            <span id="subtitle" data-typed-text="langchain models 实战 结构化输出"></span>
           
         </div>
 
@@ -248,8 +243,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2025-11-01 01:34" pubdate>
-          2025年11月1日 凌晨
+        <time datetime="2026-03-30 22:12" pubdate>
+          2026年3月30日 晚上
         </time>
       </span>
     
@@ -260,7 +255,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.3k 字
+          912 字
         
       </span>
     
@@ -271,7 +266,7 @@
         
         
         
-          12 分钟
+          8 分钟
         
       </span>
     
@@ -324,49 +319,96 @@
                         <article class="post-content mx-auto">
                             <!-- SEO header -->
                             <h1 style="display: none">
-                                Go 语言的 slice 详解
+                                langchain models 实战 结构化输出
                             </h1>
                             
                                     
                                                             <div class="markdown-body">
                                                                 
-                                                                    <h1 id="Go-语言的-slice-详解"><a href="#Go-语言的-slice-详解" class="headerlink" title="Go 语言的 slice 详解"></a>Go 语言的 slice 详解</h1><h2 id="go语言切片底层结构"><a href="#go语言切片底层结构" class="headerlink" title="go语言切片底层结构"></a>go语言切片底层结构</h2><p>slice 是 go 语言的可变数组，维护了 一个 结构体 如下</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-keyword">type</span> slice <span class="hljs-keyword">struct</span> &#123;<br>   array unsafe.Pointer<br>   <span class="hljs-built_in">len</span>   <span class="hljs-type">int</span><br>   <span class="hljs-built_in">cap</span>   <span class="hljs-type">int</span><br>&#125;<br></code></pre></td></tr></table></figure>
+                                                                    <h1 id="📦-结构化输出-——-让-AI-说”机器能懂的语言”"><a href="#📦-结构化输出-——-让-AI-说”机器能懂的语言”" class="headerlink" title="📦 结构化输出 —— 让 AI 说”机器能懂的语言”"></a>📦 结构化输出 —— 让 AI 说”机器能懂的语言”</h1><blockquote>
+<p><strong>所在目录</strong>：<code>struct_output/struct_op_test.ipynb</code><br><strong>核心依赖</strong>：<code>langchain_core</code>、<code>pydantic</code></p>
+</blockquote>
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>大模型的默认输出是自由格式的文本，但在实际开发中，我们经常需要模型返回<strong>固定格式的数据</strong>：</p>
+<ul>
+<li>从简历中提取姓名、邮箱、工作经历</li>
+<li>分析情感，返回 <code>&#123;&quot;sentiment&quot;: &quot;positive&quot;, &quot;score&quot;: 0.95&#125;</code></li>
+<li>生成结构化的商品信息，直接存入数据库</li>
+</ul>
+<p>这就是<strong>结构化输出（Structured Output）</strong>的价值：告诉模型”请用这个格式回答我”，然后直接拿到 Python 对象。</p>
+<hr>
+<h2 id="核心方法：with-structured-output"><a href="#核心方法：with-structured-output" class="headerlink" title="核心方法：with_structured_output()"></a>核心方法：<code>with_structured_output()</code></h2><p>LangChain 提供了 <code>with_structured_output()</code> 方法，将大模型”包装”成一个结构化输出器：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python">llm_structured = llm.with_structured_output(YourSchema)<br>result = llm_structured.invoke(<span class="hljs-string">&quot;...&quot;</span>)<br><span class="hljs-comment"># result 是 YourSchema 的实例，不是字符串！</span><br></code></pre></td></tr></table></figure>
 
-<p>slice 结构体 由一个指向 数组的指针和长度、容量构成 指针指向一个底层数组，len标识切片长度，标识切片的实际长度，cap标识底层数组的最大长度，若len&lt;cap，则数组中属于切片的只有 len长度，如下图示意图，slice1只有[0,1] 两个元素,后面的2，3，4非切片的元素</p>
-<p><img src="https://s2.loli.net/2025/10/31/XJlK4W3dNo95zPM.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<h2 id="切片的复制与截取"><a href="#切片的复制与截取" class="headerlink" title="切片的复制与截取"></a>切片的复制与截取</h2><p>将切片进行复制（赋值一个新变量），其实就是创建一个新的slice结构体，其中array指针指向被复制的结构体指向的底层数组</p>
-<p><img src="https://s2.loli.net/2025/10/31/imWnsAthq5NO8wD.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>显然，当底层数组指向相同那么修改slice2的某个元素，同样也会影响到slice1，如下列代码所示</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>    arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>	arr2 := arr1<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Println(arr1, arr2)<br>	&#125;<br>    <span class="hljs-comment">// [-1,1] [-1,1]</span><br></code></pre></td></tr></table></figure>
+<hr>
+<h2 id="三种定义结构的方式"><a href="#三种定义结构的方式" class="headerlink" title="三种定义结构的方式"></a>三种定义结构的方式</h2><h3 id="方式一：Pydantic-模型（推荐）✅"><a href="#方式一：Pydantic-模型（推荐）✅" class="headerlink" title="方式一：Pydantic 模型（推荐）✅"></a>方式一：Pydantic 模型（推荐）✅</h3><p>Pydantic 是 Python 生态中最流行的数据验证库，用它定义结构清晰、类型安全、自带校验：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel, Field<br><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">PersonInfo</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):<br>    <span class="hljs-string">&quot;&quot;&quot;从文本中提取人物信息&quot;&quot;&quot;</span><br>    name: <span class="hljs-built_in">str</span> = Field(description=<span class="hljs-string">&quot;人物姓名&quot;</span>)<br>    age: <span class="hljs-built_in">int</span> = Field(description=<span class="hljs-string">&quot;年龄&quot;</span>)<br>    occupation: <span class="hljs-built_in">str</span> = Field(description=<span class="hljs-string">&quot;职业&quot;</span>)<br>    skills: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>] = Field(description=<span class="hljs-string">&quot;技能列表&quot;</span>, default_factory=<span class="hljs-built_in">list</span>)<br><br>llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>)<br>extractor = llm.with_structured_output(PersonInfo)<br><br>text = <span class="hljs-string">&quot;张伟，28岁，是一名后端工程师，熟悉 Python 和 Go 语言。&quot;</span><br>result = extractor.invoke(text)<br><br><span class="hljs-built_in">print</span>(<span class="hljs-built_in">type</span>(result))       <span class="hljs-comment"># &lt;class &#x27;PersonInfo&#x27;&gt;</span><br><span class="hljs-built_in">print</span>(result.name)        <span class="hljs-comment"># 张伟</span><br><span class="hljs-built_in">print</span>(result.age)         <span class="hljs-comment"># 28</span><br><span class="hljs-built_in">print</span>(result.skills)      <span class="hljs-comment"># [&#x27;Python&#x27;, &#x27;Go&#x27;]</span><br></code></pre></td></tr></table></figure>
 
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">5</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>)<br>	arr2 := arr1[<span class="hljs-number">1</span>:<span class="hljs-number">3</span>]<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p, len1=%d, cap1 = %d\n&quot;</span>, arr1, arr1, <span class="hljs-built_in">len</span>(arr1), <span class="hljs-built_in">cap</span>(arr1))<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p, len1=%d, cap2 = %d\n&quot;</span>, arr2, arr2, <span class="hljs-built_in">len</span>(arr2), <span class="hljs-built_in">cap</span>(arr2))<br>	arr2[<span class="hljs-number">0</span>] = <span class="hljs-number">-1</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, arr2)<br>&#125;<br>	<span class="hljs-comment">//arr1=[0 1 2 3 4], addr1=0x1400001e180, len1=5, cap1 = 5</span><br>	<span class="hljs-comment">//arr2=[1 2], addr2=0x1400001e188, len1=2, cap2 = 4     容量是原容量减去被截取的元素数量</span><br>	<span class="hljs-comment">//arr1=[0 -1 2 3 4], addr1=0x1400001e180</span><br>	<span class="hljs-comment">//arr2=[-1 2], addr2=0x1400001e188</span><br></code></pre></td></tr></table></figure>
+<blockquote>
+<p>💡 <strong>Field(description=…)</strong> 非常重要——这个描述会被发送给模型，帮助它理解每个字段的含义。</p>
+</blockquote>
+<hr>
+<h3 id="方式二：TypedDict"><a href="#方式二：TypedDict" class="headerlink" title="方式二：TypedDict"></a>方式二：TypedDict</h3><p>如果不想引入 Pydantic，可以用 <code>TypedDict</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> typing <span class="hljs-keyword">import</span> TypedDict<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ProductInfo</span>(<span class="hljs-title class_ inherited__">TypedDict</span>):<br>    product_name: <span class="hljs-built_in">str</span><br>    price: <span class="hljs-built_in">float</span><br>    category: <span class="hljs-built_in">str</span><br><br>extractor = llm.with_structured_output(ProductInfo)<br>result = extractor.invoke(<span class="hljs-string">&quot;iPhone 15 Pro，价格 7999 元，属于智能手机类别&quot;</span>)<br><span class="hljs-comment"># result 是普通字典</span><br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;product_name&quot;</span>])  <span class="hljs-comment"># iPhone 15 Pro</span><br></code></pre></td></tr></table></figure>
 
-<p>同样的当进行切片截取，底层的数组是不会变的，新的slice结构体的array指针会指向被截取的数组的开始位置的地址</p>
-<h2 id="追加元素到切片当中"><a href="#追加元素到切片当中" class="headerlink" title="追加元素到切片当中"></a>追加元素到切片当中</h2><p>向切片中追加元素，使用append(slice,i),Go 会检查底层数组是否有足够的容量来容纳新的元素。如果有足够的容量，新元素会被添加到底层数组的末尾，切片的长度会增加。如果没有足够的容量，就需要进行扩容。</p>
-<p>如果容量满足：</p>
-<p>则不会进行扩容，那么append操作会直接修改slice 的len，以及在<strong>指向底层数组后直接追加元素</strong></p>
-<p>如果容量不满足：</p>
-<p>则会进行扩容，首先会在<strong>底层创建一个新的数组（数组大小由此次追加元素和现有容量决定），将原底层数组的值全部拷贝到新的数组里</strong>，然后再修改slice结构体里的array指向新的数组以及len以及cap容量。</p>
-<p><img src="https://s2.loli.net/2025/11/01/EQBuadUwzWcjGtO.png" srcset="/img/loading.gif" lazyload alt="append.png"></p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>	arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">2</span>)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">0</span>)<br>	<span class="hljs-comment">//打印arr1 底层数组的地址，如果填&amp;arr1 打印的是 结构体的地址</span><br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>	arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>	fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, arr1)<br>&#125;<br><span class="hljs-comment">//arr1=[0], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1], addr1=0x140000100a0</span><br><span class="hljs-comment">//arr1=[0 1 2], addr1=0x14000016040</span><br></code></pre></td></tr></table></figure>
+<hr>
+<h3 id="方式三：JSON-Schema"><a href="#方式三：JSON-Schema" class="headerlink" title="方式三：JSON Schema"></a>方式三：JSON Schema</h3><p>对于更动态的场景，可以直接传入 JSON Schema 字典：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python">schema = &#123;<br>    <span class="hljs-string">&quot;name&quot;</span>: <span class="hljs-string">&quot;sentiment_analysis&quot;</span>,<br>    <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;分析文本情感&quot;</span>,<br>    <span class="hljs-string">&quot;properties&quot;</span>: &#123;<br>        <span class="hljs-string">&quot;sentiment&quot;</span>: &#123;<br>            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;string&quot;</span>,<br>            <span class="hljs-string">&quot;enum&quot;</span>: [<span class="hljs-string">&quot;positive&quot;</span>, <span class="hljs-string">&quot;negative&quot;</span>, <span class="hljs-string">&quot;neutral&quot;</span>]<br>        &#125;,<br>        <span class="hljs-string">&quot;confidence&quot;</span>: &#123;<br>            <span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;number&quot;</span>,<br>            <span class="hljs-string">&quot;description&quot;</span>: <span class="hljs-string">&quot;置信度 0-1&quot;</span><br>        &#125;<br>    &#125;,<br>    <span class="hljs-string">&quot;required&quot;</span>: [<span class="hljs-string">&quot;sentiment&quot;</span>, <span class="hljs-string">&quot;confidence&quot;</span>]<br>&#125;<br><br>analyzer = llm.with_structured_output(schema)<br>result = analyzer.invoke(<span class="hljs-string">&quot;这个产品真的太棒了！&quot;</span>)<br><span class="hljs-comment"># &#123;&#x27;sentiment&#x27;: &#x27;positive&#x27;, &#x27;confidence&#x27;: 0.98&#125;</span><br></code></pre></td></tr></table></figure>
 
-<p>在go1.18版本后扩容机制大概如下，<a target="_blank" rel="noopener" href="https://developer.aliyun.com/article/1509760">可以参考 Go 语言切片如何扩容？（全面解析原理和过程）</a></p>
-<p><img src="https://ucc.alicdn.com/pic/developer-ecology/wrp43id6ygvkg_dbbb7a08cd394e32b906dbccc8e81997.png" srcset="/img/loading.gif" lazyload alt=".png"></p>
-<p>所以可见，切片的一次扩容会进行数组的一次全值复制，所以在初始化切片的时候尽可能制定第三个参数估计一个恰当的容量，提前在内存分配合适的空间能够减少扩容时带来的开销。</p>
-<p>下面我可以看一个例子看我们是否真的理解了。以下代码会打印的是一样的吗？</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><code class="hljs go"><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span>&#123;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">4</span>)<br>   arr1 = <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">1</span>)<br>   arr2 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">2</span>)<br>   arr3 := <span class="hljs-built_in">append</span>(arr1, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v, addr1=%p\n&quot;</span>, arr1, &amp;arr1)<br>   fmt.Printf(<span class="hljs-string">&quot;arr2=%v, addr2=%p\n&quot;</span>, arr2, &amp;arr2)<br>   fmt.Printf(<span class="hljs-string">&quot;arr3=%v, addr3=%p\n&quot;</span>, arr3, &amp;arr3)<br>   arr0 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">0</span>, <span class="hljs-number">1</span>)<br>   arr0 = <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">1</span>)<br>   arr4 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">2</span>)<br>   arr5 := <span class="hljs-built_in">append</span>(arr0, <span class="hljs-number">3</span>)<br>   fmt.Printf(<span class="hljs-string">&quot;arr0=%v, addr0=%p\n&quot;</span>, arr0, &amp;arr0)<br>   fmt.Printf(<span class="hljs-string">&quot;arr4=%v, addr4=%p\n&quot;</span>, arr4, &amp;arr4)<br>   fmt.Printf(<span class="hljs-string">&quot;arr5=%v, addr5=%p\n&quot;</span>, arr5, &amp;arr5)<br>&#125;<br><br><span class="hljs-comment">/**</span><br><span class="hljs-comment">arr1=[1], addr1=0x140000ba000</span><br><span class="hljs-comment">arr2=[1 3], addr2=0x140000ba018</span><br><span class="hljs-comment">arr3=[1 3], addr3=0x140000ba030</span><br><span class="hljs-comment">arr0=[1], addr0=0x140000ba090</span><br><span class="hljs-comment">arr4=[1 2], addr4=0x140000ba0a8</span><br><span class="hljs-comment">arr5=[1 3], addr5=0x140000ba0c0</span><br><span class="hljs-comment">**/</span><br></code></pre></td></tr></table></figure>
-<p>arr2 和 arr3 为什么都是[1,3];因为在进行对arr1追加元素2其实只是在原来的底层数组里面增加元素，因为初始的容量是4，append一个元素满足最大容量，所以实际上arr1、arr2、arr3结构体的数组指针指向的地址是同一个，但由于arr1的len是1，所以后续相对arr1进行append，其实都是加载底层数组array[1]上，则最后的arr3 会覆盖掉arr2 的append；但是第二种场景由于一开始的容量是1，进行append后容量是不够的需要扩容，扩容底层数组会构造新的所以arr0，arr4，arr5其实结构体指针指向的是不同数组，所以也不会发生覆盖</p>
-<h2 id="切片在底层数组基础上的完全复制"><a href="#切片在底层数组基础上的完全复制" class="headerlink" title="切片在底层数组基础上的完全复制"></a>切片在底层数组基础上的完全复制</h2><p>基于相同底层数组的复制有时候会不小心修改错数据，其实go 也提供了一个copy函数支持将切片复制是在内存空间直接复制一个一模一样的数组，来隔离切片复制后的数组共享。如果复制时长度溢出则会截断</p>
-<figure class="highlight go"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs go"><br><span class="hljs-function"><span class="hljs-keyword">func</span> <span class="hljs-title">main</span><span class="hljs-params">()</span></span> &#123;<br>   arr := []<span class="hljs-type">int</span>&#123;<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>, <span class="hljs-number">4</span>&#125;<br>   arr1 := <span class="hljs-built_in">make</span>([]<span class="hljs-type">int</span>, <span class="hljs-number">3</span>)<br>   cnt := <span class="hljs-built_in">copy</span>(arr1, arr)<br>   fmt.Printf(<span class="hljs-string">&quot;cnt=%d\n&quot;</span>, cnt)<br>   fmt.Printf(<span class="hljs-string">&quot;arr1=%v\n&quot;</span>, arr1)<br>&#125;<br><span class="hljs-comment">//cnt=3</span><br><span class="hljs-comment">//arr1=[1 2 3]</span><br></code></pre></td></tr></table></figure>
+<hr>
+<h2 id="进阶：嵌套结构"><a href="#进阶：嵌套结构" class="headerlink" title="进阶：嵌套结构"></a>进阶：嵌套结构</h2><p>Pydantic 支持嵌套模型，可以表达复杂的层级结构：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> pydantic <span class="hljs-keyword">import</span> BaseModel<br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Address</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):<br>    city: <span class="hljs-built_in">str</span><br>    province: <span class="hljs-built_in">str</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Company</span>(<span class="hljs-title class_ inherited__">BaseModel</span>):<br>    name: <span class="hljs-built_in">str</span><br>    headquarters: Address<br>    employee_count: <span class="hljs-built_in">int</span><br>    founded_year: <span class="hljs-built_in">int</span><br><br>extractor = llm.with_structured_output(Company)<br>result = extractor.invoke(<br>    <span class="hljs-string">&quot;字节跳动成立于2012年，总部位于北京市海淀区，员工约11万人。&quot;</span><br>)<br><br><span class="hljs-built_in">print</span>(result.name)                     <span class="hljs-comment"># 字节跳动</span><br><span class="hljs-built_in">print</span>(result.headquarters.city)        <span class="hljs-comment"># 北京</span><br><span class="hljs-built_in">print</span>(result.founded_year)             <span class="hljs-comment"># 2012</span><br></code></pre></td></tr></table></figure>
 
+<hr>
+<h2 id="底层原理"><a href="#底层原理" class="headerlink" title="底层原理"></a>底层原理</h2><p><code>with_structured_output()</code> 在底层使用了两种技术之一（取决于模型支持情况）：</p>
+<ol>
+<li><strong>Function Calling / Tool Calling</strong>：让模型”调用”一个虚拟函数，参数就是结构化数据（OpenAI、Anthropic 等主流模型支持）</li>
+<li><strong>JSON Mode</strong>：强制模型只输出合法 JSON，再用 Schema 校验解析</li>
+</ol>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs ada">用户输入<br>  │<br>  ▼<br>LLM（启用 <span class="hljs-keyword">Function</span> <span class="hljs-title">Calling）</span><br>  │<br>  ▼<br>JSON 字符串（模型输出）<br>  │<br>  ▼<br>Pydantic/TypedDict 校验与解析<br>  │<br>  ▼<br>Python 对象 ✅<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="使用场景对比"><a href="#使用场景对比" class="headerlink" title="使用场景对比"></a>使用场景对比</h2><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>信息提取（简历、合同、新闻）</td>
+<td>Pydantic 模型</td>
+</tr>
+<tr>
+<td>情感分析、分类任务</td>
+<td>Pydantic 或 TypedDict</td>
+</tr>
+<tr>
+<td>动态 Schema（运行时决定结构）</td>
+<td>JSON Schema 字典</td>
+</tr>
+<tr>
+<td>快速原型</td>
+<td>TypedDict</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>结构化输出是 LangChain 最实用的功能之一，它实现了从**”AI 生成文本”<strong>到</strong>“AI 生成数据”**的跨越：</p>
+<ol>
+<li>定义好 Pydantic 模型，每个字段写清楚 <code>description</code></li>
+<li>用 <code>llm.with_structured_output(Model)</code> 包装模型</li>
+<li>直接 <code>.invoke()</code> 得到干净的 Python 对象</li>
+</ol>
+<blockquote>
+<p>🚀 <strong>下一步</strong>：学习 <code>tools</code> 模块，了解如何为 Agent 配备各种工具，让它不仅能”说话”，还能”做事”。</p>
+</blockquote>
 
                                                                         
                                                             </div>
                                                             
                                                                 <hr/>
                                                                 <div style="text-align: center ">
-                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/Go 语言的 slice 详解.md" target="_blank">编辑文章✏</a>
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/04_struct_output.md" target="_blank">编辑文章✏</a>
                                                                 </div>
                                                                 <div>
                                                                     <div class="post-metas my-3">
@@ -375,7 +417,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/Go%E8%AF%AD%E8%A8%80%E8%BF%9B%E9%98%B6/" class="print-no-link">#Go语言进阶</a>
+        <a href="/tags/langchain/" class="print-no-link">#langchain</a>
       
     </div>
   
@@ -387,8 +429,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Go 语言的 slice 详解</div>
-      <div>https://yilinyo.github.io/2025/11/01/Go 语言的 slice 详解/</div>
+      <div>langchain models 实战 结构化输出</div>
+      <div>https://yilinyo.github.io/2026/03/30/04_struct_output/</div>
     </div>
     <div class="license-meta">
       
@@ -400,7 +442,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2025年11月1日</div>
+          <div>2026年3月30日</div>
         </div>
       
       
@@ -432,9 +474,9 @@
                                                                                     <article class="post-prev col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2025/11/05/Makefile%20%E4%BB%A5%E5%8F%8A%20Dockfile%20%E8%AF%A6%E8%A7%A3%E5%8F%8A%E7%94%A8%E6%B3%95/" title="Makefile 以及 Dockfile 详解及用法.">
+                                                                                                <a href="/2026/03/30/03_memory/" title="langchain models 实战 Memory 记忆模块">
                                                                                                     <i class="iconfont icon-arrowleft"></i>
-                                                                                                    <span class="hidden-mobile">Makefile 以及 Dockfile 详解及用法.</span>
+                                                                                                    <span class="hidden-mobile">langchain models 实战 Memory 记忆模块</span>
                                                                                                     <span class="visible-mobile">上一篇</span>
                                                                                                 </a>
                                                                                                 
@@ -443,8 +485,8 @@
                                                                                     <article class="post-next col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2024/01/29/Docker%20%E8%BF%9B%E9%98%B6/" title="Docker 进阶">
-                                                                                                    <span class="hidden-mobile">Docker 进阶</span>
+                                                                                                <a href="/2026/03/30/05_tools/" title="langchain models 实战 Tools 工具系统">
+                                                                                                    <span class="hidden-mobile">langchain models 实战 Tools 工具系统</span>
                                                                                                     <span class="visible-mobile">下一篇</span>
                                                                                                     <i class="iconfont icon-arrowright"></i>
                                                                                                 </a>

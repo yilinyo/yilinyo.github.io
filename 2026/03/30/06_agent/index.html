@@ -1,0 +1,816 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="🤖 Agent 智能体 —— 能思考、能行动的 AI 所在目录：agent&#x2F;agent_hello.ipynb、agent_task&#x2F;todolistagent.py、agent_task&#x2F;test_todolistagent.py核心依赖：langchain.agents、langgraph   前言如果说前面几个模块（模型、消息、工具）是 AI 应用的零件，那么 Agent（智能体） 就是把">
+<meta property="og:type" content="article">
+<meta property="og:title" content="langchain models 实战 Agent 智能体">
+<meta property="og:url" content="https://yilinyo.github.io/2026/03/30/06_agent/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="🤖 Agent 智能体 —— 能思考、能行动的 AI 所在目录：agent&#x2F;agent_hello.ipynb、agent_task&#x2F;todolistagent.py、agent_task&#x2F;test_todolistagent.py核心依赖：langchain.agents、langgraph   前言如果说前面几个模块（模型、消息、工具）是 AI 应用的零件，那么 Agent（智能体） 就是把">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-03-30T22:12:00.000Z">
+<meta property="article:modified_time" content="2026-03-30T14:15:13.550Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="langchain">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>langchain models 实战 Agent 智能体 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="langchain models 实战 Agent 智能体"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-03-30 22:12" pubdate>
+          2026年3月30日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          11 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                langchain models 实战 Agent 智能体
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="🤖-Agent-智能体-——-能思考、能行动的-AI"><a href="#🤖-Agent-智能体-——-能思考、能行动的-AI" class="headerlink" title="🤖 Agent 智能体 —— 能思考、能行动的 AI"></a>🤖 Agent 智能体 —— 能思考、能行动的 AI</h1><blockquote>
+<p><strong>所在目录</strong>：<code>agent/agent_hello.ipynb</code>、<code>agent_task/todolistagent.py</code>、<code>agent_task/test_todolistagent.py</code><br><strong>核心依赖</strong>：<code>langchain.agents</code>、<code>langgraph</code></p>
+</blockquote>
+<hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>如果说前面几个模块（模型、消息、工具）是 AI 应用的零件，那么 <strong>Agent（智能体）</strong> 就是把这些零件组装起来、让它们协同运转的引擎。</p>
+<p>Agent 的核心能力：<strong>自主决策</strong>——给它一个目标，它会自己决定用什么工具、用几次、用什么顺序，直到完成任务。</p>
+<hr>
+<h2 id="Agent-的工作原理：ReAct-循环"><a href="#Agent-的工作原理：ReAct-循环" class="headerlink" title="Agent 的工作原理：ReAct 循环"></a>Agent 的工作原理：ReAct 循环</h2><p>LangChain 中的 Agent 基于经典的 <strong>ReAct（Reasoning + Acting）</strong> 模式：</p>
+<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm">┌─────────────────────────────────────────────────────┐<br>│                    Agent Loop                       │<br>│                                                     │<br>│   用户输入                                           │<br>│       │                                             │<br>│       ▼                                             │<br>│   <span class="hljs-keyword">LLM </span>思考（需要调用哪个工具？参数是什么？）             │<br>│       │                                             │<br>│       ├─ 有工具调用 ──► 执行工具 ──► 结果返回给 <span class="hljs-keyword">LLM </span> ─┐│<br>│       │                                             ││<br>│       └─ 无工具调用 ──► 生成最终回复 ◄───────────────┘│<br>└─────────────────────────────────────────────────────┘<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="基础-Agent：快速上手"><a href="#基础-Agent：快速上手" class="headerlink" title="基础 Agent：快速上手"></a>基础 Agent：快速上手</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> create_agent<br><span class="hljs-keyword">from</span> langchain.tools <span class="hljs-keyword">import</span> tool<br><br><span class="hljs-meta">@tool</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">get_weather</span>(<span class="hljs-params">city: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;获取城市天气&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;<span class="hljs-subst">&#123;city&#125;</span>：晴天，28°C&quot;</span><br><br><span class="hljs-meta">@tool</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">search_web</span>(<span class="hljs-params">query: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;搜索网络信息&quot;&quot;&quot;</span><br>    <span class="hljs-keyword">return</span> <span class="hljs-string">f&quot;搜索结果：关于&#x27;<span class="hljs-subst">&#123;query&#125;</span>&#x27;的相关信息...&quot;</span><br><br><span class="hljs-comment"># 创建 Agent</span><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,              <span class="hljs-comment"># 使用的大模型</span><br>    tools=[get_weather, search_web],   <span class="hljs-comment"># 可用工具列表</span><br>    system_prompt=<span class="hljs-string">&quot;你是一个全能助手&quot;</span>    <span class="hljs-comment"># 系统提示词</span><br>)<br><br><span class="hljs-comment"># 运行 Agent</span><br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;北京今天天气怎样？&quot;</span>&#125;]<br>&#125;)<br><br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>].content)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="自定义状态的-Agent"><a href="#自定义状态的-Agent" class="headerlink" title="自定义状态的 Agent"></a>自定义状态的 Agent</h2><p>Agent 支持扩展默认的 <code>AgentState</code>，添加业务专属字段：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain.agents <span class="hljs-keyword">import</span> AgentState, create_agent<br><span class="hljs-keyword">from</span> dataclasses <span class="hljs-keyword">import</span> dataclass, field<br><br><span class="hljs-meta">@dataclass</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Task</span>:<br>    priority: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;中等&quot;</span><br>    description: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span><br><br><span class="hljs-meta">@dataclass</span><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">TaskManagerState</span>(<span class="hljs-title class_ inherited__">AgentState</span>):<br>    current_tasks: <span class="hljs-built_in">list</span>[Task] = field(default_factory=<span class="hljs-built_in">list</span>)   <span class="hljs-comment"># 待办任务</span><br>    completed_tasks: <span class="hljs-built_in">list</span>[Task] = field(default_factory=<span class="hljs-built_in">list</span>)  <span class="hljs-comment"># 已完成任务</span><br>    user_name: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span><br><br>agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,<br>    tools=[add_task, show_task, complete_task, delete_task],<br>    system_prompt=<span class="hljs-string">&quot;你是一个任务待办智能助手&quot;</span>,<br>    state_schema=TaskManagerState  <span class="hljs-comment"># 注入自定义状态</span><br>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="实战：任务管理-Agent"><a href="#实战：任务管理-Agent" class="headerlink" title="实战：任务管理 Agent"></a>实战：任务管理 Agent</h2><p><code>agent_task/todolistagent.py</code> 实现了一个功能完整的<strong>待办事项管理 Agent</strong>，是本项目的核心实战案例。</p>
+<h3 id="架构设计"><a href="#架构设计" class="headerlink" title="架构设计"></a>架构设计</h3><figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs awk">TaskManagerAgent<br>├── State: TaskManagerState<br>│   ├── current_tasks    ← 待办任务列表<br>│   ├── completed_tasks  ← 已完成任务列表<br>│   └── user_name        ← 用户名<br>│<br>└── Tools<br>    ├── add_task       ← 添加任务（支持优先级：高<span class="hljs-regexp">/中等/</span>低）<br>    ├── show_task      ← 展示所有任务<br>    ├── complete_task  ← 将任务标记为完成<br>    └── delete_task    ← 彻底删除任务<br></code></pre></td></tr></table></figure>
+
+<h3 id="任务优先级展示"><a href="#任务优先级展示" class="headerlink" title="任务优先级展示"></a>任务优先级展示</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> collections <span class="hljs-keyword">import</span> defaultdict<br><br>ORDER = [<span class="hljs-string">&quot;高&quot;</span>, <span class="hljs-string">&quot;中等&quot;</span>, <span class="hljs-string">&quot;低&quot;</span>]  <span class="hljs-comment"># 展示顺序</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">format_tasks</span>(<span class="hljs-params">tasks: <span class="hljs-built_in">list</span>[Task]</span>) -&gt; <span class="hljs-built_in">str</span>:<br>    <span class="hljs-string">&quot;&quot;&quot;按优先级分组展示任务&quot;&quot;&quot;</span><br>    grouped = defaultdict(<span class="hljs-built_in">list</span>)<br>    <span class="hljs-keyword">for</span> t <span class="hljs-keyword">in</span> tasks:<br>        grouped[t.priority].append(t.description)<br><br>    lines = []<br>    <span class="hljs-keyword">for</span> p <span class="hljs-keyword">in</span> ORDER:<br>        <span class="hljs-keyword">if</span> p <span class="hljs-keyword">in</span> grouped:<br>            names = grouped[p]<br>            lines.append(<span class="hljs-string">f&quot;<span class="hljs-subst">&#123;p&#125;</span> (<span class="hljs-subst">&#123;<span class="hljs-built_in">len</span>(names)&#125;</span>): <span class="hljs-subst">&#123;<span class="hljs-string">&#x27;, &#x27;</span>.join(names)&#125;</span>&quot;</span>)<br>    <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;\n&quot;</span>.join(lines)<br><br><span class="hljs-comment"># 输出示例：</span><br><span class="hljs-comment"># 高 (1): 完成 leetcode 刷题</span><br><span class="hljs-comment"># 低 (1): 完成 30min 运动</span><br></code></pre></td></tr></table></figure>
+
+<h3 id="工具实现示例：add-task"><a href="#工具实现示例：add-task" class="headerlink" title="工具实现示例：add_task"></a>工具实现示例：<code>add_task</code></h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-meta">@tool</span><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">add_task</span>(<span class="hljs-params"></span><br><span class="hljs-params">    priority: <span class="hljs-built_in">str</span>,</span><br><span class="hljs-params">    task_description: <span class="hljs-built_in">str</span>,</span><br><span class="hljs-params">    runtime: ToolRuntime[CustomContext, TaskManagerState]</span><br><span class="hljs-params"></span>) -&gt; Command:<br>    <span class="hljs-string">&quot;&quot;&quot;添加待办任务</span><br><span class="hljs-string"></span><br><span class="hljs-string">    Args:</span><br><span class="hljs-string">        priority: 优先级（低/中等/高），默认中等</span><br><span class="hljs-string">        task_description: 任务描述，如：完成有氧运动 30min</span><br><span class="hljs-string">    &quot;&quot;&quot;</span><br>    current_tasks = runtime.state[<span class="hljs-string">&quot;current_tasks&quot;</span>]<br><br>    <span class="hljs-comment"># 参数校验：优先级非法时降级为&quot;中等&quot;</span><br>    <span class="hljs-keyword">if</span> priority <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> [<span class="hljs-string">&quot;低&quot;</span>, <span class="hljs-string">&quot;中等&quot;</span>, <span class="hljs-string">&quot;高&quot;</span>]:<br>        priority = <span class="hljs-string">&quot;中等&quot;</span><br><br>    task = Task(priority=priority, description=task_description)<br>    current_tasks.append(task)<br><br>    <span class="hljs-keyword">return</span> Command(<br>        update=&#123;<br>            <span class="hljs-string">&quot;current_tasks&quot;</span>: current_tasks,<br>            <span class="hljs-string">&quot;messages&quot;</span>: [ToolMessage(<br>                content=<span class="hljs-string">&quot;Successfully set new task&quot;</span>,<br>                tool_call_id=runtime.tool_call_id<br>            )]<br>        &#125;<br>    )<br></code></pre></td></tr></table></figure>
+
+<h3 id="完整使用流程"><a href="#完整使用流程" class="headerlink" title="完整使用流程"></a>完整使用流程</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-comment"># 初始化空状态</span><br>tasks, finished = [], []<br><br><span class="hljs-comment"># 添加任务</span><br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;帮我添加低优先级任务：完成30min运动&quot;</span>&#125;],<br>    <span class="hljs-string">&quot;current_tasks&quot;</span>: tasks,<br>    <span class="hljs-string">&quot;completed_tasks&quot;</span>: finished,<br>&#125;)<br><br><span class="hljs-comment"># 继承状态，继续操作</span><br>tasks = result.get(<span class="hljs-string">&quot;current_tasks&quot;</span>)<br>finished = result.get(<span class="hljs-string">&quot;completed_tasks&quot;</span>)<br><br><span class="hljs-comment"># 查看任务</span><br>result = agent.invoke(&#123;<br>    <span class="hljs-string">&quot;messages&quot;</span>: [&#123;<span class="hljs-string">&quot;role&quot;</span>: <span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;content&quot;</span>: <span class="hljs-string">&quot;查看我的待办任务&quot;</span>&#125;],<br>    <span class="hljs-string">&quot;current_tasks&quot;</span>: tasks,<br>    <span class="hljs-string">&quot;completed_tasks&quot;</span>: finished,<br>&#125;)<br><span class="hljs-built_in">print</span>(result[<span class="hljs-string">&quot;messages&quot;</span>][-<span class="hljs-number">1</span>].content)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="单元测试：如何测试-Agent-工具"><a href="#单元测试：如何测试-Agent-工具" class="headerlink" title="单元测试：如何测试 Agent 工具"></a>单元测试：如何测试 Agent 工具</h2><p>直接测试 Agent 需要调用 LLM，成本高且结果不确定。更好的方案是<strong>Mock ToolRuntime</strong>，直接测工具逻辑：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> unittest.mock <span class="hljs-keyword">import</span> MagicMock<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">make_runtime</span>(<span class="hljs-params">current_tasks=<span class="hljs-literal">None</span>, completed_tasks=<span class="hljs-literal">None</span>, tool_call_id=<span class="hljs-string">&quot;test-id&quot;</span></span>):<br>    <span class="hljs-string">&quot;&quot;&quot;构造 Mock 的 ToolRuntime&quot;&quot;&quot;</span><br>    runtime = MagicMock()<br>    runtime.state = &#123;<br>        <span class="hljs-string">&quot;current_tasks&quot;</span>: current_tasks <span class="hljs-keyword">or</span> [],<br>        <span class="hljs-string">&quot;completed_tasks&quot;</span>: completed_tasks <span class="hljs-keyword">or</span> [],<br>    &#125;<br>    runtime.tool_call_id = tool_call_id<br>    <span class="hljs-keyword">return</span> runtime<br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">test_add_task</span>():<br>    runtime = make_runtime()<br>    result = _add_task_logic(<span class="hljs-string">&quot;高&quot;</span>, <span class="hljs-string">&quot;写技术文档&quot;</span>, runtime)<br><br>    <span class="hljs-keyword">assert</span> <span class="hljs-built_in">len</span>(result.update[<span class="hljs-string">&quot;current_tasks&quot;</span>]) == <span class="hljs-number">1</span><br>    <span class="hljs-keyword">assert</span> result.update[<span class="hljs-string">&quot;current_tasks&quot;</span>][<span class="hljs-number">0</span>].priority == <span class="hljs-string">&quot;高&quot;</span><br>    <span class="hljs-keyword">assert</span> <span class="hljs-string">&quot;Successfully&quot;</span> <span class="hljs-keyword">in</span> result.update[<span class="hljs-string">&quot;messages&quot;</span>][<span class="hljs-number">0</span>].content<br></code></pre></td></tr></table></figure>
+
+<p>这种测试策略的优势：</p>
+<ul>
+<li>🚀 <strong>无 LLM 调用</strong>：测试速度快，零成本</li>
+<li>🎯 <strong>精准覆盖</strong>：直接测工具逻辑，与模型行为无关</li>
+<li>🔁 <strong>结果确定</strong>：不受随机性影响，CI/CD 友好</li>
+</ul>
+<hr>
+<h2 id="create-agent-参数速查"><a href="#create-agent-参数速查" class="headerlink" title="create_agent 参数速查"></a><code>create_agent</code> 参数速查</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs python">agent = create_agent(<br>    model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>,        <span class="hljs-comment"># 模型名称或实例</span><br>    tools=[...],                 <span class="hljs-comment"># 工具列表</span><br>    system_prompt=<span class="hljs-string">&quot;...&quot;</span>,         <span class="hljs-comment"># 系统提示词</span><br>    state_schema=MyState,        <span class="hljs-comment"># 自定义状态 Schema</span><br>    context_schema=MyContext,    <span class="hljs-comment"># 不可变上下文 Schema</span><br>    checkpointer=saver,          <span class="hljs-comment"># 记忆/检查点（短期记忆）</span><br>    store=store,                 <span class="hljs-comment"># 持久化存储（长期记忆）</span><br>    middleware=[...],            <span class="hljs-comment"># 中间件列表</span><br>)<br></code></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><table>
+<thead>
+<tr>
+<th>概念</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>create_agent()</code></td>
+<td>创建具备推理和工具调用能力的 Agent</td>
+</tr>
+<tr>
+<td><code>AgentState</code></td>
+<td>Agent 的内部状态，工具可读写</td>
+</tr>
+<tr>
+<td><code>CustomContext</code></td>
+<td>不可变的请求上下文（如用户ID）</td>
+</tr>
+<tr>
+<td><code>Command</code></td>
+<td>工具通过此对象修改 Agent 状态</td>
+</tr>
+<tr>
+<td>Mock ToolRuntime</td>
+<td>单元测试工具逻辑的最佳实践</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>🚀 <strong>下一步</strong>：学习 <code>chunk</code> 模块，了解流式输出（Streaming）的使用方式。</p>
+</blockquote>
+
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/06_agent.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/langchain/" class="print-no-link">#langchain</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>langchain models 实战 Agent 智能体</div>
+      <div>https://yilinyo.github.io/2026/03/30/06_agent/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年3月30日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/03/30/05_tools/" title="langchain models 实战 Tools 工具系统">
+                                                                                                    <i class="iconfont icon-arrowleft"></i>
+                                                                                                    <span class="hidden-mobile">langchain models 实战 Tools 工具系统</span>
+                                                                                                    <span class="visible-mobile">上一篇</span>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/03/30/07_chunk_streaming/" title="langchain models 实战 流式输出（Streaming）">
+                                                                                                    <span class="hidden-mobile">langchain models 实战 流式输出（Streaming）</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
