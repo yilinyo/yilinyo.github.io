@@ -1,31 +1,7 @@
 {
   "source_dir": "博客",
   "target_post_dir": "source/_posts",
-  "generated_at": "2026-03-31T10:01:02+00:00",
-  "files": [
-    "source/_posts/personal.md"
-  ],
-  "warnings": {
-    "博客/personal.md": [
-      "images/WEBRESOURCE4257bec3bbe30a3d5ec2144d79a017ceimage.png",
-      "images/WEBRESOURCEb2c2333487f260b358a8c17480057d3dimage.png",
-      "images/WEBRESOURCE1489559df2ab4bc8a8eeec0826f9e888image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE1792e496e265b14fdaa022a1a3c691ffimage.png",
-      "images/WEBRESOURCE037b6129c598896c7b169b97f8e4977fimage.png",
-      "images/WEBRESOURCE6966c8aad65833f15064ac49a08f2997image.png",
-      "images/WEBRESOURCE049e588e6bb3a4820675496fd93182acimage.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE29f348aabf1b69aa68adc44c32e58c95image.png",
-      "images/WEBRESOURCEb52aca8b9dd522b0b24183e43afcc93e截图.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCEd6d6e8d0b253eec2aab354496cf1fcf8image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE08d2cd3411615d9ee4128e4ad9ea3fe6image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCEf48ac8705a2fc2adefe478b2685da3d8image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE774be1605931d2a5a5daf62ae6175007IMG_3950.PNG",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCEd8011e6b91c39a3713af9a5116df1267image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCEab68f181f5753009619901f3405f08a3image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE5895b922f7e9836137bd13dcb632724cimage.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE0cd77a8290a3f10ce5b741ee4ed0849cimage.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE57d293534e1767beac63e276ac149c51image.png",
-      "/Users/yilin/Documents/ydynotes/博客/images/WEBRESOURCE3afee5337d1399b064d71a7345a33481image.png"
-    ]
-  }
+  "generated_at": "2026-03-31T10:20:06+00:00",
+  "files": [],
+  "warnings": {}
 }
