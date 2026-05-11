@@ -24,22 +24,21 @@
   <meta name="author" content="yilin">
   <meta name="keywords" content="">
   
-    <meta name="description" content="⚡ 流式输出（Streaming）—— 让回复”实时涌现” 所在目录：chunk&#x2F;stream_mode.ipynb核心依赖：langchain_openai、langchain.agents   前言ChatGPT 的回复是一个字一个字涌现出来的，而不是等全部生成完再展示——这就是流式输出（Streaming）。它让用户感受到”AI 正在实时思考”，而不是对着空屏幕等待。    对比维度 普通">
+    <meta name="description" content="测试">
 <meta property="og:type" content="article">
-<meta property="og:title" content="langchain models 实战 流式输出（Streaming）">
-<meta property="og:url" content="https://yilinyo.github.io/2026/03/30/07_chunk_streaming/index.html">
+<meta property="og:title" content="Yilin派哟yoo🥧">
+<meta property="og:url" content="https://yilinyo.github.io/2026/05/11/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/index.html">
 <meta property="og:site_name" content="Yilin派哟yoo🥧">
-<meta property="og:description" content="⚡ 流式输出（Streaming）—— 让回复”实时涌现” 所在目录：chunk&#x2F;stream_mode.ipynb核心依赖：langchain_openai、langchain.agents   前言ChatGPT 的回复是一个字一个字涌现出来的，而不是等全部生成完再展示——这就是流式输出（Streaming）。它让用户感受到”AI 正在实时思考”，而不是对着空屏幕等待。    对比维度 普通">
+<meta property="og:description" content="测试">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2026-03-30T22:12:00.000Z">
-<meta property="article:modified_time" content="2026-05-11T16:15:22.391Z">
+<meta property="article:published_time" content="2026-05-11T16:15:22.392Z">
+<meta property="article:modified_time" content="2026-05-11T16:15:22.392Z">
 <meta property="article:author" content="yilin">
-<meta property="article:tag" content="langchain">
 <meta name="twitter:card" content="summary_large_image">
   
   
   
-  <title>langchain models 实战 流式输出（Streaming） - Yilin派哟yoo🥧</title>
+  <title>Yilin派哟yoo🥧</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -232,7 +231,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="langchain models 实战 流式输出（Streaming）"></span>
+            <span id="subtitle" data-typed-text=""></span>
           
         </div>
 
@@ -243,8 +242,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2026-03-30 22:12" pubdate>
-          2026年3月30日 晚上
+        <time datetime="2026-05-11 16:15" pubdate>
+          2026年5月11日 下午
         </time>
       </span>
     
@@ -255,7 +254,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          466 字
+          2 字
         
       </span>
     
@@ -266,7 +265,7 @@
         
         
         
-          4 分钟
+          1 分钟
         
       </span>
     
@@ -319,103 +318,23 @@
                         <article class="post-content mx-auto">
                             <!-- SEO header -->
                             <h1 style="display: none">
-                                langchain models 实战 流式输出（Streaming）
+                                
                             </h1>
                             
                                     
                                                             <div class="markdown-body">
                                                                 
-                                                                    <h1 id="⚡-流式输出（Streaming）——-让回复”实时涌现”"><a href="#⚡-流式输出（Streaming）——-让回复”实时涌现”" class="headerlink" title="⚡ 流式输出（Streaming）—— 让回复”实时涌现”"></a>⚡ 流式输出（Streaming）—— 让回复”实时涌现”</h1><blockquote>
-<p><strong>所在目录</strong>：<code>chunk/stream_mode.ipynb</code><br><strong>核心依赖</strong>：<code>langchain_openai</code>、<code>langchain.agents</code></p>
-</blockquote>
-<hr>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>ChatGPT 的回复是一个字一个字涌现出来的，而不是等全部生成完再展示——这就是<strong>流式输出（Streaming）</strong>。它让用户感受到”AI 正在实时思考”，而不是对着空屏幕等待。</p>
-<table>
-<thead>
-<tr>
-<th>对比维度</th>
-<th>普通 <code>invoke</code></th>
-<th>流式 <code>stream</code></th>
-</tr>
-</thead>
-<tbody><tr>
-<td>用户体验</td>
-<td>长时等待 → 突然全文出现</td>
-<td>内容实时涌现</td>
-</tr>
-<tr>
-<td>首字节时间</td>
-<td>等待全部生成</td>
-<td>几乎即时</td>
-</tr>
-<tr>
-<td>适用场景</td>
-<td>批处理、后台任务</td>
-<td>对话界面、实时展示</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="基础流式：llm-stream"><a href="#基础流式：llm-stream" class="headerlink" title="基础流式：llm.stream()"></a>基础流式：<code>llm.stream()</code></h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> langchain_openai <span class="hljs-keyword">import</span> ChatOpenAI<br><br>llm = ChatOpenAI(model=<span class="hljs-string">&quot;gpt-4o-mini&quot;</span>)<br><br><span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> llm.stream(<span class="hljs-string">&quot;给我讲一个关于程序员的笑话&quot;</span>):<br>    <span class="hljs-built_in">print</span>(chunk.content, end=<span class="hljs-string">&quot;&quot;</span>, flush=<span class="hljs-literal">True</span>)<br></code></pre></td></tr></table></figure>
-
-<p>返回的每个 <code>chunk</code> 是 <code>AIMessageChunk</code>，<code>.content</code> 是这次输出的文本片段。</p>
-<hr>
-<h2 id="Agent-流式：astream-events"><a href="#Agent-流式：astream-events" class="headerlink" title="Agent 流式：astream_events()"></a>Agent 流式：<code>astream_events()</code></h2><p>Agent 执行涉及多个阶段（思考 → 调工具 → 再思考），用 <code>astream_events()</code> 可以感知每个阶段：</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> event <span class="hljs-keyword">in</span> agent.astream_events(input_data, version=<span class="hljs-string">&quot;v2&quot;</span>):<br>    event_type = event[<span class="hljs-string">&quot;event&quot;</span>]<br><br>    <span class="hljs-keyword">if</span> event_type == <span class="hljs-string">&quot;on_chat_model_stream&quot;</span>:<br>        <span class="hljs-built_in">print</span>(event[<span class="hljs-string">&quot;data&quot;</span>][<span class="hljs-string">&quot;chunk&quot;</span>].content, end=<span class="hljs-string">&quot;&quot;</span>, flush=<span class="hljs-literal">True</span>)<br><br>    <span class="hljs-keyword">elif</span> event_type == <span class="hljs-string">&quot;on_tool_start&quot;</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n🔧 调用工具：<span class="hljs-subst">&#123;event[<span class="hljs-string">&#x27;name&#x27;</span>]&#125;</span>，参数：<span class="hljs-subst">&#123;event[<span class="hljs-string">&#x27;data&#x27;</span>].get(<span class="hljs-string">&#x27;input&#x27;</span>)&#125;</span>&quot;</span>)<br><br>    <span class="hljs-keyword">elif</span> event_type == <span class="hljs-string">&quot;on_tool_end&quot;</span>:<br>        <span class="hljs-built_in">print</span>(<span class="hljs-string">f&quot;\n✅ 工具返回：<span class="hljs-subst">&#123;event[<span class="hljs-string">&#x27;data&#x27;</span>].get(<span class="hljs-string">&#x27;output&#x27;</span>)&#125;</span>&quot;</span>)<br></code></pre></td></tr></table></figure>
-
-<h3 id="常见事件类型"><a href="#常见事件类型" class="headerlink" title="常见事件类型"></a>常见事件类型</h3><table>
-<thead>
-<tr>
-<th>事件名</th>
-<th>触发时机</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>on_chat_model_stream</code></td>
-<td>模型输出每个 chunk</td>
-</tr>
-<tr>
-<td><code>on_tool_start</code></td>
-<td>工具开始执行</td>
-</tr>
-<tr>
-<td><code>on_tool_end</code></td>
-<td>工具执行完毕</td>
-</tr>
-<tr>
-<td><code>on_chain_start/end</code></td>
-<td>链的开始/结束</td>
-</tr>
-</tbody></table>
-<hr>
-<h2 id="在-FastAPI-中使用流式"><a href="#在-FastAPI-中使用流式" class="headerlink" title="在 FastAPI 中使用流式"></a>在 FastAPI 中使用流式</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">from</span> fastapi.responses <span class="hljs-keyword">import</span> StreamingResponse<br><br><span class="hljs-meta">@app.get(<span class="hljs-params"><span class="hljs-string">&quot;/chat&quot;</span></span>)</span><br><span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">chat</span>(<span class="hljs-params">question: <span class="hljs-built_in">str</span></span>):<br>    <span class="hljs-keyword">async</span> <span class="hljs-keyword">def</span> <span class="hljs-title function_">generate</span>():<br>        <span class="hljs-keyword">async</span> <span class="hljs-keyword">for</span> chunk <span class="hljs-keyword">in</span> llm.astream(question):<br>            <span class="hljs-keyword">yield</span> chunk.content<br>    <span class="hljs-keyword">return</span> StreamingResponse(generate(), media_type=<span class="hljs-string">&quot;text/plain&quot;</span>)<br></code></pre></td></tr></table></figure>
-
-<hr>
-<h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><ol>
-<li><strong>简单场景</strong>：<code>llm.stream()</code> 即可，逐 chunk 打印</li>
-<li><strong>Agent 场景</strong>：<code>agent.astream_events()</code> 获取完整执行事件流</li>
-<li><strong>Web 服务</strong>：结合 <code>StreamingResponse</code> 实现真正的实时流</li>
-</ol>
-<blockquote>
-<p>🚀 <strong>下一步</strong>：学习 <code>middleware</code> 模块，了解如何在 Agent 执行链路上添加限流、重试、审批、隐私保护等横切能力。</p>
-</blockquote>
-
+                                                                    <h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2>
                                                                         
                                                             </div>
                                                             
                                                                 <hr/>
                                                                 <div style="text-align: center ">
-                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/07_chunk_streaming.md" target="_blank">编辑文章✏</a>
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/测试/测试.md" target="_blank">编辑文章✏</a>
                                                                 </div>
                                                                 <div>
                                                                     <div class="post-metas my-3">
   
-  
-    <div class="post-meta">
-      <i class="iconfont icon-tags"></i>
-      
-        <a href="/tags/langchain/" class="print-no-link">#langchain</a>
-      
-    </div>
   
 </div>
 
@@ -425,8 +344,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>langchain models 实战 流式输出（Streaming）</div>
-      <div>https://yilinyo.github.io/2026/03/30/07_chunk_streaming/</div>
+      <div></div>
+      <div>https://yilinyo.github.io/2026/05/11/测试/测试/</div>
     </div>
     <div class="license-meta">
       
@@ -438,7 +357,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2026年3月30日</div>
+          <div>2026年5月11日</div>
         </div>
       
       
@@ -470,9 +389,9 @@
                                                                                     <article class="post-prev col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2026/03/30/06_agent/" title="langchain models 实战 Agent 智能体">
+                                                                                                <a href="/2026/05/12/%E6%9E%B6%E6%9E%84/ddd%20%E7%BB%93%E6%9E%84%E7%9A%84%E5%BA%94%E7%94%A8/" title="go项目中的DDD四层架构">
                                                                                                     <i class="iconfont icon-arrowleft"></i>
-                                                                                                    <span class="hidden-mobile">langchain models 实战 Agent 智能体</span>
+                                                                                                    <span class="hidden-mobile">go项目中的DDD四层架构</span>
                                                                                                     <span class="visible-mobile">上一篇</span>
                                                                                                 </a>
                                                                                                 
@@ -481,8 +400,8 @@
                                                                                     <article class="post-next col-6">
                                                                                         
                                                                                             
-                                                                                                <a href="/2026/03/30/08_middleware/" title="langchain models 实战 Middleware 中间件">
-                                                                                                    <span class="hidden-mobile">langchain models 实战 Middleware 中间件</span>
+                                                                                                <a href="/2026/04/01/ai/function%20calling%20%E5%92%8C%20mcp/" title="function calling 和 mcp 的关系">
+                                                                                                    <span class="hidden-mobile">function calling 和 mcp 的关系</span>
                                                                                                     <span class="visible-mobile">下一篇</span>
                                                                                                     <i class="iconfont icon-arrowright"></i>
                                                                                                 </a>
