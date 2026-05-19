@@ -1,12 +1,8 @@
 ---
-title: "ai vibecoding workflow"
-date: "2026-05-18 10:45:50"
----
----
 title: ai vibecoding workflow 实践 
 tag: 大模型应用  
-date: 2026-05-18 18:42:00  
----  
+date: 2026-05-18 18:42:00 
+---
 ## ai vibecoding 开发模式
 
 ![手绘图展示 ai vibecoding 中前端优先、前后端同步、后端优先三种开发路径](https://files.seeusercontent.com/2026/05/12/Cui7/ai-vibecoding-workflow-cover.jpg)
