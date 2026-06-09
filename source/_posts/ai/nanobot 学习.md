@@ -29,7 +29,6 @@ date: 2026-06-09 15:03:00
 - **Iteration**：一个 Turn 内部，`AgentRunner` 主循环的一次迭代。  
   
 一个 Turn 可能包含多次 Iteration，例如：  
-  
 ```text  
 Iteration 0：LLM 请求 read_file  
 Iteration 1：LLM 根据文件内容请求 edit_file  
@@ -47,7 +46,8 @@ Telegram / Slack / WebSocket / CLI
 → InboundMessage  
 → MessageBus.inbound  
 → AgentLoop  
-```  
+```
+ 
   
 Agent 处理完成后生成 `OutboundMessage`：  
   
@@ -56,7 +56,8 @@ AgentLoop
 → OutboundMessage  
 → MessageBus.outbound  
 → 对应 Channel  
-```  
+```
+ 
   
 `MessageBus` 的作用是解耦 Channel 与 Agent 核心。Channel 不需要直接调用 LLM，AgentLoop 也不需要了解各平台的收发实现。  
   
