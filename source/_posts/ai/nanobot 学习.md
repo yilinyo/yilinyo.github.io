@@ -2,7 +2,7 @@
 title: nanobot的整体运行机制 
 tag: agent
 date: 2026-06-09 15:03:00
----  
+---
 本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。  
 
 ![展示用户消息进入 nanobot、经过 Agent 执行与工具调用后保存会话并返回响应的封面图](https://files.seeusercontent.com/2026/06/09/9iXc/01-cover.webp)
