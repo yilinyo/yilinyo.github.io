@@ -1,6 +1,4 @@
 ---
-
----
 title: function calling 和 mcp 的关系
 tag: 大模型应用
 date: 2026-04-01 20:12:00
