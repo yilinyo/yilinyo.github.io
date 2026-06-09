@@ -267,7 +267,7 @@
       
       <a class="index-excerpt index-excerpt__noimg" href="/2026/06/09/ai/nanobot%20%E5%AD%A6%E4%B9%A0/" target="_self">
         <div>
-          本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。    一、核心概念1. Turn一个 Turn 表示系统处理一条入站消息的完整过程：   1234567891011121314151617181920212223242526272829303132333435363738394
+          本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。    一、核心概念1. Turn一个 Turn 表示系统处理一条入站消息的完整过程：   123456接收 InboundMessage  → 恢复 Session  → 构建上下文  → 运行 Agent  → 保存结果  →
         </div>
       </a>
 
@@ -315,7 +315,7 @@
         
           <div class="post-meta mr-3">
             <i class="iconfont icon-date"></i>
-            <time datetime="2026-06-09 07:19" pubdate>
+            <time datetime="2026-06-09 07:25" pubdate>
               2026-06-09
             </time>
           </div>
@@ -485,15 +485,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/03/30/02_message/" target="_self">
-          langchain models 实战 消息系统详解
+        <a href="/2026/03/30/01_models/" target="_self">
+          langchain models 实战 模型初始化与调用
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/02_message/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/01_models/" target="_self">
         <div>
-          💬 消息系统详解 —— LangChain 的对话语言 所在目录：message/message_use.ipynb核心依赖：langchain_core.messages   前言如果说大模型是引擎，那么消息（Message）就是燃料。LangChain 用一套精心设计的消息类型系统来描述”对话”这件事——谁说了什么、什么角色说的、工具返回了什么……每一条信息都有明确的类型。 理解消息系统，是
+          🤖 模型初始化与调用 —— LangChain 的第一步 所在目录：models/initmodel_demo.ipynb核心依赖：langchain_openai、langchain_anthropic、langchain_core   前言在使用 LangChain 构建 AI 应用之前，第一步永远是”选一个大模型，把它跑起来”。models 模块就是干这件事的——它演示了如何初始化不同厂商
         </div>
       </a>
 
@@ -525,15 +525,15 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/03/30/01_models/" target="_self">
-          langchain models 实战 模型初始化与调用
+        <a href="/2026/03/30/02_message/" target="_self">
+          langchain models 实战 消息系统详解
         </a>
       </h2>
 
       
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/01_models/" target="_self">
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/02_message/" target="_self">
         <div>
-          🤖 模型初始化与调用 —— LangChain 的第一步 所在目录：models/initmodel_demo.ipynb核心依赖：langchain_openai、langchain_anthropic、langchain_core   前言在使用 LangChain 构建 AI 应用之前，第一步永远是”选一个大模型，把它跑起来”。models 模块就是干这件事的——它演示了如何初始化不同厂商
+          💬 消息系统详解 —— LangChain 的对话语言 所在目录：message/message_use.ipynb核心依赖：langchain_core.messages   前言如果说大模型是引擎，那么消息（Message）就是燃料。LangChain 用一套精心设计的消息类型系统来描述”对话”这件事——谁说了什么、什么角色说的、工具返回了什么……每一条信息都有明确的类型。 理解消息系统，是
         </div>
       </a>
 
