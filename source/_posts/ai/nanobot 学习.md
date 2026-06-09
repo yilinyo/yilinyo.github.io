@@ -19,8 +19,8 @@ date: 2026-06-09 15:03:00
 → 构建上下文  
 → 运行 Agent  
 → 保存结果  
-→ 生成 OutboundMessage  
-```  
+→ 生成 OutboundMessage
+```
   
 需要区分三个容易混淆的概念：  
   
