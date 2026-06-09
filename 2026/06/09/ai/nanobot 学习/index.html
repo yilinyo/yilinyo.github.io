@@ -1,0 +1,745 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="title: nanobot的整体运行机制tag: agentdate: 2026-06-09 15:03:00  本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。    一、核心概念1. Turn一个 Turn 表示系统处理一条入站消息的完整过程：   12345678910">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nanobot 学习">
+<meta property="og:url" content="https://yilinyo.github.io/2026/06/09/ai/nanobot%20%E5%AD%A6%E4%B9%A0/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="title: nanobot的整体运行机制tag: agentdate: 2026-06-09 15:03:00  本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。    一、核心概念1. Turn一个 Turn 表示系统处理一条入站消息的完整过程：   12345678910">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://files.seeusercontent.com/2026/06/09/9iXc/01-cover.webp">
+<meta property="article:published_time" content="2026-06-09T07:05:33.000Z">
+<meta property="article:modified_time" content="2026-06-09T07:05:56.961Z">
+<meta property="article:author" content="yilin">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://files.seeusercontent.com/2026/06/09/9iXc/01-cover.webp">
+  
+  
+  
+  <title>nanobot 学习 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nanobot 学习"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-09 07:05" pubdate>
+          2026年6月9日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.9k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          33 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                nanobot 学习
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <hr>
+<p>title: nanobot的整体运行机制<br>tag: agent<br>date: 2026-06-09 15:03:00</p>
+<hr>
+<p>本文以nanobot项目代码为准，重点梳理一条用户消息从 Channel 进入系统，到 Agent 调用 LLM、执行工具、保存 Session，再返回响应的完整流程。  </p>
+<p><img src="https://files.seeusercontent.com/2026/06/09/9iXc/01-cover.webp" srcset="/img/loading.gif" lazyload alt="展示用户消息进入 nanobot、经过 Agent 执行与工具调用后保存会话并返回响应的封面图"></p>
+<h2 id="一、核心概念"><a href="#一、核心概念" class="headerlink" title="一、核心概念"></a>一、核心概念</h2><h3 id="1-Turn"><a href="#1-Turn" class="headerlink" title="1. Turn"></a>1. Turn</h3><p>一个 Turn 表示系统处理一条入站消息的完整过程：  </p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br><span class="line">363</span><br><span class="line">364</span><br><span class="line">365</span><br><span class="line">366</span><br><span class="line">367</span><br><span class="line">368</span><br><span class="line">369</span><br><span class="line">370</span><br><span class="line">371</span><br><span class="line">372</span><br><span class="line">373</span><br><span class="line">374</span><br><span class="line">375</span><br><span class="line">376</span><br><span class="line">377</span><br><span class="line">378</span><br><span class="line">379</span><br><span class="line">380</span><br><span class="line">381</span><br><span class="line">382</span><br><span class="line">383</span><br><span class="line">384</span><br><span class="line">385</span><br><span class="line">386</span><br><span class="line">387</span><br><span class="line">388</span><br><span class="line">389</span><br><span class="line">390</span><br><span class="line">391</span><br><span class="line">392</span><br><span class="line">393</span><br><span class="line">394</span><br><span class="line">395</span><br><span class="line">396</span><br><span class="line">397</span><br><span class="line">398</span><br><span class="line">399</span><br><span class="line">400</span><br><span class="line">401</span><br><span class="line">402</span><br><span class="line">403</span><br><span class="line">404</span><br><span class="line">405</span><br><span class="line">406</span><br><span class="line">407</span><br><span class="line">408</span><br><span class="line">409</span><br><span class="line">410</span><br><span class="line">411</span><br><span class="line">412</span><br><span class="line">413</span><br><span class="line">414</span><br><span class="line">415</span><br><span class="line">416</span><br><span class="line">417</span><br><span class="line">418</span><br><span class="line">419</span><br><span class="line">420</span><br><span class="line">421</span><br><span class="line">422</span><br><span class="line">423</span><br><span class="line">424</span><br><span class="line">425</span><br><span class="line">426</span><br><span class="line">427</span><br><span class="line">428</span><br><span class="line">429</span><br><span class="line">430</span><br><span class="line">431</span><br><span class="line">432</span><br><span class="line">433</span><br><span class="line">434</span><br><span class="line">435</span><br><span class="line">436</span><br><span class="line">437</span><br><span class="line">438</span><br><span class="line">439</span><br><span class="line">440</span><br><span class="line">441</span><br><span class="line">442</span><br><span class="line">443</span><br><span class="line">444</span><br><span class="line">445</span><br><span class="line">446</span><br><span class="line">447</span><br><span class="line">448</span><br><span class="line">449</span><br><span class="line">450</span><br><span class="line">451</span><br><span class="line">452</span><br><span class="line">453</span><br><span class="line">454</span><br><span class="line">455</span><br><span class="line">456</span><br><span class="line">457</span><br><span class="line">458</span><br><span class="line">459</span><br><span class="line">460</span><br><span class="line">461</span><br><span class="line">462</span><br><span class="line">463</span><br><span class="line">464</span><br><span class="line">465</span><br><span class="line">466</span><br><span class="line">467</span><br><span class="line">468</span><br><span class="line">469</span><br><span class="line">470</span><br><span class="line">471</span><br><span class="line">472</span><br><span class="line">473</span><br><span class="line">474</span><br><span class="line">475</span><br><span class="line">476</span><br><span class="line">477</span><br><span class="line">478</span><br><span class="line">479</span><br><span class="line">480</span><br><span class="line">481</span><br><span class="line">482</span><br><span class="line">483</span><br><span class="line">484</span><br><span class="line">485</span><br><span class="line">486</span><br><span class="line">487</span><br><span class="line">488</span><br><span class="line">489</span><br><span class="line">490</span><br><span class="line">491</span><br><span class="line">492</span><br><span class="line">493</span><br><span class="line">494</span><br><span class="line">495</span><br><span class="line">496</span><br><span class="line">497</span><br><span class="line">498</span><br><span class="line">499</span><br><span class="line">500</span><br><span class="line">501</span><br><span class="line">502</span><br><span class="line">503</span><br><span class="line">504</span><br><span class="line">505</span><br><span class="line">506</span><br><span class="line">507</span><br><span class="line">508</span><br><span class="line">509</span><br><span class="line">510</span><br><span class="line">511</span><br><span class="line">512</span><br><span class="line">513</span><br><span class="line">514</span><br><span class="line">515</span><br><span class="line">516</span><br><span class="line">517</span><br><span class="line">518</span><br><span class="line">519</span><br><span class="line">520</span><br><span class="line">521</span><br><span class="line">522</span><br><span class="line">523</span><br><span class="line">524</span><br><span class="line">525</span><br><span class="line">526</span><br><span class="line">527</span><br><span class="line">528</span><br><span class="line">529</span><br><span class="line">530</span><br><span class="line">531</span><br><span class="line">532</span><br><span class="line">533</span><br><span class="line">534</span><br><span class="line">535</span><br><span class="line">536</span><br><span class="line">537</span><br><span class="line">538</span><br><span class="line">539</span><br><span class="line">540</span><br><span class="line">541</span><br><span class="line">542</span><br><span class="line">543</span><br><span class="line">544</span><br><span class="line">545</span><br><span class="line">546</span><br><span class="line">547</span><br><span class="line">548</span><br><span class="line">549</span><br><span class="line">550</span><br><span class="line">551</span><br><span class="line">552</span><br><span class="line">553</span><br><span class="line">554</span><br><span class="line">555</span><br><span class="line">556</span><br><span class="line">557</span><br><span class="line">558</span><br><span class="line">559</span><br><span class="line">560</span><br><span class="line">561</span><br><span class="line">562</span><br><span class="line">563</span><br><span class="line">564</span><br><span class="line">565</span><br><span class="line">566</span><br><span class="line">567</span><br><span class="line">568</span><br><span class="line">569</span><br><span class="line">570</span><br><span class="line">571</span><br><span class="line">572</span><br><span class="line">573</span><br><span class="line">574</span><br><span class="line">575</span><br><span class="line">576</span><br><span class="line">577</span><br><span class="line">578</span><br><span class="line">579</span><br><span class="line">580</span><br><span class="line">581</span><br><span class="line">582</span><br><span class="line">583</span><br><span class="line">584</span><br><span class="line">585</span><br><span class="line">586</span><br><span class="line">587</span><br><span class="line">588</span><br><span class="line">589</span><br><span class="line">590</span><br><span class="line">591</span><br><span class="line">592</span><br><span class="line">593</span><br><span class="line">594</span><br><span class="line">595</span><br><span class="line">596</span><br><span class="line">597</span><br><span class="line">598</span><br><span class="line">599</span><br><span class="line">600</span><br><span class="line">601</span><br><span class="line">602</span><br><span class="line">603</span><br><span class="line">604</span><br><span class="line">605</span><br><span class="line">606</span><br><span class="line">607</span><br><span class="line">608</span><br><span class="line">609</span><br><span class="line">610</span><br><span class="line">611</span><br><span class="line">612</span><br><span class="line">613</span><br><span class="line">614</span><br><span class="line">615</span><br><span class="line">616</span><br><span class="line">617</span><br><span class="line">618</span><br><span class="line">619</span><br><span class="line">620</span><br><span class="line">621</span><br><span class="line">622</span><br><span class="line">623</span><br><span class="line">624</span><br><span class="line">625</span><br><span class="line">626</span><br><span class="line">627</span><br><span class="line">628</span><br><span class="line">629</span><br><span class="line">630</span><br><span class="line">631</span><br><span class="line">632</span><br><span class="line">633</span><br><span class="line">634</span><br><span class="line">635</span><br><span class="line">636</span><br><span class="line">637</span><br><span class="line">638</span><br><span class="line">639</span><br><span class="line">640</span><br><span class="line">641</span><br><span class="line">642</span><br><span class="line">643</span><br><span class="line">644</span><br><span class="line">645</span><br><span class="line">646</span><br><span class="line">647</span><br><span class="line">648</span><br><span class="line">649</span><br><span class="line">650</span><br><span class="line">651</span><br><span class="line">652</span><br><span class="line">653</span><br><span class="line">654</span><br><span class="line">655</span><br><span class="line">656</span><br><span class="line">657</span><br><span class="line">658</span><br><span class="line">659</span><br><span class="line">660</span><br><span class="line">661</span><br><span class="line">662</span><br><span class="line">663</span><br><span class="line">664</span><br><span class="line">665</span><br><span class="line">666</span><br><span class="line">667</span><br><span class="line">668</span><br><span class="line">669</span><br><span class="line">670</span><br><span class="line">671</span><br><span class="line">672</span><br><span class="line">673</span><br><span class="line">674</span><br><span class="line">675</span><br><span class="line">676</span><br><span class="line">677</span><br><span class="line">678</span><br><span class="line">679</span><br><span class="line">680</span><br><span class="line">681</span><br><span class="line">682</span><br><span class="line">683</span><br><span class="line">684</span><br><span class="line">685</span><br><span class="line">686</span><br><span class="line">687</span><br><span class="line">688</span><br><span class="line">689</span><br><span class="line">690</span><br><span class="line">691</span><br><span class="line">692</span><br><span class="line">693</span><br><span class="line">694</span><br><span class="line">695</span><br><span class="line">696</span><br><span class="line">697</span><br><span class="line">698</span><br><span class="line">699</span><br><span class="line">700</span><br><span class="line">701</span><br><span class="line">702</span><br><span class="line">703</span><br><span class="line">704</span><br><span class="line">705</span><br><span class="line">706</span><br><span class="line">707</span><br><span class="line">708</span><br><span class="line">709</span><br><span class="line">710</span><br><span class="line">711</span><br><span class="line">712</span><br><span class="line">713</span><br><span class="line">714</span><br><span class="line">715</span><br><span class="line">716</span><br><span class="line">717</span><br><span class="line">718</span><br><span class="line">719</span><br><span class="line">720</span><br><span class="line">721</span><br><span class="line">722</span><br><span class="line">723</span><br><span class="line">724</span><br><span class="line">725</span><br><span class="line">726</span><br><span class="line">727</span><br><span class="line">728</span><br><span class="line">729</span><br><span class="line">730</span><br><span class="line">731</span><br><span class="line">732</span><br><span class="line">733</span><br><span class="line">734</span><br><span class="line">735</span><br><span class="line">736</span><br><span class="line">737</span><br><span class="line">738</span><br><span class="line">739</span><br><span class="line">740</span><br><span class="line">741</span><br><span class="line">742</span><br><span class="line">743</span><br><span class="line">744</span><br><span class="line">745</span><br><span class="line">746</span><br><span class="line">747</span><br><span class="line">748</span><br><span class="line">749</span><br><span class="line">750</span><br><span class="line">751</span><br><span class="line">752</span><br><span class="line">753</span><br><span class="line">754</span><br><span class="line">755</span><br><span class="line">756</span><br><span class="line">757</span><br><span class="line">758</span><br><span class="line">759</span><br><span class="line">760</span><br><span class="line">761</span><br><span class="line">762</span><br><span class="line">763</span><br><span class="line">764</span><br><span class="line">765</span><br><span class="line">766</span><br><span class="line">767</span><br><span class="line">768</span><br><span class="line">769</span><br><span class="line">770</span><br><span class="line">771</span><br><span class="line">772</span><br><span class="line">773</span><br><span class="line">774</span><br><span class="line">775</span><br><span class="line">776</span><br><span class="line">777</span><br><span class="line">778</span><br><span class="line">779</span><br><span class="line">780</span><br><span class="line">781</span><br><span class="line">782</span><br><span class="line">783</span><br><span class="line">784</span><br><span class="line">785</span><br><span class="line">786</span><br><span class="line">787</span><br><span class="line">788</span><br><span class="line">789</span><br><span class="line">790</span><br><span class="line">791</span><br><span class="line">792</span><br><span class="line">793</span><br></pre></td><td class="code"><pre><code class="hljs text">接收 InboundMessage  <br>→ 恢复 Session  <br>→ 构建上下文  <br>→ 运行 Agent  <br>→ 保存结果  <br>→ 生成 OutboundMessage  <br>```  <br>  <br>需要区分三个容易混淆的概念：  <br>  <br>- **AgentLoop**：长期存在的编排对象，不是一次 request。  <br>- **Turn**：处理一条入站消息的一轮业务流程。  <br>- **Iteration**：一个 Turn 内部，`AgentRunner` 主循环的一次迭代。  <br>  <br>一个 Turn 可能包含多次 Iteration，例如：  <br>  <br>```text  <br>Iteration 0：LLM 请求 read_file  <br>Iteration 1：LLM 根据文件内容请求 edit_file  <br>Iteration 2：LLM 返回最终回答  <br>```  <br>  <br>通常一次 Iteration 会发起一次主要 LLM 请求，但空响应恢复等逻辑可能在同一个 Iteration 内额外请求 LLM，因此 Iteration 数不一定严格等于 Provider API 请求总数。  <br>  <br>### 2. 消息与总线  <br>  <br>Channel 将外部平台消息转换为 `InboundMessage`，再发布到 `MessageBus`：  <br>  <br>```text  <br>Telegram / Slack / WebSocket / CLI  <br>→ InboundMessage  <br>→ MessageBus.inbound  <br>→ AgentLoop  <br>```  <br>  <br>Agent 处理完成后生成 `OutboundMessage`：  <br>  <br>```text  <br>AgentLoop  <br>→ OutboundMessage  <br>→ MessageBus.outbound  <br>→ 对应 Channel  <br>```  <br>  <br>`MessageBus` 的作用是解耦 Channel 与 Agent 核心。Channel 不需要直接调用 LLM，AgentLoop 也不需要了解各平台的收发实现。  <br>  <br>### 3. Session  <br>  <br>`Session` 表示一段对话的持久化状态，定义在 `session/manager.py`：  <br>  <br>```python  <br>@dataclass  <br>class Session:  <br>    key: str  <br>    messages: list[dict[str, Any]]  <br>    created_at: datetime    updated_at: datetime    metadata: dict[str, Any]  <br>    last_consolidated: int  <br>```  <br>  <br>各字段含义：  <br>  <br>- `key`：会话唯一标识，通常是 `channel:chat_id`。  <br>- `messages`：该会话保存的消息。  <br>- `created_at`：Session 创建时间。  <br>- `updated_at`：最近一次消息或维护操作的时间。  <br>- `metadata`：标题、摘要、checkpoint、持续目标等扩展状态。  <br>- `last_consolidated`：已经归档的消息前缀长度。  <br>  <br>未归档、仍可进入近期上下文的消息是：  <br>  <br>```python  <br>session.messages[session.last_consolidated:]  <br>```  <br>  <br>## 二、AgentLoop 的职责  <br><br>![展示 nanobot 外部接入、消息总线、产品层编排、执行循环与会话持久化边界的架构图](https://files.seeusercontent.com/2026/06/09/xxH4/02-architecture.webp)<br>  <br>`AgentLoop` 定义在 `agent/loop.py`，是产品层的核心编排器，主要负责：  <br>  <br>1. 从 `MessageBus` 接收消息。  <br>2. 按 Session 串行、跨 Session 并发地调度任务。  <br>3. 维护 Turn 状态机。  <br>4. 构建历史、记忆、技能和运行时上下文。  <br>5. 调用 `AgentRunner`。  <br>6. 保存 Session 并发布响应。  <br>  <br>`AgentLoop` 不直接实现通用的 ReAct 工具循环；真正的 LLM/工具迭代位于 `AgentRunner`。  <br>  <br>## 三、AgentLoop 的主要入口  <br>  <br>### 1. `run()`：持续消费 MessageBus  <br>  <br>```python  <br>async def run(self) -&gt; None:  <br>    while self._running:        msg = await asyncio.wait_for(            self.bus.consume_inbound(),            timeout=1.0,  <br>        )```  <br>  <br>它适用于 Gateway 和各种持续运行的 Channel。  <br>  <br>等待入站消息超时后，系统会检查空闲 Session：  <br>  <br>```python  <br>self.auto_compact.check_expired(...)  <br>```  <br>  <br>收到普通消息后，`run()` 创建后台任务：  <br>  <br>```python  <br>task = asyncio.create_task(self._dispatch(msg))  <br>```  <br>  <br>这样 AgentLoop 不会因为某个 Session 正在等待 LLM，而停止接收其他 Session 的消息。  <br>  <br>### 2. `_dispatch()`：并发调度与消息发布  <br>  <br>`_dispatch()` 的并发原则是：  <br>  <br>```text  <br>同一个 Session：通过 asyncio.Lock 串行执行  <br>不同 Session：可以并发执行  <br>全局并发量：可通过 Semaphore 限制  <br>```  <br>  <br>核心结构：  <br>  <br>```python  <br>lock = self._session_locks.setdefault(session_key, asyncio.Lock())  <br>gate = self._concurrency_gate or nullcontext()  <br>  <br>async with lock, gate:  <br>    response = await self._process_message(...)  <br>```  <br>  <br>如果同一个 Session 已经有任务运行，后续普通消息会进入 `pending_queue`，供当前 Runner 在执行过程中注入，而不是再启动一个相互竞争的 Turn。  <br>  <br>`_dispatch()` 还负责：  <br>  <br>- 建立流式输出回调。  <br>- 调用 `_process_message()`。  <br>- 将最终 `OutboundMessage` 发布到总线。  <br>- 在取消时恢复 runtime checkpoint。  <br>- 将未消费的 pending 消息重新发布，避免丢失。  <br>  <br>### 3. `process_direct()`：直接处理一条消息  <br>  <br>```python  <br>async def process_direct(  <br>    self,  <br>    content: str,  <br>    session_key: str = &quot;cli:direct&quot;,  <br>    ...) -&gt; OutboundMessage | None:  <br>```  <br>  <br>它自行构造 `InboundMessage`，取得 Session 锁，然后调用 `_process_message()`。  <br>  <br>当前项目中它被 Python SDK、OpenAI 兼容 API、CLI 的部分直接调用路径以及 Dream 内部任务使用。它不经过 MessageBus 的持续消费循环，但仍复用同一套 Turn 状态机。  <br>  <br>### 4. `_process_message()`：Turn 状态机驱动器  <br>  <br>`_process_message()` 创建 `TurnContext`，然后循环调用当前状态对应的 handler：  <br>  <br>```python  <br>while ctx.state is not TurnState.DONE:  <br>    handler_name = f&quot;_state_&#123;ctx.state.name.lower()&#125;&quot;    handler = getattr(self, handler_name)    event = await handler(ctx)    ctx.state = self._TRANSITIONS[(ctx.state, event)]  <br>```  <br>  <br>每个状态的耗时、事件和异常会写入 `ctx.trace`。  <br>  <br>## 四、TurnContext 与状态机  <br><br>![展示 AgentLoop 外层 Turn 状态机与 RUN 阶段内部 AgentRunner 多次 Iteration 的流程图](https://files.seeusercontent.com/2026/06/09/w3kT/03-turn-flow.webp)<br>  <br>### 1. `TurnState`  <br>  <br>完整状态流转：  <br>  <br>```text  <br>RESTORE  <br>→ COMPACT  <br>→ COMMAND  <br>→ BUILD  <br>→ RUN  <br>→ SAVE  <br>→ RESPOND  <br>→ DONE  <br>```  <br>  <br>`COMMAND` 还可以通过 `&quot;shortcut&quot;` 直接进入 `DONE`。  <br>  <br>### 2. `StateTraceEntry`  <br>  <br>记录单个状态的执行情况：  <br>  <br>```python  <br>@dataclass  <br>class StateTraceEntry:  <br>    state: TurnState    started_at: float  <br>    duration_ms: float  <br>    event: str  <br>    error: str | None = None```  <br>  <br>例如可以记录：  <br>  <br>```text  <br>RESTORE：3 ms  <br>BUILD：20 ms  <br>RUN：5 s  <br>```  <br>  <br>### 3. `TurnContext`  <br>  <br>`TurnContext` 不是 AgentLoop 本身，而是某一个 Turn 的临时工作上下文。  <br>  <br>它保存：  <br>  <br>- 当前 `InboundMessage` 和 `Session`。  <br>- 当前状态及 trace。  <br>- 历史消息和待发送给模型的 `initial_messages`。  <br>- 最终回答、工具使用情况和停止原因。  <br>- pending queue、压缩摘要和流式回调。  <br>- 本轮是否为 `ephemeral` 内部运行。  <br>  <br>## 五、各状态详解  <br>  <br>### 1. RESTORE  <br>  <br>对应 `_state_restore()`。  <br>  <br>主要工作：  <br>  <br>1. 处理消息附件，必要时提取文档文本。  <br>2. 获取或创建 Session。  <br>3. 发布 Session Turn 开始事件。  <br>4. 保存消息对应的工作区范围。  <br>5. 恢复中断前的 runtime checkpoint。  <br>6. 恢复提前持久化但尚未完成的用户消息。  <br>  <br>checkpoint 可以保留中断前的 Assistant tool call 和已经完成的工具结果，使 `/stop` 或任务取消后不会完全丢失执行现场。  <br>  <br>### 2. COMPACT  <br>  <br>对应 `_state_compact()`：  <br>  <br>```python  <br>ctx.session, pending = self.auto_compact.prepare_session(  <br>    ctx.session,    ctx.session_key,)  <br>ctx.pending_summary = pending  <br>```  <br>  <br>这里通常不执行实际压缩，而是把后台空闲压缩的结果接回当前 Turn：  <br>  <br>- 重新取得可能已经被替换的 Session。  <br>- 读取 `_last_summary`。  <br>- 将格式化摘要保存到 `ctx.pending_summary`，供 BUILD 阶段注入 prompt。  <br>  <br>真正的空闲压缩由：  <br>  <br>```text  <br>AutoCompact.check_expired()  <br>→ AutoCompact._archive()  <br>→ Consolidator.compact_idle_session()  <br>```  <br>  <br>在后台执行。  <br>  <br>如果 `idleCompactAfterMinutes=0`，空闲压缩关闭，此状态通常只返回原 Session；但如果 Session 已经有 `_last_summary`，仍可能读取并注入摘要。  <br>  <br>### 3. COMMAND  <br>  <br>对应 `_state_command()`。  <br>  <br>它调用：  <br>  <br>```python  <br>result = await self.commands.dispatch(cmd_ctx)  <br>```  <br>  <br>如果是普通消息，返回 `&quot;dispatch&quot;`，进入 BUILD。  <br>  <br>如果命令已直接处理，返回 `&quot;shortcut&quot;`，跳过 BUILD、RUN、SAVE 和 RESPOND，直接进入 DONE。为了让 WebUI 能恢复命令历史，除 `/new` 外，命令和结果会在这里直接保存，并标记 `_command=True`，使其不进入普通 LLM 历史。  <br>  <br>需要注意：`/stop` 等优先级控制命令会在 `AgentLoop.run()` 中提前处理，不一定进入这个状态。  <br>  <br>### 4. BUILD  <br>  <br>对应 `_state_build()`，作用是构造本轮 LLM 输入。  <br>  <br>#### 4.1 Token consolidation  <br>  <br>非 `ephemeral` Turn 先调用：  <br>  <br>```python  <br>await self.consolidator.maybe_consolidate_by_tokens(...)```  <br>  <br>安全输入预算：  <br>  <br>```text  <br>context_window_tokens  <br>- max_completion_tokens  <br>- 1024 safety buffer  <br>```  <br>  <br>估算对象不仅是 Session 文本，还包括：  <br>  <br>- System prompt。  <br>- 未归档 Session 历史。  <br>- `_last_summary`。  <br>- Memory、skills 和运行时上下文。  <br>- Session metadata。  <br>- 工具 definitions。  <br>- 探测消息 `[token-probe]`。  <br>  <br>当：  <br>  <br>```text  <br>estimated &gt;= input budget  <br>```  <br>  <br>系统会选择旧的完整用户轮次，通过 LLM 生成摘要，写入 `memory/history.jsonl`，推进 `last_consolidated`，并把最近摘要写入：  <br>  <br>```python  <br>session.metadata[&quot;_last_summary&quot;]  <br>```  <br>  <br>默认目标是压到：  <br>  <br>```text  <br>input budget × consolidation_ratio  <br>```  <br>  <br>`consolidation_ratio` 默认是 `0.5`。  <br>  <br>#### 4.2 构建近期历史  <br>  <br>```python  <br>ctx.history = ctx.session.get_history(  <br>    max_messages=self._max_messages,    max_tokens=self._replay_token_budget(),    include_timestamps=True,)  <br>```  <br>  <br>`get_history()` 会：  <br>  <br>- 只读取 `last_consolidated` 后的消息。  <br>- 按消息数和 token 预算截取。  <br>- 尽量从 user 消息开始。  <br>- 删除开头孤立的 tool result。  <br>- 过滤 `_command` 消息。  <br>- 为附件补充文本 breadcrumb。  <br>- 给 user 消息添加时间戳。  <br>  <br>#### 4.3 构造完整 prompt  <br>  <br>```python  <br>ctx.initial_messages = self._build_initial_messages(  <br>    ctx.msg,    ctx.session,    ctx.history,    ctx.pending_summary,    include_memory_recent_history=not ctx.ephemeral,)  <br>```  <br>  <br>最终上下文大致为：  <br>  <br>```text  <br>System prompt  <br>+ 工作区与运行时说明  <br>+ Skills  <br>+ MEMORY.md 等长期记忆  <br>+ 压缩摘要  <br>+ 最近完整历史  <br>+ 当前用户消息  <br>```  <br>  <br>BUILD 还会：  <br>  <br>- 设置工具上下文。  <br>- 重置 `MessageTool` 的本轮状态。  <br>- 提前持久化当前用户消息，防止执行中断后丢失。  <br>- 创建进度和重试等待回调。  <br>  <br>### 5. RUN  <br>  <br>对应 `_state_run()`。  <br>  <br>它先发布 `&quot;running&quot;` 状态，然后调用：  <br>  <br>```python  <br>result = await self._run_agent_loop(...)  <br>```  <br>  <br>`_run_agent_loop()` 负责把产品层上下文适配成 `AgentRunSpec`：  <br>  <br>- 进度、流式和额外 Hook。  <br>- checkpoint callback。  <br>- pending message injection callback。  <br>- RequestContext、workspace scope 和 file state。  <br>- 模型、工具、上下文窗口与超时。  <br>- sustained goal 的自动继续条件。  <br>  <br>随后调用：  <br>  <br>```python  <br>result = await self.runner.run(AgentRunSpec(...))  <br>```  <br>  <br>`_state_run()` 将返回结果写回 `TurnContext`：  <br>  <br>```python  <br>ctx.final_content  <br>ctx.tools_used  <br>ctx.all_messages  <br>ctx.stop_reason  <br>ctx.had_injections  <br>```  <br>  <br>最后检查是否需要创建内部 continuation。  <br>  <br>### 6. SAVE  <br>  <br>对应 `_state_save()`。  <br>  <br>主要工作：  <br>  <br>1. 处理 continuation 的保存边界。  <br>2. 为意外空回答补充统一占位文本。  <br>3. 计算本轮用户可感知延迟。  <br>4. 将 Runner 产生的新消息追加到 Session。  <br>5. 记录运行时间。  <br>6. 执行 Session 文件消息数量上限保护。  <br>7. 后台再次安排 token consolidation，为下一轮提前整理。  <br>8. 清除 pending user turn 和 runtime checkpoint。  <br>9. 原子保存 Session。  <br>  <br>这里的后台 token consolidation 与 BUILD 前的同步检查互补：  <br>  <br>```text  <br>BUILD 前：确保当前请求发送前不会超预算  <br>SAVE 后：利用后台时间为下一轮提前整理  <br>```  <br>  <br>### 7. RESPOND  <br>  <br>对应 `_state_respond()`。  <br>  <br>如果 `suppress_response=True`，则不生成普通出站消息。  <br>  <br>否则调用 `_assemble_outbound()`，将最终文本包装为：  <br>  <br>```python  <br>OutboundMessage(  <br>    channel=ctx.msg.channel,    chat_id=ctx.msg.chat_id,    content=ctx.final_content,    metadata=...,)  <br>```  <br>  <br>如果本轮 `MessageTool` 已经主动发送消息，普通最终回复可能被抑制，避免重复发送。  <br>  <br>流式响应会在 metadata 中标记 `_streamed`，延迟会记录为 `latency_ms`。`ephemeral` 内部运行还会附带 `_stop_reason`。  <br>  <br>## 六、AgentRunner  <br>  <br>`AgentRunner` 定义在 `agent/runner.py`，目标是提供不依赖 Channel、SessionManager 等产品层细节的通用工具型 Agent 执行循环。  <br>  <br>### 1. `AgentRunSpec`  <br>  <br>描述一次 Runner 执行所需的配置：  <br>  <br>- `initial_messages`  <br>- `tools`  <br>- `model`  <br>- `max_iterations`  <br>- `max_tool_result_chars`  <br>- Hook 和回调  <br>- workspace、session key  <br>- context window  <br>- timeout  <br>- injection callback  <br>- sustained goal 条件  <br>  <br>### 2. `AgentRunResult`  <br>  <br>Runner 的统一返回结构：  <br>  <br>```python  <br>@dataclass  <br>class AgentRunResult:  <br>    final_content: str | None  <br>    messages: list[dict[str, Any]]  <br>    tools_used: list[str]  <br>    usage: dict[str, int]  <br>    stop_reason: str  <br>    error: str | None  <br>    tool_events: list[dict[str, str]]  <br>    had_injections: bool  <br>```  <br>  <br>### 3. `run()`  <br>  <br>`AgentRunner.run()` 管理 Hook 生命周期和异常边界：  <br>  <br>```text  <br>hook.before_run()  <br>→ _run_core()  <br>→ hook.after_run() / hook.on_error()  <br>→ hook.on_finally()  <br>```  <br>  <br>真正的 ReAct 循环位于 `_run_core()`。  <br>  <br>## 七、`_run_core()` 主循环  <br>  <br>核心结构：  <br>  <br>```python  <br>for iteration in range(spec.max_iterations):  <br>    messages_for_model = 治理后的上下文    response = await self._request_model(...)  <br>    if response.should_execute_tools:        执行工具        continue  <br>    处理恢复、错误和注入    保存最终回答    breakelse:  <br>    stop_reason = &quot;max_iterations&quot;  <br>```  <br>  <br>这里的 `else` 属于 `for...else`：只有循环自然耗尽且没有执行 `break` 时才进入。  <br>  <br>### 1. 每轮上下文治理  <br>  <br>每次请求模型前依次执行：  <br>  <br>```python  <br>_drop_orphan_tool_results()  <br>_backfill_missing_tool_results()  <br>_microcompact()  <br>_apply_tool_result_budget()  <br>_snip_history()  <br>```  <br>  <br>作用分别是：  <br>  <br>- 删除没有对应 assistant tool call 的孤立 tool result。  <br>- 为缺失结果的 tool call 插入合成错误结果。  <br>- 将较早的大型工具结果替换为一行提示。  <br>- 限制单条工具结果大小，必要时落盘。  <br>- 当整个 prompt 超预算时，只保留较新的合法历史。  <br>  <br>这些处理只作用于 `messages_for_model`，不直接改变用于持久化的原始 `messages`。  <br>  <br>`_snip_history()` 后可能再次产生孤立工具消息，因此还会重新执行结构修复。  <br>  <br>### 2. 请求模型  <br>  <br>```python  <br>response = await self._request_model(  <br>    spec,    messages_for_model,    hook,    context,)  <br>```  <br>  <br>响应包含：  <br>  <br>- `content`  <br>- `tool_calls`  <br>- `finish_reason`  <br>- reasoning/thinking 信息  <br>- token usage  <br>  <br>`finish_reason` 表示单次 LLM 生成停止的原因，例如：  <br>  <br>- `stop`：正常结束。  <br>- `tool_calls` / `function_call`：请求执行工具。  <br>- `length`：达到输出 token 上限。  <br>- `error`：Provider 调用失败。  <br>  <br>它不同于 Runner 的 `stop_reason`；后者描述整个 Agent 执行最终为何停止。  <br>  <br>### 3. 工具调用分支  <br>  <br>当：  <br>  <br>```python  <br>response.should_execute_tools  <br>```  <br>  <br>为真时，Runner 会：  <br>  <br>1. 将 Assistant tool call 追加到 `messages`。  <br>2. 保存 `awaiting_tools` checkpoint。  <br>3. 调用 `_execute_tools()`。  <br>4. 将每个结果包装为 `role=&quot;tool&quot;` 消息。  <br>5. 保存 `tools_completed` checkpoint。  <br>6. 检查是否有 pending 消息需要注入。  <br>7. `continue` 进入下一次 Iteration。  <br>  <br>### 4. 工具执行链  <br>  <br>完整调用路径：  <br>  <br>```text  <br>_run_core()  <br>→ _execute_tools()  <br>→ _partition_tool_batches()  <br>→ _run_tool()  <br>→ ToolRegistry.prepare_call()  <br>→ 具体 Tool.execute()  <br>```  <br>  <br>`prepare_call()` 负责：  <br>  <br>- 按名称找到工具。  <br>- 转换参数类型。  <br>- 根据 JSON Schema 校验参数。  <br>  <br>随后正常路径直接调用：  <br>  <br>```python  <br>result = await tool.execute(**params)  <br>```  <br>  <br>如果传入的是不支持 `prepare_call()` 的兼容工具容器，则退化为：  <br>  <br>```python  <br>result = await spec.tools.execute(tool_call.name, params)  <br>```  <br>  <br>只读且 `concurrency_safe=True` 的工具可以通过 `asyncio.gather()` 并发执行；写文件、执行命令等有副作用工具通常单独执行。  <br>  <br>工具结果会被标准化为：  <br>  <br>```python  <br>&#123;  <br>    &quot;role&quot;: &quot;tool&quot;,    &quot;tool_call_id&quot;: tool_call.id,    &quot;name&quot;: tool_call.name,    &quot;content&quot;: normalized_result,&#125;  <br>```  <br>  <br>下一轮 LLM 请求会看到该结果，并决定继续调用工具还是返回最终答案。  <br>  <br>### 5. 没有工具调用时  <br>  <br>没有工具调用不代表立即在分支处返回。Runner 还需要检查：  <br>  <br>- 空回答是否需要重试。  <br>- 输出是否被 `max_tokens` 截断并需要续写。  <br>- 是否有用户追加消息或子 Agent 结果。  <br>- sustained goal 是否仍需继续。  <br>- Provider 是否返回错误。  <br>  <br>如果这些情况都不存在，则：  <br>  <br>```python  <br>messages.append(assistant_message)  <br>final_content = clean  <br>break  <br>```  <br>  <br>循环退出后统一构造 `AgentRunResult`。  <br>  <br>### 6. 恢复与特殊分支  <br>  <br>#### 空回答  <br>  <br>空回答会先重试；多次为空时，再发起 finalization retry。仍为空则：  <br>  <br>```python  <br>stop_reason = &quot;empty_final_response&quot;  <br>```  <br>  <br>#### 输出截断  <br>  <br>当：  <br>  <br>```python  <br>response.finish_reason == &quot;length&quot;  <br>```  <br>  <br>Runner 会把当前部分回答加入消息，再加入“继续输出”提示，然后进入下一次 Iteration。恢复次数有上限。  <br>  <br>#### 中途消息注入  <br>  <br>用户在 Agent 执行过程中发送的新消息，或子 Agent 返回的结果，可以通过 `injection_callback` 注入当前消息链。  <br>  <br>有注入时：  <br>  <br>```python  <br>had_injections = True  <br>continue  <br>```  <br>  <br>#### LLM 或工具错误  <br>  <br>错误会被转换为统一文本和 `stop_reason`。如果此时还有可注入消息，Runner 仍可能继续；否则退出。  <br>  <br>#### 最大迭代次数  <br>  <br>如果一直调用工具、续写或处理注入，直到 `for` 循环自然耗尽：  <br>  <br>```python  <br>stop_reason = &quot;max_iterations&quot;  <br>```  <br>  <br>系统生成统一的迭代上限提示并返回。  <br>  <br>## 八、Session 压缩的三个层次  <br><br>![对比 nanobot Session 的空闲压缩、Token consolidation 与 Runner snip 三层机制](https://files.seeusercontent.com/2026/06/09/qr3E/05-compaction-comparison.webp)<br>  <br>### 1. 空闲压缩  <br>  <br>配置：  <br>  <br>```json  <br>&#123;  <br>  &quot;agents&quot;: &#123;    &quot;defaults&quot;: &#123;      &quot;idleCompactAfterMinutes&quot;: 30    &#125;  &#125;&#125;  <br>```  <br>  <br>`0` 表示关闭，默认值也是 `0`。  <br>  <br>Session 空闲达到 TTL 后，后台调用 `compact_idle_session()`：  <br>  <br>- 将旧消息通过 LLM 归档。  <br>- 最多保留最近 8 条合法消息。  <br>- 真正替换 `session.messages`。  <br>- 将 `last_consolidated` 重置为 `0`。  <br>- 保存 `_last_summary`。  <br>  <br>空闲压缩不先检查 Session 是否 token 超限；触发条件是空闲时间。  <br>  <br>### 2. Token consolidation  <br>  <br>在 BUILD 前同步检查，并在 SAVE 后后台检查。  <br>  <br>触发条件是完整 prompt 的估算 token 达到安全输入预算。它通常不立即删除旧消息，而是：  <br>  <br>- 对旧消息生成摘要。  <br>- 写入 `history.jsonl`。  <br>- 推进 `last_consolidated`。  <br>- 让 `get_history()` 忽略已经归档的前缀。  <br>  <br>### 3. Runner 即时裁剪  <br>  <br>`AgentRunner._snip_history()` 是最后一道防线：  <br>  <br>- 不调用 LLM 摘要。  <br>- 不修改 Session。  <br>- 不更新 `last_consolidated`。  <br>- 只裁剪当前这一请求实际发送给模型的 `messages_for_model`。  <br>  <br>三者的区别：  <br>  <br>```text  <br>空闲压缩：按空闲时间触发，硬删除旧 Session 消息  <br>Token consolidation：按 prompt token 触发，持久化摘要并推进游标  <br>Runner snip：每次请求前的临时防线，只影响当前模型输入  <br>```  <br>  <br>## 九、一次完整请求示例  <br><br>![展示 Channel、MessageBus、AgentLoop、AgentRunner、LLM 与 ToolRegistry 完成一次请求的时序图](https://files.seeusercontent.com/2026/06/09/6Wwn/04-sequence.webp)<br>  <br>```text  <br>1. Channel 收到用户消息  <br>2. 发布 InboundMessage 到 MessageBus  <br>3. AgentLoop.run() 消费消息  <br>4. _dispatch() 获取 Session 锁  <br>5. _process_message() 创建 TurnContext  <br>6. RESTORE 恢复 Session 和 checkpoint  <br>7. COMPACT 接入后台空闲压缩结果  <br>8. COMMAND 判断是否为快捷命令  <br>9. BUILD 检查 token、读取历史、构建 prompt  <br>10. RUN 调用 AgentRunner  <br>11. LLM 请求 read_file  <br>12. Runner 执行 ReadFileTool.execute()  <br>13. 工具结果加入 messages  <br>14. Runner 再次请求 LLM  <br>15. LLM 返回最终回答  <br>16. SAVE 将新消息写入 Session  <br>17. RESPOND 构造 OutboundMessage  <br>18. _dispatch() 发布消息到 MessageBus  <br>19. Channel 将响应发送给用户  <br>```  <br>  <br>## 十、代码的边界  <br>  <br>```text  <br>Channel / MessageBus：消息传输  <br>AgentLoop：产品层 Turn 编排  <br>TurnContext：单个 Turn 的临时状态  <br>SessionManager：会话持久化  <br>ContextBuilder：Prompt 组装  <br>Consolidator / AutoCompact：历史压缩与摘要  <br>AgentRunner：通用 LLM + Tool 迭代  <br>ToolRegistry：工具注册、参数校验与执行分发  <br>Provider：具体模型 API 调用  <br>```  <br>  <br>理解这些边界后，阅读 nanobot 的主线可以简化为：  <br>  <br>```text  <br>消息进入  <br>→ AgentLoop 组织一轮 Turn  <br>→ ContextBuilder 准备模型输入  <br>→ AgentRunner 完成 ReAct 循环  <br>→ ToolRegistry 执行能力  <br>→ SessionManager 保存现场  <br>→ 消息返回  <br></code></pre></td></tr></table></figure>
+
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/ai/nanobot 学习.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nanobot 学习</div>
+      <div>https://yilinyo.github.io/2026/06/09/ai/nanobot 学习/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月9日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/09/ai/ai%20vibecoding%20workflow/" title="ai vibecoding workflow">
+                                                                                                    <i class="iconfont icon-arrowleft"></i>
+                                                                                                    <span class="hidden-mobile">ai vibecoding workflow</span>
+                                                                                                    <span class="visible-mobile">上一篇</span>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/05/12/%E6%9E%B6%E6%9E%84/ddd%20%E7%BB%93%E6%9E%84%E7%9A%84%E5%BA%94%E7%94%A8/" title="go项目中的DDD四层架构">
+                                                                                                    <span class="hidden-mobile">go项目中的DDD四层架构</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
