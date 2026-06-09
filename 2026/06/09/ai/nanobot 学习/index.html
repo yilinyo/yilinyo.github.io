@@ -33,7 +33,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://files.seeusercontent.com/2026/06/09/9iXc/01-cover.webp">
 <meta property="article:published_time" content="2026-06-09T15:03:00.000Z">
-<meta property="article:modified_time" content="2026-06-09T07:41:26.437Z">
+<meta property="article:modified_time" content="2026-06-09T07:45:22.865Z">
 <meta property="article:author" content="yilin">
 <meta property="article:tag" content="agent">
 <meta name="twitter:card" content="summary_large_image">
@@ -337,8 +337,10 @@
 <li><strong>Turn</strong>：处理一条入站消息的一轮业务流程。  </li>
 <li><strong>Iteration</strong>：一个 Turn 内部，<code>AgentRunner</code> 主循环的一次迭代。  </li>
 </ul>
-<p>一个 Turn 可能包含多次 Iteration，例如：  </p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><code class="hljs text">Iteration 0：LLM 请求 read_file  <br>Iteration 1：LLM 根据文件内容请求 edit_file  <br>Iteration 2：LLM 返回最终回答  <br>```  <br>  <br>通常一次 Iteration 会发起一次主要 LLM 请求，但空响应恢复等逻辑可能在同一个 Iteration 内额外请求 LLM，因此 Iteration 数不一定严格等于 Provider API 请求总数。  <br>  <br>### 2. 消息与总线  <br>  <br>Channel 将外部平台消息转换为 `InboundMessage`，再发布到 `MessageBus`：  <br>  <br>```text  <br>Telegram / Slack / WebSocket / CLI  <br>→ InboundMessage  <br>→ MessageBus.inbound  <br>→ AgentLoop  <br></code></pre></td></tr></table></figure>
+<p>一个 Turn 可能包含多次 Iteration，例如：<br>Iteration 0：LLM 请求 read_file<br>Iteration 1：LLM 根据文件内容请求 edit_file<br>Iteration 2：LLM 返回最终回答  </p>
+<p>通常一次 Iteration 会发起一次主要 LLM 请求，但空响应恢复等逻辑可能在同一个 Iteration 内额外请求 LLM，因此 Iteration 数不一定严格等于 Provider API 请求总数。  </p>
+<h3 id="2-消息与总线"><a href="#2-消息与总线" class="headerlink" title="2. 消息与总线"></a>2. 消息与总线</h3><p>Channel 将外部平台消息转换为 <code>InboundMessage</code>，再发布到 <code>MessageBus</code>：  </p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">Telegram / Slack / WebSocket / CLI  <br>→ InboundMessage  <br>→ MessageBus.inbound  <br>→ AgentLoop  <br></code></pre></td></tr></table></figure>
 <p>Agent 处理完成后生成 <code>OutboundMessage</code>：  </p>
 <figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs text">AgentLoop  <br>→ OutboundMessage  <br>→ MessageBus.outbound  <br>→ 对应 Channel  <br></code></pre></td></tr></table></figure>
 <p><code>MessageBus</code> 的作用是解耦 Channel 与 Agent 核心。Channel 不需要直接调用 LLM，AgentLoop 也不需要了解各平台的收发实现。  </p>
