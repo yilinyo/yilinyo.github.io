@@ -29,12 +29,10 @@ date: 2026-06-09 15:03:00
 - **Iteration**：一个 Turn 内部，`AgentRunner` 主循环的一次迭代。  
   
 一个 Turn 可能包含多次 Iteration，例如：  
-```text  
 Iteration 0：LLM 请求 read_file  
 Iteration 1：LLM 根据文件内容请求 edit_file  
 Iteration 2：LLM 返回最终回答  
-```  
-  
+
 通常一次 Iteration 会发起一次主要 LLM 请求，但空响应恢复等逻辑可能在同一个 Iteration 内额外请求 LLM，因此 Iteration 数不一定严格等于 Provider API 请求总数。  
   
 ### 2. 消息与总线  
