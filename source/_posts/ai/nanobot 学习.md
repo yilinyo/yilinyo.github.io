@@ -13,7 +13,7 @@ date: 2026-06-09 15:03:00
   
 一个 Turn 表示系统处理一条入站消息的完整过程：  
   
-```text  
+```text
 接收 InboundMessage  
 → 恢复 Session  
 → 构建上下文  
@@ -29,49 +29,52 @@ date: 2026-06-09 15:03:00
 - **Iteration**：一个 Turn 内部，`AgentRunner` 主循环的一次迭代。  
   
 一个 Turn 可能包含多次 Iteration，例如：  
+  
+```text
 Iteration 0：LLM 请求 read_file  
 Iteration 1：LLM 根据文件内容请求 edit_file  
 Iteration 2：LLM 返回最终回答  
-
+```
+  
 通常一次 Iteration 会发起一次主要 LLM 请求，但空响应恢复等逻辑可能在同一个 Iteration 内额外请求 LLM，因此 Iteration 数不一定严格等于 Provider API 请求总数。  
   
 ### 2. 消息与总线  
   
 Channel 将外部平台消息转换为 `InboundMessage`，再发布到 `MessageBus`：  
   
-```text  
+```text
 Telegram / Slack / WebSocket / CLI  
 → InboundMessage  
 → MessageBus.inbound  
 → AgentLoop  
 ```
- 
   
 Agent 处理完成后生成 `OutboundMessage`：  
   
-```text  
+```text
 AgentLoop  
 → OutboundMessage  
 → MessageBus.outbound  
 → 对应 Channel  
 ```
- 
   
 `MessageBus` 的作用是解耦 Channel 与 Agent 核心。Channel 不需要直接调用 LLM，AgentLoop 也不需要了解各平台的收发实现。  
   
 ### 3. Session  
   
 `Session` 表示一段对话的持久化状态，定义在 `session/manager.py`：  
+  
 ```python
 @dataclass  
 class Session:  
     key: str  
     messages: list[dict[str, Any]]  
     created_at: datetime    updated_at: datetime    metadata: dict[str, Any]  
-    last_consolidated: int 
+    last_consolidated: int  
 ```
-
+  
 各字段含义：  
+  
 - `key`：会话唯一标识，通常是 `channel:chat_id`。  
 - `messages`：该会话保存的消息。  
 - `created_at`：Session 创建时间。  
@@ -81,9 +84,9 @@ class Session:
   
 未归档、仍可进入近期上下文的消息是：  
   
-```python  
+```python
 session.messages[session.last_consolidated:]  
-```  s
+```
   
 ## 二、AgentLoop 的职责  
 
@@ -104,7 +107,7 @@ session.messages[session.last_consolidated:]
   
 ### 1. `run()`：持续消费 MessageBus  
   
-```python  
+```python
 async def run(self) -> None:  
     while self._running:
         msg = await asyncio.wait_for(
@@ -117,15 +120,15 @@ async def run(self) -> None:
   
 等待入站消息超时后，系统会检查空闲 Session：  
   
-```python  
+```python
 self.auto_compact.check_expired(...)  
-```  
+```
   
 收到普通消息后，`run()` 创建后台任务：  
   
-```python  
+```python
 task = asyncio.create_task(self._dispatch(msg))  
-```  
+```
   
 这样 AgentLoop 不会因为某个 Session 正在等待 LLM，而停止接收其他 Session 的消息。  
   
@@ -133,21 +136,21 @@ task = asyncio.create_task(self._dispatch(msg))
   
 `_dispatch()` 的并发原则是：  
   
-```text  
+```text
 同一个 Session：通过 asyncio.Lock 串行执行  
 不同 Session：可以并发执行  
 全局并发量：可通过 Semaphore 限制  
-```  
+```
   
 核心结构：  
   
-```python  
+```python
 lock = self._session_locks.setdefault(session_key, asyncio.Lock())  
 gate = self._concurrency_gate or nullcontext()  
   
 async with lock, gate:  
     response = await self._process_message(...)  
-```  
+```
   
 如果同一个 Session 已经有任务运行，后续普通消息会进入 `pending_queue`，供当前 Runner 在执行过程中注入，而不是再启动一个相互竞争的 Turn。  
   
@@ -161,13 +164,13 @@ async with lock, gate:
   
 ### 3. `process_direct()`：直接处理一条消息  
   
-```python  
+```python
 async def process_direct(  
     self,  
     content: str,  
     session_key: str = "cli:direct",  
     ...) -> OutboundMessage | None:  
-```  
+```
   
 它自行构造 `InboundMessage`，取得 Session 锁，然后调用 `_process_message()`。  
   
@@ -177,10 +180,10 @@ async def process_direct(
   
 `_process_message()` 创建 `TurnContext`，然后循环调用当前状态对应的 handler：  
   
-```python  
+```python
 while ctx.state is not TurnState.DONE:  
     handler_name = f"_state_{ctx.state.name.lower()}"    handler = getattr(self, handler_name)    event = await handler(ctx)    ctx.state = self._TRANSITIONS[(ctx.state, event)]  
-```  
+```
   
 每个状态的耗时、事件和异常会写入 `ctx.trace`。  
   
@@ -192,7 +195,7 @@ while ctx.state is not TurnState.DONE:
   
 完整状态流转：  
   
-```text  
+```text
 RESTORE  
 → COMPACT  
 → COMMAND  
@@ -201,7 +204,7 @@ RESTORE
 → SAVE  
 → RESPOND  
 → DONE  
-```  
+```
   
 `COMMAND` 还可以通过 `"shortcut"` 直接进入 `DONE`。  
   
@@ -209,7 +212,7 @@ RESTORE
   
 记录单个状态的执行情况：  
   
-```python  
+```python
 @dataclass  
 class StateTraceEntry:  
     state: TurnState
@@ -221,7 +224,7 @@ class StateTraceEntry:
   
 例如可以记录：  
   
-```text  
+```text
 RESTORE：3 ms  
 BUILD：20 ms  
 RUN：5 s  
@@ -261,11 +264,11 @@ checkpoint 可以保留中断前的 Assistant tool call 和已经完成的工具
   
 对应 `_state_compact()`：  
   
-```python  
+```python
 ctx.session, pending = self.auto_compact.prepare_session(  
     ctx.session,    ctx.session_key,)  
 ctx.pending_summary = pending  
-```  
+```
   
 这里通常不执行实际压缩，而是把后台空闲压缩的结果接回当前 Turn：  
   
@@ -275,11 +278,11 @@ ctx.pending_summary = pending
   
 真正的空闲压缩由：  
   
-```text  
+```text
 AutoCompact.check_expired()  
 → AutoCompact._archive()  
 → Consolidator.compact_idle_session()  
-```  
+```
   
 在后台执行。  
   
@@ -291,9 +294,9 @@ AutoCompact.check_expired()
   
 它调用：  
   
-```python  
+```python
 result = await self.commands.dispatch(cmd_ctx)  
-```  
+```
   
 如果是普通消息，返回 `"dispatch"`，进入 BUILD。  
   
@@ -309,17 +312,17 @@ result = await self.commands.dispatch(cmd_ctx)
   
 非 `ephemeral` Turn 先调用：  
   
-```python  
+```python
 await self.consolidator.maybe_consolidate_by_tokens(...)
 ```
   
 安全输入预算：  
   
-```text  
+```text
 context_window_tokens  
 - max_completion_tokens  
 - 1024 safety buffer  
-```  
+```
   
 估算对象不仅是 Session 文本，还包括：  
   
@@ -333,30 +336,30 @@ context_window_tokens
   
 当：  
   
-```text  
+```text
 estimated >= input budget  
-```  
+```
   
 系统会选择旧的完整用户轮次，通过 LLM 生成摘要，写入 `memory/history.jsonl`，推进 `last_consolidated`，并把最近摘要写入：  
   
-```python  
+```python
 session.metadata["_last_summary"]  
-```  
+```
   
 默认目标是压到：  
   
-```text  
+```text
 input budget × consolidation_ratio  
-```  
+```
   
 `consolidation_ratio` 默认是 `0.5`。  
   
 #### 4.2 构建近期历史  
   
-```python  
+```python
 ctx.history = ctx.session.get_history(  
     max_messages=self._max_messages,    max_tokens=self._replay_token_budget(),    include_timestamps=True,)  
-```  
+```
   
 `get_history()` 会：  
   
@@ -370,14 +373,14 @@ ctx.history = ctx.session.get_history(
   
 #### 4.3 构造完整 prompt  
   
-```python  
+```python
 ctx.initial_messages = self._build_initial_messages(  
     ctx.msg,    ctx.session,    ctx.history,    ctx.pending_summary,    include_memory_recent_history=not ctx.ephemeral,)  
-```  
+```
   
 最终上下文大致为：  
   
-```text  
+```text
 System prompt  
 + 工作区与运行时说明  
 + Skills  
@@ -385,7 +388,7 @@ System prompt
 + 压缩摘要  
 + 最近完整历史  
 + 当前用户消息  
-```  
+```
   
 BUILD 还会：  
   
@@ -400,9 +403,9 @@ BUILD 还会：
   
 它先发布 `"running"` 状态，然后调用：  
   
-```python  
+```python
 result = await self._run_agent_loop(...)  
-```  
+```
   
 `_run_agent_loop()` 负责把产品层上下文适配成 `AgentRunSpec`：  
   
@@ -415,19 +418,19 @@ result = await self._run_agent_loop(...)
   
 随后调用：  
   
-```python  
+```python
 result = await self.runner.run(AgentRunSpec(...))  
-```  
+```
   
 `_state_run()` 将返回结果写回 `TurnContext`：  
   
-```python  
+```python
 ctx.final_content  
 ctx.tools_used  
 ctx.all_messages  
 ctx.stop_reason  
 ctx.had_injections  
-```  
+```
   
 最后检查是否需要创建内部 continuation。  
   
@@ -449,10 +452,10 @@ ctx.had_injections
   
 这里的后台 token consolidation 与 BUILD 前的同步检查互补：  
   
-```text  
+```text
 BUILD 前：确保当前请求发送前不会超预算  
 SAVE 后：利用后台时间为下一轮提前整理  
-```  
+```
   
 ### 7. RESPOND  
   
@@ -462,10 +465,10 @@ SAVE 后：利用后台时间为下一轮提前整理
   
 否则调用 `_assemble_outbound()`，将最终文本包装为：  
   
-```python  
+```python
 OutboundMessage(  
     channel=ctx.msg.channel,    chat_id=ctx.msg.chat_id,    content=ctx.final_content,    metadata=...,)  
-```  
+```
   
 如果本轮 `MessageTool` 已经主动发送消息，普通最终回复可能被抑制，避免重复发送。  
   
@@ -495,7 +498,7 @@ OutboundMessage(
   
 Runner 的统一返回结构：  
   
-```python  
+```python
 @dataclass  
 class AgentRunResult:  
     final_content: str | None  
@@ -506,18 +509,18 @@ class AgentRunResult:
     error: str | None  
     tool_events: list[dict[str, str]]  
     had_injections: bool  
-```  
+```
   
 ### 3. `run()`  
   
 `AgentRunner.run()` 管理 Hook 生命周期和异常边界：  
   
-```text  
+```text
 hook.before_run()  
 → _run_core()  
 → hook.after_run() / hook.on_error()  
 → hook.on_finally()  
-```  
+```
   
 真正的 ReAct 循环位于 `_run_core()`。  
   
@@ -525,13 +528,13 @@ hook.before_run()
   
 核心结构：  
   
-```python  
+```python
 for iteration in range(spec.max_iterations):  
     messages_for_model = 治理后的上下文    response = await self._request_model(...)  
     if response.should_execute_tools:        执行工具        continue  
     处理恢复、错误和注入    保存最终回答    breakelse:  
     stop_reason = "max_iterations"  
-```  
+```
   
 这里的 `else` 属于 `for...else`：只有循环自然耗尽且没有执行 `break` 时才进入。  
   
@@ -539,13 +542,13 @@ for iteration in range(spec.max_iterations):
   
 每次请求模型前依次执行：  
   
-```python  
+```python
 _drop_orphan_tool_results()  
 _backfill_missing_tool_results()  
 _microcompact()  
 _apply_tool_result_budget()  
 _snip_history()  
-```  
+```
   
 作用分别是：  
   
@@ -561,10 +564,10 @@ _snip_history()
   
 ### 2. 请求模型  
   
-```python  
+```python
 response = await self._request_model(  
     spec,    messages_for_model,    hook,    context,)  
-```  
+```
   
 响应包含：  
   
@@ -587,9 +590,9 @@ response = await self._request_model(
   
 当：  
   
-```python  
+```python
 response.should_execute_tools  
-```  
+```
   
 为真时，Runner 会：  
   
@@ -605,14 +608,14 @@ response.should_execute_tools
   
 完整调用路径：  
   
-```text  
+```text
 _run_core()  
 → _execute_tools()  
 → _partition_tool_batches()  
 → _run_tool()  
 → ToolRegistry.prepare_call()  
 → 具体 Tool.execute()  
-```  
+```
   
 `prepare_call()` 负责：  
   
@@ -622,24 +625,24 @@ _run_core()
   
 随后正常路径直接调用：  
   
-```python  
+```python
 result = await tool.execute(**params)  
-```  
+```
   
 如果传入的是不支持 `prepare_call()` 的兼容工具容器，则退化为：  
   
-```python  
+```python
 result = await spec.tools.execute(tool_call.name, params)  
-```  
+```
   
 只读且 `concurrency_safe=True` 的工具可以通过 `asyncio.gather()` 并发执行；写文件、执行命令等有副作用工具通常单独执行。  
   
 工具结果会被标准化为：  
   
-```python  
+```python
 {  
     "role": "tool",    "tool_call_id": tool_call.id,    "name": tool_call.name,    "content": normalized_result,}  
-```  
+```
   
 下一轮 LLM 请求会看到该结果，并决定继续调用工具还是返回最终答案。  
   
@@ -655,11 +658,11 @@ result = await spec.tools.execute(tool_call.name, params)
   
 如果这些情况都不存在，则：  
   
-```python  
+```python
 messages.append(assistant_message)  
 final_content = clean  
 break  
-```  
+```
   
 循环退出后统一构造 `AgentRunResult`。  
   
@@ -669,17 +672,17 @@ break
   
 空回答会先重试；多次为空时，再发起 finalization retry。仍为空则：  
   
-```python  
+```python
 stop_reason = "empty_final_response"  
-```  
+```
   
 #### 输出截断  
   
 当：  
   
-```python  
+```python
 response.finish_reason == "length"  
-```  
+```
   
 Runner 会把当前部分回答加入消息，再加入“继续输出”提示，然后进入下一次 Iteration。恢复次数有上限。  
   
@@ -689,10 +692,10 @@ Runner 会把当前部分回答加入消息，再加入“继续输出”提示�
   
 有注入时：  
   
-```python  
+```python
 had_injections = True  
 continue  
-```  
+```
   
 #### LLM 或工具错误  
   
@@ -702,9 +705,9 @@ continue
   
 如果一直调用工具、续写或处理注入，直到 `for` 循环自然耗尽：  
   
-```python  
+```python
 stop_reason = "max_iterations"  
-```  
+```
   
 系统生成统一的迭代上限提示并返回。  
   
@@ -716,10 +719,10 @@ stop_reason = "max_iterations"
   
 配置：  
   
-```json  
+```json
 {  
   "agents": {    "defaults": {      "idleCompactAfterMinutes": 30    }  }}  
-```  
+```
   
 `0` 表示关闭，默认值也是 `0`。  
   
@@ -755,17 +758,17 @@ Session 空闲达到 TTL 后，后台调用 `compact_idle_session()`：
   
 三者的区别：  
   
-```text  
+```text
 空闲压缩：按空闲时间触发，硬删除旧 Session 消息  
 Token consolidation：按 prompt token 触发，持久化摘要并推进游标  
 Runner snip：每次请求前的临时防线，只影响当前模型输入  
-```  
+```
   
 ## 九、一次完整请求示例  
 
 ![展示 Channel、MessageBus、AgentLoop、AgentRunner、LLM 与 ToolRegistry 完成一次请求的时序图](https://files.seeusercontent.com/2026/06/09/6Wwn/04-sequence.webp)
   
-```text  
+```text
 1. Channel 收到用户消息  
 2. 发布 InboundMessage 到 MessageBus  
 3. AgentLoop.run() 消费消息  
@@ -785,11 +788,11 @@ Runner snip：每次请求前的临时防线，只影响当前模型输入
 17. RESPOND 构造 OutboundMessage  
 18. _dispatch() 发布消息到 MessageBus  
 19. Channel 将响应发送给用户  
-```  
+```
   
 ## 十、代码的边界  
   
-```text  
+```text
 Channel / MessageBus：消息传输  
 AgentLoop：产品层 Turn 编排  
 TurnContext：单个 Turn 的临时状态  
@@ -799,11 +802,11 @@ Consolidator / AutoCompact：历史压缩与摘要
 AgentRunner：通用 LLM + Tool 迭代  
 ToolRegistry：工具注册、参数校验与执行分发  
 Provider：具体模型 API 调用  
-```  
+```
   
 理解这些边界后，阅读 nanobot 的主线可以简化为：  
   
-```text  
+```text
 消息进入  
 → AgentLoop 组织一轮 Turn  
 → ContextBuilder 准备模型输入  
