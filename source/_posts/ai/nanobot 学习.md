@@ -62,18 +62,16 @@ AgentLoop
 ### 3. Session  
   
 `Session` 表示一段对话的持久化状态，定义在 `session/manager.py`：  
-  
-```python  
+```python
 @dataclass  
 class Session:  
     key: str  
     messages: list[dict[str, Any]]  
     created_at: datetime    updated_at: datetime    metadata: dict[str, Any]  
-    last_consolidated: int  
-```  
-  
+    last_consolidated: int 
+```
+
 各字段含义：  
-  
 - `key`：会话唯一标识，通常是 `channel:chat_id`。  
 - `messages`：该会话保存的消息。  
 - `created_at`：Session 创建时间。  
@@ -85,7 +83,7 @@ class Session:
   
 ```python  
 session.messages[session.last_consolidated:]  
-```  
+```  s
   
 ## 二、AgentLoop 的职责  
 

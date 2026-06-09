@@ -1,6 +1,6 @@
 ---
 title: "ai vibecoding workflow"
-date: "2026-06-09 07:45:01"
+date: "2026-06-09 07:54:36"
 ---
 ---
 title: ai vibecoding workflow 实践 
