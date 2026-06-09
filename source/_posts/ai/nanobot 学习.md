@@ -1,8 +1,4 @@
 ---
-title: "nanobot 学习"
-date: "2026-06-09 07:05:33"
----
----
 title: nanobot的整体运行机制 
 tag: agent
 date: 2026-06-09 15:03:00
