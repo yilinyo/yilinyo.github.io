@@ -1,8 +1,4 @@
 ---
-title: "ai vibecoding workflow"
-date: "2026-06-09 07:05:33"
----
----
 title: ai vibecoding workflow 实践 
 tag: 大模型应用  
 date: 2026-05-18 18:42:00  
