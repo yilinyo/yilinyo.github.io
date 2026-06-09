@@ -19,7 +19,7 @@ date: 2026-06-09 15:03:00
 → 构建上下文  
 → 运行 Agent  
 → 保存结果  
-→ 生成 OutboundMessage
+→ 生成 OutboundMessage  
 ```
   
 需要区分三个容易混淆的概念：  
@@ -109,8 +109,12 @@ session.messages[session.last_consolidated:]
   
 ```python  
 async def run(self) -> None:  
-    while self._running:        msg = await asyncio.wait_for(            self.bus.consume_inbound(),            timeout=1.0,  
-        )```  
+    while self._running:
+        msg = await asyncio.wait_for(
+            self.bus.consume_inbound(),
+            timeout=1.0,
+        )
+```
   
 它适用于 Gateway 和各种持续运行的 Channel。  
   
@@ -211,10 +215,12 @@ RESTORE
 ```python  
 @dataclass  
 class StateTraceEntry:  
-    state: TurnState    started_at: float  
+    state: TurnState
+    started_at: float
     duration_ms: float  
     event: str  
-    error: str | None = None```  
+    error: str | None = None
+```
   
 例如可以记录：  
   
@@ -222,7 +228,7 @@ class StateTraceEntry:
 RESTORE：3 ms  
 BUILD：20 ms  
 RUN：5 s  
-```  
+```
   
 ### 3. `TurnContext`  
   
@@ -307,7 +313,8 @@ result = await self.commands.dispatch(cmd_ctx)
 非 `ephemeral` Turn 先调用：  
   
 ```python  
-await self.consolidator.maybe_consolidate_by_tokens(...)```  
+await self.consolidator.maybe_consolidate_by_tokens(...)
+```
   
 安全输入预算：  
   
