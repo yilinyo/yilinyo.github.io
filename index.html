@@ -259,6 +259,192 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
+        <a href="/2026/06/22/ai/nanobot-session/" target="_self">
+          nanobot的session和workspace机制
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/22/ai/nanobot-session/" target="_self">
+        <div>
+          nanobot Session、SessionManager 与 Workspace 机制本文结合 nanobot.md 的执行流程梳理，说明 nanobot 中 Session、SessionManager 与 Workspace 的设计关系，以及一条会话从创建、使用、持久化、压缩到删除的生命周期。 1. 总体关系nanobot 的会话系统可以按下面的层次理解： 1234567Workspace
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-22 15:03" pubdate>
+              2026-06-22
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/agent/">#agent</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/06/22/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/" target="_self">
+          
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/22/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/" target="_self">
+        <div>
+          测试
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-22 11:31" pubdate>
+              2026-06-22
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/06/22/ai/ai%20vibecoding%20workflow/" target="_self">
+          ai vibecoding workflow
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/22/ai/ai%20vibecoding%20workflow/" target="_self">
+        <div>
+          title: ai vibecoding workflow 实践tag: 大模型应用date: 2026-05-18 18:42:00    ai vibecoding 开发模式  根据需求 先开发前端 ，mock接口 给出api端点 然后喂给后端生成必须要严格检查数据库 字段是否完全准确，必须要检查后端暴露接口以及response字段是否完全一致 优点：能最快看到效果  缺点：前后端联调要对齐
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-22 11:31" pubdate>
+              2026-06-22
+            </time>
+          </div>
+        
+        
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/06/16/ai/nanobot-security/" target="_self">
+          nanobot的安全机制
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/16/ai/nanobot-security/" target="_self">
+        <div>
+          nanobot 安全机制与 Shell 沙箱学习笔记本文整理 nanobot 当前代码中的安全机制，重点说明：聊天权限如何控制、restrictToWorkspace 如何限制文件访问、Shell 命令执行前经过哪些检查、bwrap 沙箱如何包装并启动命令，以及这些机制能够保护什么、不能保护什么。  一、总体设计nanobot 的安全机制不是一个单独的开关，而是由多层边界共同组成： 1234567
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-16 15:03" pubdate>
+              2026-06-16
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/agent/">#agent</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
+        <a href="/2026/06/12/ai/nanobot-memory/" target="_self">
+          nanobot的记忆机制
+        </a>
+      </h2>
+
+      
+      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/12/ai/nanobot-memory/" target="_self">
+        <div>
+          nanobot 记忆系统学习笔记本文整理前面对 nanobot 记忆系统的讨论，重点说明：哪些文件保存记忆、各自用途是什么、什么时候写入、如何恢复中断中的会话，以及 runtime_checkpoint、last_consolidated、history.jsonl 之间的关系。 一、总体设计nanobot 的记忆系统不是单一文件，而是分成三层： 1234567891011121314151617
+        </div>
+      </a>
+
+      <div class="index-btm post-metas">
+        
+          <div class="post-meta mr-3">
+            <i class="iconfont icon-date"></i>
+            <time datetime="2026-06-12 15:03" pubdate>
+              2026-06-12
+            </time>
+          </div>
+        
+        
+        
+          <div class="post-meta">
+            <i class="iconfont icon-tags"></i>
+            
+              <a href="/tags/agent/">#agent</a>
+            
+          </div>
+        
+      </div>
+    </article>
+  </div>
+
+  <div class="row mx-auto index-card">
+    
+    
+    <article class="col-12 col-md-12 mx-auto index-info">
+      <h2 class="index-header">
+        
         <a href="/2026/06/09/ai/nanobot%20%E5%AD%A6%E4%B9%A0/" target="_self">
           nanobot的整体运行机制
         </a>
@@ -288,72 +474,6 @@
               <a href="/tags/agent/">#agent</a>
             
           </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/06/09/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/" target="_self">
-          
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/09/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/" target="_self">
-        <div>
-          测试
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-06-09 08:01" pubdate>
-              2026-06-09
-            </time>
-          </div>
-        
-        
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/06/09/ai/ai%20vibecoding%20workflow/" target="_self">
-          ai vibecoding workflow
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/06/09/ai/ai%20vibecoding%20workflow/" target="_self">
-        <div>
-          title: ai vibecoding workflow 实践tag: 大模型应用date: 2026-05-18 18:42:00    ai vibecoding 开发模式  根据需求 先开发前端 ，mock接口 给出api端点 然后喂给后端生成必须要严格检查数据库 字段是否完全准确，必须要检查后端暴露接口以及response字段是否完全一致 优点：能最快看到效果  缺点：前后端联调要对齐
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-06-09 08:01" pubdate>
-              2026-06-09
-            </time>
-          </div>
-        
-        
         
       </div>
     </article>
@@ -485,46 +605,6 @@
     <article class="col-12 col-md-12 mx-auto index-info">
       <h2 class="index-header">
         
-        <a href="/2026/03/30/01_models/" target="_self">
-          langchain models 实战 模型初始化与调用
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/01_models/" target="_self">
-        <div>
-          🤖 模型初始化与调用 —— LangChain 的第一步 所在目录：models/initmodel_demo.ipynb核心依赖：langchain_openai、langchain_anthropic、langchain_core   前言在使用 LangChain 构建 AI 应用之前，第一步永远是”选一个大模型，把它跑起来”。models 模块就是干这件事的——它演示了如何初始化不同厂商
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-30 22:12" pubdate>
-              2026-03-30
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/langchain/">#langchain</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
         <a href="/2026/03/30/02_message/" target="_self">
           langchain models 实战 消息系统详解
         </a>
@@ -559,91 +639,11 @@
     </article>
   </div>
 
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/03/30/03_memory/" target="_self">
-          langchain models 实战 Memory 记忆模块
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/03_memory/" target="_self">
-        <div>
-          🧠 Memory 记忆模块 —— 让 AI 记住过去的对话 所在目录：memory/short_memory.ipynb核心依赖：langgraph.checkpoint、langgraph.store、langchain.agents   前言一个没有记忆的 AI 助手，每次对话都像是第一次见面。它不知道你叫什么名字，不知道你上次讲过什么，更别说积累对你的了解。 LangChain/LangG
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-30 22:12" pubdate>
-              2026-03-30
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/langchain/">#langchain</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
-  <div class="row mx-auto index-card">
-    
-    
-    <article class="col-12 col-md-12 mx-auto index-info">
-      <h2 class="index-header">
-        
-        <a href="/2026/03/30/04_struct_output/" target="_self">
-          langchain models 实战 结构化输出
-        </a>
-      </h2>
-
-      
-      <a class="index-excerpt index-excerpt__noimg" href="/2026/03/30/04_struct_output/" target="_self">
-        <div>
-          📦 结构化输出 —— 让 AI 说”机器能懂的语言” 所在目录：struct_output/struct_op_test.ipynb核心依赖：langchain_core、pydantic   前言大模型的默认输出是自由格式的文本，但在实际开发中，我们经常需要模型返回固定格式的数据：  从简历中提取姓名、邮箱、工作经历 分析情感，返回 &#123;&quot;sentiment&quot;: &
-        </div>
-      </a>
-
-      <div class="index-btm post-metas">
-        
-          <div class="post-meta mr-3">
-            <i class="iconfont icon-date"></i>
-            <time datetime="2026-03-30 22:12" pubdate>
-              2026-03-30
-            </time>
-          </div>
-        
-        
-        
-          <div class="post-meta">
-            <i class="iconfont icon-tags"></i>
-            
-              <a href="/tags/langchain/">#langchain</a>
-            
-          </div>
-        
-      </div>
-    </article>
-  </div>
-
 
 
   <nav aria-label="navigation">
     <span class="pagination" id="pagination">
-      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
+      <span class="page-number current">1</span><a class="page-number" href="/page/2/#board">2</a><a class="page-number" href="/page/3/#board">3</a><a class="page-number" href="/page/4/#board">4</a><a class="extend next" rel="next" href="/page/2/#board"><i class="iconfont icon-arrowright"></i></a>
     </span>
   </nav>
 

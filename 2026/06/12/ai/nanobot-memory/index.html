@@ -1,0 +1,1076 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="nanobot 记忆系统学习笔记本文整理前面对 nanobot 记忆系统的讨论，重点说明：哪些文件保存记忆、各自用途是什么、什么时候写入、如何恢复中断中的会话，以及 runtime_checkpoint、last_consolidated、history.jsonl 之间的关系。 一、总体设计nanobot 的记忆系统不是单一文件，而是分成三层： 1234567891011121314151617">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nanobot的记忆机制">
+<meta property="og:url" content="https://yilinyo.github.io/2026/06/12/ai/nanobot-memory/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="nanobot 记忆系统学习笔记本文整理前面对 nanobot 记忆系统的讨论，重点说明：哪些文件保存记忆、各自用途是什么、什么时候写入、如何恢复中断中的会话，以及 runtime_checkpoint、last_consolidated、history.jsonl 之间的关系。 一、总体设计nanobot 的记忆系统不是单一文件，而是分成三层： 1234567891011121314151617">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-12T15:03:00.000Z">
+<meta property="article:modified_time" content="2026-06-22T11:31:30.339Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="agent">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>nanobot的记忆机制 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nanobot的记忆机制"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-12 15:03" pubdate>
+          2026年6月12日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          22 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                nanobot的记忆机制
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="nanobot-记忆系统学习笔记"><a href="#nanobot-记忆系统学习笔记" class="headerlink" title="nanobot 记忆系统学习笔记"></a>nanobot 记忆系统学习笔记</h1><p>本文整理前面对 nanobot 记忆系统的讨论，重点说明：哪些文件保存记忆、各自用途是什么、什么时候写入、如何恢复中断中的会话，以及 <code>runtime_checkpoint</code>、<code>last_consolidated</code>、<code>history.jsonl</code> 之间的关系。</p>
+<h2 id="一、总体设计"><a href="#一、总体设计" class="headerlink" title="一、总体设计"></a>一、总体设计</h2><p>nanobot 的记忆系统不是单一文件，而是分成三层：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>sessions/*.jsonl<br><br>= 每个会话的完整上下文和运行状态<br><br>  <br><br>memory/history.jsonl<br><br>= 跨会话的全局历史归档队列<br><br>  <br><br>SOUL.md / USER.md / memory/MEMORY.md / skills/&lt;name&gt;/SKILL.md<br><br>= Dream 提炼后的长期记忆和可复用知识<br><br></code></pre></td></tr></table></figure>
+
+<p>可以理解为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>会话消息先进入 sessions/*.jsonl<br><br>↓<br><br>旧消息太多时，归档/压缩进 memory/history.jsonl<br><br>↓<br><br>Dream 周期性读取 history.jsonl<br><br>↓<br><br>把有长期价值的信息整理进 SOUL.md / USER.md / MEMORY.md / SKILL.md<br><br></code></pre></td></tr></table></figure>
+
+<p>这个设计把“运行时上下文”和“长期记忆”分开：</p>
+<ul>
+<li><p><code>sessions/*.jsonl</code> 负责让当前会话能继续。</p>
+</li>
+<li><p><code>memory/history.jsonl</code> 负责保存被压缩出去的历史线索。</p>
+</li>
+<li><p><code>MEMORY.md</code> 等长期文件负责保存提炼后的稳定知识。</p>
+</li>
+</ul>
+<h2 id="二、关键文件作用"><a href="#二、关键文件作用" class="headerlink" title="二、关键文件作用"></a>二、关键文件作用</h2><h3 id="1-sessions-lt-session-key-gt-jsonl"><a href="#1-sessions-lt-session-key-gt-jsonl" class="headerlink" title="1. sessions/&lt;session-key&gt;.jsonl"></a>1. <code>sessions/&lt;session-key&gt;.jsonl</code></h3><p>作用：保存每个聊天会话的完整上下文。</p>
+<p>位置由 <code>SessionManager</code> 管理，目录是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>workspace/sessions/<br><br></code></pre></td></tr></table></figure>
+
+<p>每个 session 一个 JSONL 文件，正常格式如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs jsonl"><br>&#123;&quot;_type&quot;:&quot;metadata&quot;,&quot;metadata&quot;:&#123;&#125;,&quot;last_consolidated&quot;:0&#125;<br><br>&#123;&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;...&quot;&#125;<br><br>&#123;&quot;role&quot;:&quot;assistant&quot;,&quot;content&quot;:&quot;...&quot;&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>第一行是 metadata，后面是消息。</p>
+<p>metadata 中可能保存：</p>
+<ul>
+<li><p>WebUI 标题</p>
+</li>
+<li><p>sustained goal 状态</p>
+</li>
+<li><p><code>runtime_checkpoint</code></p>
+</li>
+<li><p><code>_pending_user_turn</code></p>
+</li>
+<li><p>其他会话级状态</p>
+</li>
+</ul>
+<p><code>last_consolidated</code> 表示这个 session 前面多少条消息已经被归档/压缩过。</p>
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>messages[0:40] 已经归档<br><br>messages[40:100] 仍作为近期上下文使用<br><br>  <br><br>last_consolidated = 40<br><br></code></pre></td></tr></table></figure>
+
+<p>构建历史时会从这里开始：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>unconsolidated = self.messages[self.last_consolidated:]<br><br></code></pre></td></tr></table></figure>
+
+<p>所以它的作用是避免旧消息重复进入上下文，也避免重复归档。</p>
+<h3 id="2-memory-history-jsonl"><a href="#2-memory-history-jsonl" class="headerlink" title="2. memory/history.jsonl"></a>2. <code>memory/history.jsonl</code></h3><p>作用：跨会话的全局历史归档队列。</p>
+<p>它不是“每一行一个完整会话”，而是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>一行 = 一次 append_history()<br><br></code></pre></td></tr></table></figure>
+
+<p>一条记录可能来自：</p>
+<ul>
+<li><p>某个 session 中被压缩掉的一段旧消息摘要</p>
+</li>
+<li><p>idle session 被 AutoCompact 归档的一段消息</p>
+</li>
+<li><p>LLM 归档失败时的 <code>[RAW]</code> 原始片段</p>
+</li>
+<li><p>旧版 <code>HISTORY.md</code> 迁移过来的历史块</p>
+</li>
+</ul>
+<p>格式示例：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;cursor&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-number">1</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;2026-06-11 10:30&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;用户询问 nanobot 记忆机制...&quot;</span><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>字段含义：</p>
+<ul>
+<li><p><code>cursor</code>：全局递增游标。</p>
+</li>
+<li><p><code>timestamp</code>：写入时间。</p>
+</li>
+<li><p><code>content</code>：归档摘要或原始片段。</p>
+</li>
+</ul>
+<p>它不是最终长期记忆，而是 Dream 的原料池。</p>
+<h3 id="3-memory-cursor"><a href="#3-memory-cursor" class="headerlink" title="3. memory/.cursor"></a>3. <code>memory/.cursor</code></h3><p>作用：记录 <code>history.jsonl</code> 最新写入到哪个 cursor。</p>
+<p><code>append_history()</code> 写入一条历史时，会分配新的 cursor，并把最新 cursor 写到 <code>.cursor</code>。</p>
+<p>这个文件用于保证历史条目的全局递增编号。</p>
+<h3 id="4-memory-dream-cursor"><a href="#4-memory-dream-cursor" class="headerlink" title="4. memory/.dream_cursor"></a>4. <code>memory/.dream_cursor</code></h3><p>作用：记录 Dream 已经处理到 <code>history.jsonl</code> 的哪一条。</p>
+<p>Dream 运行时会读取：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>last_cursor = self.get_last_dream_cursor()<br><br>entries = self.read_unprocessed_history(since_cursor=last_cursor)<br><br></code></pre></td></tr></table></figure>
+
+<p>也就是说，Dream 只处理：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>cursor &gt; .dream_cursor<br><br></code></pre></td></tr></table></figure>
+
+<p>Dream 成功完成后，才会更新 <code>.dream_cursor</code>。</p>
+<p>如果 Dream 失败，cursor 不会前进，避免历史被误标记为已处理。</p>
+<h3 id="5-memory-MEMORY-md"><a href="#5-memory-MEMORY-md" class="headerlink" title="5. memory/MEMORY.md"></a>5. <code>memory/MEMORY.md</code></h3><p>作用：保存项目级长期记忆。</p>
+<p>例如：</p>
+<ul>
+<li><p>项目目标</p>
+</li>
+<li><p>架构理解</p>
+</li>
+<li><p>长期技术决策</p>
+</li>
+<li><p>基础设施概览</p>
+</li>
+<li><p>重要背景信息</p>
+</li>
+</ul>
+<p>它由 Dream 自动维护，不建议手动编辑。</p>
+<h3 id="6-USER-md"><a href="#6-USER-md" class="headerlink" title="6. USER.md"></a>6. <code>USER.md</code></h3><p>作用：保存用户画像和偏好。</p>
+<p>例如：</p>
+<ul>
+<li><p>用户身份</p>
+</li>
+<li><p>交流偏好</p>
+</li>
+<li><p>语言偏好</p>
+</li>
+<li><p>回复长度偏好</p>
+</li>
+<li><p>稳定的个人习惯</p>
+</li>
+</ul>
+<p>例如“用户偏好中文回答”应该进入 <code>USER.md</code>。</p>
+<h3 id="7-SOUL-md"><a href="#7-SOUL-md" class="headerlink" title="7. SOUL.md"></a>7. <code>SOUL.md</code></h3><p>作用：保存 Agent 自身行为规则和交互策略。</p>
+<p>例如：</p>
+<ul>
+<li><p>工具使用策略</p>
+</li>
+<li><p>与用户协作方式</p>
+</li>
+<li><p>行为护栏</p>
+</li>
+<li><p>agent 的长期沟通风格</p>
+</li>
+</ul>
+<p>例如“回答前优先查源码”更适合进入 <code>SOUL.md</code>。</p>
+<h3 id="8-skills-lt-name-gt-SKILL-md"><a href="#8-skills-lt-name-gt-SKILL-md" class="headerlink" title="8. skills/&lt;name&gt;/SKILL.md"></a>8. <code>skills/&lt;name&gt;/SKILL.md</code></h3><p>作用：保存可复用工作流、命令、步骤和具体操作模板。</p>
+<p>Dream 发现某些信息不是普通记忆，而是可复用流程时，可能迁移到 skill。</p>
+<p>例如：</p>
+<ul>
+<li><p>固定排查步骤</p>
+</li>
+<li><p>重复出现的命令</p>
+</li>
+<li><p>某服务的操作流程</p>
+</li>
+<li><p>某类任务的模板</p>
+</li>
+</ul>
+<h2 id="三、保存机制"><a href="#三、保存机制" class="headerlink" title="三、保存机制"></a>三、保存机制</h2><h3 id="1-Session-如何保存"><a href="#1-Session-如何保存" class="headerlink" title="1. Session 如何保存"></a>1. Session 如何保存</h3><p><code>SessionManager.save()</code> 会重写整个 session 文件：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>1. 写入临时文件 .jsonl.tmp<br><br>2. 第一行写 metadata<br><br>3. 后续行写 session.messages<br><br>4. os.replace(tmp, 正式文件)<br><br></code></pre></td></tr></table></figure>
+
+<p>所以 session 文件的 metadata 正常只在第一行。</p>
+<p>加载时实现更宽松：它会逐行扫描整个 JSONL，只要遇到 <code>_type == &quot;metadata&quot;</code> 就当作 metadata。如果异常出现多条 metadata，后面的会覆盖前面的。</p>
+<h3 id="2-history-jsonl-如何追加"><a href="#2-history-jsonl-如何追加" class="headerlink" title="2. history.jsonl 如何追加"></a>2. <code>history.jsonl</code> 如何追加</h3><p><code>append_history()</code> 会：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>1. 清理 entry 中的 think/template 泄漏<br><br>2. 对超长内容做截断<br><br>3. 分配新的 cursor<br><br>4. 追加一行 JSON 到 memory/history.jsonl<br><br>5. 更新 memory/.cursor<br><br></code></pre></td></tr></table></figure>
+
+<p>每一行是一条独立归档记录，不按 session 单独分文件。</p>
+<h3 id="3-什么时候写入-history-jsonl"><a href="#3-什么时候写入-history-jsonl" class="headerlink" title="3. 什么时候写入 history.jsonl"></a>3. 什么时候写入 <code>history.jsonl</code></h3><p>主要情况：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>session 太长，需要 token 级压缩<br><br>idle session 被 AutoCompact 压缩<br><br>session 文件超过上限，需要硬裁剪<br><br>归档 LLM 失败，需要 raw_archive 兜底<br><br>旧版 HISTORY.md 迁移<br><br></code></pre></td></tr></table></figure>
+
+<p>正常情况下，归档会先让 LLM 总结旧消息，再把摘要写入 <code>history.jsonl</code>。</p>
+<p>如果 LLM 总结失败，则写入 <code>[RAW]</code> 截断片段，避免信息完全丢失。</p>
+<h2 id="四、Dream-的作用"><a href="#四、Dream-的作用" class="headerlink" title="四、Dream 的作用"></a>四、Dream 的作用</h2><p>Dream 是长期记忆提炼器。</p>
+<p>它不会直接读取所有 session，而是读取：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>memory/history.jsonl 中 .dream_cursor 之后的新记录<br><br></code></pre></td></tr></table></figure>
+
+<p>然后根据 <code>templates/agent/dream.md</code> 的规则，把信息路由到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>SOUL.md<br><br>USER.md<br><br>memory/MEMORY.md<br><br>skills/&lt;name&gt;/SKILL.md<br><br></code></pre></td></tr></table></figure>
+
+<p>Dream 的核心原则是 MECE：</p>
+<ul>
+<li><p>用户偏好进入 <code>USER.md</code></p>
+</li>
+<li><p>agent 行为规则进入 <code>SOUL.md</code></p>
+</li>
+<li><p>项目长期背景进入 <code>MEMORY.md</code></p>
+</li>
+<li><p>可复用流程进入 <code>SKILL.md</code></p>
+</li>
+<li><p>不重复保存同一个事实</p>
+</li>
+<li><p>过期或短暂信息应删除或忽略</p>
+</li>
+</ul>
+<p>Dream 成功后：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>1. 更新 memory/.dream_cursor<br><br>2. compact_history() 压缩 history.jsonl<br><br>3. 如果 GitStore 已初始化，可能自动 commit 记忆变更<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="五、runtime-checkpoint-是什么"><a href="#五、runtime-checkpoint-是什么" class="headerlink" title="五、runtime_checkpoint 是什么"></a>五、<code>runtime_checkpoint</code> 是什么</h2><p><code>runtime_checkpoint</code> 是保存在 <code>session.metadata</code> 里的临时恢复点。</p>
+<p>它不是长期记忆，而是用于防止一轮对话跑到一半中断后丢状态。</p>
+<p>它会在这些阶段生成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>awaiting_tools<br><br>模型已经返回 tool_calls，但工具还没执行<br><br>  <br><br>tools_completed<br><br>工具已经执行完，但还没进入下一轮 LLM<br><br>  <br><br>final_response<br><br>最终回复已经生成，但还没完全保存到 session<br><br></code></pre></td></tr></table></figure>
+
+<p>checkpoint 一生成就会马上写 session 文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>session.metadata[<span class="hljs-string">&quot;runtime_checkpoint&quot;</span>] = payload<br><br>self.sessions.save(session)<br><br></code></pre></td></tr></table></figure>
+
+<p>所以它不是只存在内存里。</p>
+<p>正常 turn 结束后会清掉：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>self._clear_runtime_checkpoint(session)<br><br>self.sessions.save(session)<br><br></code></pre></td></tr></table></figure>
+
+<p>因此正常情况下它只短暂存在。</p>
+<h2 id="六、checkpoint-如何恢复"><a href="#六、checkpoint-如何恢复" class="headerlink" title="六、checkpoint 如何恢复"></a>六、checkpoint 如何恢复</h2><p>恢复的判断很简单：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>进入 session 时检查 session.metadata[&quot;runtime_checkpoint&quot;]<br><br></code></pre></td></tr></table></figure>
+
+<p>如果它是 dict，就说明上次 turn 中断后留下了 checkpoint。</p>
+<p>恢复时不是恢复 Python 协程，而是把 checkpoint 中的半截 turn 转成正式消息，追加进 <code>session.messages</code>。</p>
+<p>也就是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>metadata[&quot;runtime_checkpoint&quot;]<br><br>↓<br><br>session.messages<br><br></code></pre></td></tr></table></figure>
+
+<p>恢复逻辑会取出：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>assistant_message<br><br>completed_tool_results<br><br>pending_tool_calls<br><br></code></pre></td></tr></table></figure>
+
+<p>然后：</p>
+<ul>
+<li><p><code>assistant_message</code> 追加为 assistant 消息。</p>
+</li>
+<li><p><code>completed_tool_results</code> 追加为 tool 消息。</p>
+</li>
+<li><p><code>pending_tool_calls</code> 补成失败的 tool 消息。</p>
+</li>
+</ul>
+<p>未完成工具会补成：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tool&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;tool_call_id&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;name&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;tool_name&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;Error: Task interrupted before this tool finished.&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这样做是为了保证 OpenAI-style tool call 历史结构完整：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>assistant 有 tool_calls<br><br>后面必须有对应 tool 消息<br><br></code></pre></td></tr></table></figure>
+
+<p>恢复成功后，会立即保存 session 文件：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">if</span> self._restore_runtime_checkpoint(ctx.session):<br><br>self.sessions.save(ctx.session)<br><br></code></pre></td></tr></table></figure>
+
+<p>保存后文件会变成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>metadata 里没有 runtime_checkpoint<br><br>messages 里多了补进去的 assistant/tool 消息<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="七、几个关键问题总结"><a href="#七、几个关键问题总结" class="headerlink" title="七、几个关键问题总结"></a>七、几个关键问题总结</h2><h3 id="1-memory-history-jsonl-是按会话追加的吗？"><a href="#1-memory-history-jsonl-是按会话追加的吗？" class="headerlink" title="1. memory/history.jsonl 是按会话追加的吗？"></a>1. <code>memory/history.jsonl</code> 是按会话追加的吗？</h3><p>不是严格按会话。</p>
+<p>它是跨会话的全局归档日志。不同 session 的归档内容都会追加到同一个 <code>history.jsonl</code>。</p>
+<p>单条记录不是一个完整会话，而是一次归档产生的一段内容。</p>
+<h3 id="2-一条-history-jsonl-记录是不是一个会话？"><a href="#2-一条-history-jsonl-记录是不是一个会话？" class="headerlink" title="2. 一条 history.jsonl 记录是不是一个会话？"></a>2. 一条 <code>history.jsonl</code> 记录是不是一个会话？</h3><p>不是。</p>
+<p>更准确是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>一条 history.jsonl 记录 = 一次 append_history()<br><br></code></pre></td></tr></table></figure>
+
+<p>它通常对应某个会话的一部分历史，而不是完整会话。每条对应的是一个会话的部分。</p>
+<p>一个长会话可能产生多条 <code>history.jsonl</code> 记录。</p>
+<h3 id="3-session-metadata-是内存里的还是文件里的？"><a href="#3-session-metadata-是内存里的还是文件里的？" class="headerlink" title="3. session.metadata 是内存里的还是文件里的？"></a>3. <code>session.metadata</code> 是内存里的还是文件里的？</h3><p>两者都是。</p>
+<p>运行时它是内存中的 Python dict：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>session.metadata<br><br></code></pre></td></tr></table></figure>
+
+<p>保存时会写入 session JSONL 第一行：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;_type&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-punctuation">,</span><span class="hljs-attr">&quot;metadata&quot;</span><span class="hljs-punctuation">:</span><span class="hljs-punctuation">&#123;</span>...<span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>如果只改内存但不 save，重启后会丢。</p>
+<p>但 <code>runtime_checkpoint</code> 写入时会马上 <code>save()</code>。</p>
+<h3 id="4-session-初始化-metadata-只取-JSONL-第一行吗？"><a href="#4-session-初始化-metadata-只取-JSONL-第一行吗？" class="headerlink" title="4. session 初始化 metadata 只取 JSONL 第一行吗？"></a>4. session 初始化 metadata 只取 JSONL 第一行吗？</h3><p>正常文件格式是第一行 metadata。</p>
+<p>但加载实现不是只读第一行，而是逐行扫描：</p>
+<ul>
+<li><p>遇到 <code>_type == &quot;metadata&quot;</code> 就更新 metadata。</p>
+</li>
+<li><p>其他行当作 message。</p>
+</li>
+</ul>
+<p>所以如果异常出现多条 metadata，后面的会覆盖前面的。</p>
+<h3 id="5-checkpoint-每次都会生成吗？"><a href="#5-checkpoint-每次都会生成吗？" class="headerlink" title="5. checkpoint 每次都会生成吗？"></a>5. checkpoint 每次都会生成吗？</h3><p>不是。</p>
+<p>只有 runner 到达可恢复阶段时才生成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>awaiting_tools<br><br>tools_completed<br><br>final_response<br><br></code></pre></td></tr></table></figure>
+
+<p>普通无工具调用的 turn 通常只会在 <code>final_response</code> 生成一次。</p>
+<p>如果很早就报错或取消，可能没有 checkpoint。</p>
+<h3 id="6-只有-stop-才会恢复-checkpoint-吗？"><a href="#6-只有-stop-才会恢复-checkpoint-吗？" class="headerlink" title="6. 只有 /stop 才会恢复 checkpoint 吗？"></a>6. 只有 <code>/stop</code> 才会恢复 checkpoint 吗？</h3><p>不是。</p>
+<p><code>/stop</code> 是典型场景，但只要 session 文件里残留 <code>runtime_checkpoint</code>，下次进入同一个 session 时都会尝试恢复。</p>
+<p>可能来源包括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>/stop<br><br>进程崩溃<br><br>服务重启<br><br>异常中断<br><br>任务取消<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="7-恢复后会马上写文件吗？"><a href="#7-恢复后会马上写文件吗？" class="headerlink" title="7. 恢复后会马上写文件吗？"></a>7. 恢复后会马上写文件吗？</h3><p>会。</p>
+<p>恢复成功后外层会调用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>self.sessions.save(session)<br><br></code></pre></td></tr></table></figure>
+
+<p>所以补进 <code>messages</code> 的 assistant/tool 消息会立即写回 <code>sessions/&lt;session-key&gt;.jsonl</code>。</p>
+<h2 id="八、核心关系图"><a href="#八、核心关系图" class="headerlink" title="八、核心关系图"></a>八、核心关系图</h2><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>用户消息<br><br>↓<br><br>SessionManager 加载 sessions/&lt;session-key&gt;.jsonl<br><br>↓<br><br>检查 metadata.runtime_checkpoint<br><br>├─ 有：恢复半截 turn 到 session.messages，然后保存<br><br>└─ 无：正常继续<br><br>↓<br><br>构建上下文：system prompt + memory + recent session history<br><br>↓<br><br>AgentRunner 执行 LLM / tools 循环<br><br>↓<br><br>运行中写 runtime_checkpoint<br><br>↓<br><br>正常完成：保存 messages，清掉 runtime_checkpoint<br><br>↓<br><br>如果 session 太长：旧消息归档到 memory/history.jsonl<br><br>↓<br><br>Dream 读取未处理 history<br><br>↓<br><br>更新 SOUL.md / USER.md / MEMORY.md / skills<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="九、源码阅读入口"><a href="#九、源码阅读入口" class="headerlink" title="九、源码阅读入口"></a>九、源码阅读入口</h2><p>建议按这个顺序读：</p>
+<ol>
+<li><code>session/manager.py</code></li>
+</ol>
+<ul>
+<li><p><code>Session</code></p>
+</li>
+<li><p><code>SessionManager._load()</code></p>
+</li>
+<li><p><code>SessionManager.save()</code></p>
+</li>
+</ul>
+<ol start="2">
+<li><code>agent/loop.py</code></li>
+</ol>
+<ul>
+<li><p><code>_set_runtime_checkpoint()</code></p>
+</li>
+<li><p><code>_restore_runtime_checkpoint()</code></p>
+</li>
+<li><p><code>_clear_runtime_checkpoint()</code></p>
+</li>
+<li><p><code>_state_restore()</code></p>
+</li>
+<li><p><code>_state_save()</code></p>
+</li>
+</ul>
+<ol start="3">
+<li><code>agent/runner.py</code></li>
+</ol>
+<ul>
+<li><p><code>_emit_checkpoint()</code></p>
+</li>
+<li><p><code>awaiting_tools</code></p>
+</li>
+<li><p><code>tools_completed</code></p>
+</li>
+<li><p><code>final_response</code></p>
+</li>
+</ul>
+<ol start="4">
+<li><code>agent/memory.py</code></li>
+</ol>
+<ul>
+<li><p><code>MemoryStore.append_history()</code></p>
+</li>
+<li><p><code>MemoryStore.raw_archive()</code></p>
+</li>
+<li><p><code>MemoryConsolidator.archive()</code></p>
+</li>
+<li><p><code>MemoryStore.build_dream_prompt()</code></p>
+</li>
+<li><p><code>MemoryStore.set_last_dream_cursor()</code></p>
+</li>
+</ul>
+<ol start="5">
+<li><code>templates/agent/dream.md</code></li>
+</ol>
+<ul>
+<li>Dream 如何把历史路由到 <code>SOUL.md</code>、<code>USER.md</code>、<code>MEMORY.md</code>、<code>SKILL.md</code></li>
+</ul>
+<h2 id="十、一句话总结"><a href="#十、一句话总结" class="headerlink" title="十、一句话总结"></a>十、一句话总结</h2><p>nanobot 的记忆系统本质上是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>session 文件保存当前对话状态；<br><br>history.jsonl 保存被压缩出去的历史原料；<br><br>Dream 把历史原料提炼成长期记忆；<br><br>runtime_checkpoint 保障半轮对话中断后可以恢复。<br><br></code></pre></td></tr></table></figure>
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/ai/nanobot-memory.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/agent/" class="print-no-link">#agent</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nanobot的记忆机制</div>
+      <div>https://yilinyo.github.io/2026/06/12/ai/nanobot-memory/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月12日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/16/ai/nanobot-security/" title="nanobot的安全机制">
+                                                                                                    <i class="iconfont icon-arrowleft"></i>
+                                                                                                    <span class="hidden-mobile">nanobot的安全机制</span>
+                                                                                                    <span class="visible-mobile">上一篇</span>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/09/ai/nanobot%20%E5%AD%A6%E4%B9%A0/" title="nanobot的整体运行机制">
+                                                                                                    <span class="hidden-mobile">nanobot的整体运行机制</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

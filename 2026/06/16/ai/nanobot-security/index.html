@@ -1,0 +1,1372 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="nanobot 安全机制与 Shell 沙箱学习笔记本文整理 nanobot 当前代码中的安全机制，重点说明：聊天权限如何控制、restrictToWorkspace 如何限制文件访问、Shell 命令执行前经过哪些检查、bwrap 沙箱如何包装并启动命令，以及这些机制能够保护什么、不能保护什么。  一、总体设计nanobot 的安全机制不是一个单独的开关，而是由多层边界共同组成： 1234567">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nanobot的安全机制">
+<meta property="og:url" content="https://yilinyo.github.io/2026/06/16/ai/nanobot-security/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="nanobot 安全机制与 Shell 沙箱学习笔记本文整理 nanobot 当前代码中的安全机制，重点说明：聊天权限如何控制、restrictToWorkspace 如何限制文件访问、Shell 命令执行前经过哪些检查、bwrap 沙箱如何包装并启动命令，以及这些机制能够保护什么、不能保护什么。  一、总体设计nanobot 的安全机制不是一个单独的开关，而是由多层边界共同组成： 1234567">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://files.seeusercontent.com/2026/06/15/8uuJ/01-cover.webp">
+<meta property="og:image" content="https://files.seeusercontent.com/2026/06/15/J8eg/02-security-architecture.webp">
+<meta property="og:image" content="https://files.seeusercontent.com/2026/06/15/3iQw/03-bwrap-flow.webp">
+<meta property="og:image" content="https://files.seeusercontent.com/2026/06/15/o5cD/04-boundary-comparison.webp">
+<meta property="article:published_time" content="2026-06-16T15:03:00.000Z">
+<meta property="article:modified_time" content="2026-06-22T11:31:30.339Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="agent">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://files.seeusercontent.com/2026/06/15/8uuJ/01-cover.webp">
+  
+  
+  
+  <title>nanobot的安全机制 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nanobot的安全机制"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-16 15:03" pubdate>
+          2026年6月16日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          5.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          47 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                nanobot的安全机制
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="nanobot-安全机制与-Shell-沙箱学习笔记"><a href="#nanobot-安全机制与-Shell-沙箱学习笔记" class="headerlink" title="nanobot 安全机制与 Shell 沙箱学习笔记"></a>nanobot 安全机制与 Shell 沙箱学习笔记</h1><p>本文整理 nanobot 当前代码中的安全机制，重点说明：聊天权限如何控制、<code>restrictToWorkspace</code> 如何限制文件访问、Shell 命令执行前经过哪些检查、<code>bwrap</code> 沙箱如何包装并启动命令，以及这些机制能够保护什么、不能保护什么。</p>
+<p><img src="https://files.seeusercontent.com/2026/06/15/8uuJ/01-cover.webp" srcset="/img/loading.gif" lazyload alt="展示 nanobot Agent 在可读写 Workspace 中受控执行，同时隔离宿主机配置密钥、SSH 私钥和系统目录的安全机制封面图"></p>
+<h2 id="一、总体设计"><a href="#一、总体设计" class="headerlink" title="一、总体设计"></a>一、总体设计</h2><p>nanobot 的安全机制不是一个单独的开关，而是由多层边界共同组成：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Channel 发送者校验<br><br>↓<br><br>聊天 workspace scope<br><br>↓<br><br>Tool 参数 Schema 校验<br><br>↓<br><br>文件路径边界检查<br><br>↓<br><br>Shell 命令文本检查<br><br>↓<br><br>bwrap 文件系统隔离<br><br>↓<br><br>网络 SSRF 防护<br><br></code></pre></td></tr></table></figure>
+
+<p>这些机制解决的问题不同：</p>
+<ul>
+<li><p>Channel 权限控制“谁可以向 Agent 发消息”。</p>
+</li>
+<li><p>Workspace scope 控制“当前聊天以哪个项目目录作为边界”。</p>
+</li>
+<li><p>Tool Schema 控制“模型传入的工具参数是否合法”。</p>
+</li>
+<li><p>文件工具限制控制“文件路径是否位于允许目录”。</p>
+</li>
+<li><p>Shell guard 控制“命令文本中是否包含明显危险操作”。</p>
+</li>
+<li><p><code>bwrap</code> 控制“命令在操作系统层面能够看到哪些文件”。</p>
+</li>
+<li><p>SSRF 防护控制“工具是否可以访问内网和云元数据地址”。</p>
+</li>
+</ul>
+<p>需要先明确一个核心区别：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>restrictToWorkspace<br><br>= nanobot 应用层路径检查<br><br>  <br><br>bwrap<br><br>= Linux 内核提供的文件系统视图隔离<br><br></code></pre></td></tr></table></figure>
+
+<p>前者依赖 nanobot 正确识别路径和命令，后者在进程真正访问文件时生效。</p>
+<p><img src="https://files.seeusercontent.com/2026/06/15/J8eg/02-security-architecture.webp" srcset="/img/loading.gif" lazyload alt="展示 nanobot 从 Channel 身份校验、Workspace Scope、Tool Schema、Shell Guard、bwrap 到 SSRF 防护的多层安全架构图"></p>
+<h2 id="二、Channel-访问控制"><a href="#二、Channel-访问控制" class="headerlink" title="二、Channel 访问控制"></a>二、Channel 访问控制</h2><h3 id="1-allowFrom"><a href="#1-allowFrom" class="headerlink" title="1. allowFrom"></a>1. <code>allowFrom</code></h3><p>Channel 在把消息发布到 <code>MessageBus</code> 前，会先检查发送者：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">is_allowed</span>(<span class="hljs-params">self, sender_id: <span class="hljs-built_in">str</span></span>) -&gt; <span class="hljs-built_in">bool</span>:<br><br><span class="hljs-keyword">if</span> <span class="hljs-string">&quot;*&quot;</span> <span class="hljs-keyword">in</span> allow_list:<br><br><span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">if</span> <span class="hljs-built_in">str</span>(sender_id) <span class="hljs-keyword">in</span> allow_list:<br><br><span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">if</span> is_approved(self.name, <span class="hljs-built_in">str</span>(sender_id)):<br><br><span class="hljs-keyword">return</span> <span class="hljs-literal">True</span><br><br><span class="hljs-keyword">return</span> <span class="hljs-literal">False</span><br><br></code></pre></td></tr></table></figure>
+
+<p>规则如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>allowFrom 包含 &quot;*&quot;<br><br>→ 允许所有发送者<br><br>  <br><br>allowFrom 包含当前 sender_id<br><br>→ 允许该发送者<br><br>  <br><br>发送者已经通过 pairing 批准<br><br>→ 允许该发送者<br><br>  <br><br>以上都不满足<br><br>→ 拒绝<br><br></code></pre></td></tr></table></figure>
+
+<p><code>allowFrom</code> 使用精确字符串匹配，不会把发送者 ID 当作正则表达式或子串。</p>
+<h3 id="2-Pairing"><a href="#2-Pairing" class="headerlink" title="2. Pairing"></a>2. Pairing</h3><p>未授权用户在私聊中发送消息时，Channel 可以生成临时配对码：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>未授权 DM<br><br>↓<br><br>generate_code()<br><br>↓<br><br>返回 ABCD-EFGH 形式的随机码<br><br>↓<br><br>Owner 执行 /pairing approve &lt;code&gt;<br><br>↓<br><br>发送者加入 approved 列表<br><br></code></pre></td></tr></table></figure>
+
+<p>配对码使用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>secrets.choice(...)<br><br></code></pre></td></tr></table></figure>
+
+<p>生成，默认有效期为 600 秒，即 10 分钟。</p>
+<p>配对信息持久化在：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>~/.nanobot/pairing.json<br><br></code></pre></td></tr></table></figure>
+
+<p>Channel 权限相关代码主要位于：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>channels/base.py<br><br>pairing/store.py<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="三、聊天-Workspace-Scope"><a href="#三、聊天-Workspace-Scope" class="headerlink" title="三、聊天 Workspace Scope"></a>三、聊天 Workspace Scope</h2><h3 id="1-两种访问模式"><a href="#1-两种访问模式" class="headerlink" title="1. 两种访问模式"></a>1. 两种访问模式</h3><p>WebUI 聊天可以保存自己的 workspace scope：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;workspace_scope&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;project_path&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/path/to/project&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;access_mode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;restricted&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>当前支持两种实际访问模式：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>restricted<br><br>= 当前聊天限制在 project_path<br><br>  <br><br>full<br><br>= 当前聊天不启用 workspace 路径限制<br><br></code></pre></td></tr></table></figure>
+
+<p>WebUI 展示的 Default Access 表示继承全局配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>如果全局配置为 <code>true</code>，Default Access 最终得到 <code>restricted</code>；如果全局配置为 <code>false</code>，Default Access 最终得到 <code>full</code>。</p>
+<h3 id="2-Scope-会覆盖全局配置"><a href="#2-Scope-会覆盖全局配置" class="headerlink" title="2. Scope 会覆盖全局配置"></a>2. Scope 会覆盖全局配置</h3><p>每轮 Agent 执行前，系统会把当前 scope 绑定到 <code>ContextVar</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>workspace_token = bind_workspace_scope(effective_scope)<br><br></code></pre></td></tr></table></figure>
+
+<p>工具调用时再读取当前 scope：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>access = current_tool_workspace(...)<br><br></code></pre></td></tr></table></figure>
+
+<p>因此 WebUI 会话中保存的：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;access_mode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;full&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>可以覆盖全局：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><br></code></pre></td></tr></table></figure>
+
+<p>这也是修改全局配置并重启后，旧聊天仍可能访问 workspace 外部的原因。旧聊天的 scope 保存在 Session metadata 中，不会因为重启自动删除。</p>
+<p>主要实现位于：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>security/workspace_access.py<br><br>webui/workspaces.py<br><br>channels/websocket.py<br><br>agent/loop.py<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="四、restrictToWorkspace"><a href="#四、restrictToWorkspace" class="headerlink" title="四、restrictToWorkspace"></a>四、<code>restrictToWorkspace</code></h2><h3 id="1-配置定义"><a href="#1-配置定义" class="headerlink" title="1. 配置定义"></a>1. 配置定义</h3><p>配置定义在 <code>config/schema.py</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ToolsConfig</span>(<span class="hljs-title class_ inherited__">Base</span>):<br><br>restrict_to_workspace: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">False</span><br><br></code></pre></td></tr></table></figure>
+
+<p>默认值是 <code>False</code>，需要显式开启：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>JSON 中使用 camelCase，Pydantic 加载后对应 Python 字段：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>config.tools.restrict_to_workspace<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-配置什么时候进入-AgentLoop"><a href="#2-配置什么时候进入-AgentLoop" class="headerlink" title="2. 配置什么时候进入 AgentLoop"></a>2. 配置什么时候进入 AgentLoop</h3><p>Gateway 启动时：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>nanobot gateway<br><br>↓<br><br>_load_runtime_config()<br><br>↓<br><br>_run_gateway()<br><br>↓<br><br>AgentLoop.from_config()<br><br>↓<br><br>AgentLoop.__init__()<br><br></code></pre></td></tr></table></figure>
+
+<p><code>AgentLoop.from_config()</code> 把配置传入构造函数：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">return</span> cls(<br><br>...<br><br>restrict_to_workspace=config.tools.restrict_to_workspace,<br><br>tools_config=config.tools,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>AgentLoop.__init__()</code> 随后创建工具注册表并加载工具：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>self.tools = ToolRegistry()<br><br>self._register_default_tools()<br><br></code></pre></td></tr></table></figure>
+
+<p>所以修改 <code>restrictToWorkspace</code>、<code>exec.enable</code> 或 <code>exec.sandbox</code> 后，通常需要重启 Gateway，使新的 <code>AgentLoop</code> 和工具实例重新创建。</p>
+<h2 id="五、文件工具如何限制路径"><a href="#五、文件工具如何限制路径" class="headerlink" title="五、文件工具如何限制路径"></a>五、文件工具如何限制路径</h2><h3 id="1-创建文件工具"><a href="#1-创建文件工具" class="headerlink" title="1. 创建文件工具"></a>1. 创建文件工具</h3><p>文件工具创建时会判断是否需要限制 workspace：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>restrict = (<br><br>ctx.config.restrict_to_workspace<br><br><span class="hljs-keyword">or</span> ctx.config.<span class="hljs-built_in">exec</span>.sandbox<br><br>)<br><br>  <br><br>allowed_dir = Path(ctx.workspace) <span class="hljs-keyword">if</span> restrict <span class="hljs-keyword">else</span> <span class="hljs-literal">None</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这表示：</p>
+<ul>
+<li><p>显式开启 <code>restrictToWorkspace</code> 时限制文件工具。</p>
+</li>
+<li><p>只要配置了 Shell sandbox，也自动限制文件工具。</p>
+</li>
+</ul>
+<h3 id="2-路径解析流程"><a href="#2-路径解析流程" class="headerlink" title="2. 路径解析流程"></a>2. 路径解析流程</h3><p>文件工具调用 <code>_resolve()</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">return</span> resolve_workspace_path(<br><br>path,<br><br>access.project_path,<br><br>access.allowed_root,<br><br>self._extra_allowed_dirs,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p>最终进入 <code>resolve_allowed_path()</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>resolved = resolve_path(path, workspace, strict=<span class="hljs-literal">False</span>)<br><br>  <br><br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_path_allowed(resolved, roots):<br><br><span class="hljs-keyword">raise</span> WorkspaceBoundaryError(...)<br><br></code></pre></td></tr></table></figure>
+
+<p>完整流程可以表示为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>用户传入 path<br><br>↓<br><br>展开 ~<br><br>↓<br><br>相对路径拼接 workspace<br><br>↓<br><br>Path.resolve()<br><br>↓<br><br>消除 .. 和符号链接<br><br>↓<br><br>检查最终路径是否位于允许根目录<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-路径包含判断"><a href="#3-路径包含判断" class="headerlink" title="3. 路径包含判断"></a>3. 路径包含判断</h3><p>核心判断使用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>resolved_path.relative_to(resolved_root)<br><br></code></pre></td></tr></table></figure>
+
+<p>如果成功，说明路径等于根目录或位于根目录下；如果抛出 <code>ValueError</code>，说明路径越界。</p>
+<p>例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>workspace = /home/user/project<br><br>  <br><br>/home/user/project/src/main.py<br><br>→ 允许<br><br>  <br><br>/home/user/project/../secret.txt<br><br>→ resolve 后成为 /home/user/secret.txt<br><br>→ 拒绝<br><br>  <br><br>/home/user/project/link<br><br>→ 如果 link 指向 /etc<br><br>→ resolve 后位于 /etc<br><br>→ 拒绝<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-额外允许目录"><a href="#4-额外允许目录" class="headerlink" title="4. 额外允许目录"></a>4. 额外允许目录</h3><p>文件工具除了 workspace，还可能允许读取：</p>
+<ul>
+<li><p>上传媒体目录。</p>
+</li>
+<li><p>内置 skills 目录。</p>
+</li>
+<li><p>工具显式配置的其他允许目录。</p>
+</li>
+</ul>
+<p>这些额外目录不代表整个宿主机都开放，只是加入允许根目录集合。</p>
+<p>主要代码位于：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>agent/tools/filesystem.py<br><br>agent/tools/path_utils.py<br><br>security/workspace_policy.py<br><br>security/workspace_access.py<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="六、Shell-工具的安全检查"><a href="#六、Shell-工具的安全检查" class="headerlink" title="六、Shell 工具的安全检查"></a>六、Shell 工具的安全检查</h2><h3 id="1-ExecTool-配置"><a href="#1-ExecTool-配置" class="headerlink" title="1. ExecTool 配置"></a>1. ExecTool 配置</h3><p><code>ExecToolConfig</code> 定义：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ExecToolConfig</span>(<span class="hljs-title class_ inherited__">Base</span>):<br><br>enable: <span class="hljs-built_in">bool</span> = <span class="hljs-literal">True</span><br><br>timeout: <span class="hljs-built_in">int</span> = <span class="hljs-number">60</span><br><br>path_append: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span><br><br>sandbox: <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span><br><br>allowed_env_keys: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>] = []<br><br>allow_patterns: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>] = []<br><br>deny_patterns: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">str</span>] = []<br><br></code></pre></td></tr></table></figure>
+
+<p>其中：</p>
+<ul>
+<li><p><code>enable</code>：是否注册 <code>exec</code> 工具。</p>
+</li>
+<li><p><code>timeout</code>：默认命令超时。</p>
+</li>
+<li><p><code>sandbox</code>：沙箱后端名称，目前只有 <code>bwrap</code>。</p>
+</li>
+<li><p><code>allowed_env_keys</code>：额外允许传入子进程的环境变量。</p>
+</li>
+<li><p><code>allow_patterns</code>：命令允许规则。</p>
+</li>
+<li><p><code>deny_patterns</code>：命令拒绝规则。</p>
+</li>
+</ul>
+<p>完全禁用 Shell：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>此时 <code>ToolLoader</code> 会执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tool_cls.enabled(ctx):<br><br><span class="hljs-keyword">continue</span><br><br></code></pre></td></tr></table></figure>
+
+<p>所以 <code>ExecTool</code> 不会进入 <code>ToolRegistry</code>，LLM 也看不到 <code>exec</code> 工具定义。</p>
+<h3 id="2-命令执行入口"><a href="#2-命令执行入口" class="headerlink" title="2. 命令执行入口"></a>2. 命令执行入口</h3><p>LLM 调用 <code>exec</code> 后，执行链是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>AgentRunner<br><br>↓<br><br>ToolRegistry.prepare_call()<br><br>↓<br><br>参数转换和 Schema 校验<br><br>↓<br><br>ExecTool.execute()<br><br>↓<br><br>ExecTool._prepare_command()<br><br>↓<br><br>ExecTool._spawn()<br><br></code></pre></td></tr></table></figure>
+
+<p><code>_prepare_command()</code> 负责安全检查和命令包装，<code>_spawn()</code> 负责真正创建子进程。</p>
+<h3 id="3-cwd"><a href="#3-cwd" class="headerlink" title="3. cwd"></a>3. <code>cwd</code></h3><p><code>cwd</code> 是 Current Working Directory，即子进程的初始工作目录：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>cwd = working_dir <span class="hljs-keyword">or</span> workspace_root <span class="hljs-keyword">or</span> os.getcwd()<br><br></code></pre></td></tr></table></figure>
+
+<p>优先级为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>工具调用传入 working_dir<br><br>↓<br><br>当前 workspace<br><br>↓<br><br>nanobot 进程自己的工作目录<br><br></code></pre></td></tr></table></figure>
+
+<p>创建子进程时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">await</span> asyncio.create_subprocess_exec(<br><br>*args,<br><br>cwd=cwd,<br><br>env=env,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p>需要注意：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>cwd 只是起始目录，不是安全边界。<br><br></code></pre></td></tr></table></figure>
+
+<p>没有沙箱时，即使进程从 workspace 启动，也可以执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br><span class="hljs-built_in">cd</span> /etc<br><br><span class="hljs-built_in">cat</span> passwd<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-working-dir-越界检查"><a href="#4-working-dir-越界检查" class="headerlink" title="4. working_dir 越界检查"></a>4. <code>working_dir</code> 越界检查</h3><p>开启 workspace 限制后，<code>_prepare_command()</code> 会检查：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>requested = Path(cwd).expanduser().resolve()<br><br>resolved_root = Path(workspace_root).expanduser().resolve()<br><br>  <br><br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> is_path_within(requested, resolved_root):<br><br><span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Error: working_dir is outside the configured workspace&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>因此模型不能直接传入：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;working_dir&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;/etc&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>但这只限制启动目录，不代表命令运行后绝对不能切换目录。</p>
+<h3 id="5-危险命令过滤"><a href="#5-危险命令过滤" class="headerlink" title="5. 危险命令过滤"></a>5. 危险命令过滤</h3><p><code>ExecTool</code> 内置了一组 deny patterns，用于拦截明显危险命令：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>rm -r / rm -rf<br><br>del /f<br><br>rmdir /s<br><br>mkfs<br><br>diskpart<br><br>dd if=<br><br>写入 /dev/sd*<br><br>shutdown / reboot / poweroff<br><br>fork bomb<br><br></code></pre></td></tr></table></figure>
+
+<p>另外还会保护 nanobot 内部的：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>history.jsonl<br><br>.dream_cursor<br><br></code></pre></td></tr></table></figure>
+
+<p>避免 Shell 直接重定向、<code>tee</code>、<code>cp</code>、<code>mv</code>、<code>dd</code> 或 <code>sed -i</code> 破坏这些文件。</p>
+<h3 id="6-Shell-路径检查"><a href="#6-Shell-路径检查" class="headerlink" title="6. Shell 路径检查"></a>6. Shell 路径检查</h3><p>开启 workspace 限制后，<code>_guard_command()</code> 会：</p>
+<ol>
+<li><p>拒绝命令文本中的 <code>../</code> 和 <code>..\</code>。</p>
+</li>
+<li><p>用正则提取显式绝对路径。</p>
+</li>
+<li><p>对每个路径执行 <code>resolve()</code>。</p>
+</li>
+<li><p>检查路径是否位于当前工作目录或媒体目录。</p>
+</li>
+</ol>
+<p>例如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br><span class="hljs-built_in">cat</span> /etc/passwd<br><br></code></pre></td></tr></table></figure>
+
+<p>可以提取出 <code>/etc/passwd</code> 并拒绝。</p>
+<p>但以下形式可能没有显式绝对路径：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br><span class="hljs-built_in">cd</span> <span class="hljs-variable">$HOME</span><br><br><span class="hljs-built_in">cat</span> <span class="hljs-string">&quot;<span class="hljs-variable">$HOME</span>/.ssh/id_rsa&quot;</span><br><br>sh -c <span class="hljs-string">&#x27;cd &quot;$HOME&quot; &amp;&amp; pwd&#x27;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这说明 Shell guard 属于 best-effort 文本检查，不是严格的操作系统边界。</p>
+<h3 id="7-环境变量最小化"><a href="#7-环境变量最小化" class="headerlink" title="7. 环境变量最小化"></a>7. 环境变量最小化</h3><p>Unix 子进程默认只继承少量环境变量：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>env = &#123;<br><br><span class="hljs-string">&quot;HOME&quot;</span>: home,<br><br><span class="hljs-string">&quot;LANG&quot;</span>: ...,<br><br><span class="hljs-string">&quot;TERM&quot;</span>: ...,<br><br><span class="hljs-string">&quot;PYTHONUNBUFFERED&quot;</span>: <span class="hljs-string">&quot;1&quot;</span>,<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>API Key 等变量默认不会直接传给子进程。只有配置在：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;allowedEnvKeys&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><span class="hljs-string">&quot;SOME_KEY&quot;</span><span class="hljs-punctuation">]</span><br><br></code></pre></td></tr></table></figure>
+
+<p>中的变量才会额外传入。</p>
+<p>不过当前默认使用 login shell：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>bash -l -c command<br><br></code></pre></td></tr></table></figure>
+
+<p>login shell 可能读取用户 profile，因此实际环境还需要结合宿主机 Shell 配置理解。</p>
+<h3 id="8-超时与输出限制"><a href="#8-超时与输出限制" class="headerlink" title="8. 超时与输出限制"></a>8. 超时与输出限制</h3><p>模型单次传入的 timeout 最大为 600 秒：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">return</span> <span class="hljs-built_in">min</span>(timeout, self._MAX_TIMEOUT)<br><br></code></pre></td></tr></table></figure>
+
+<p>默认超时为 60 秒。</p>
+<p>命令输出默认限制约 10,000 字符，过长时保留开头和结尾，中间替换为截断提示。</p>
+<h2 id="七、Tool-参数-Schema"><a href="#七、Tool-参数-Schema" class="headerlink" title="七、Tool 参数 Schema"></a>七、Tool 参数 Schema</h2><h3 id="1-tool-parameters"><a href="#1-tool-parameters" class="headerlink" title="1. @tool_parameters"></a>1. <code>@tool_parameters</code></h3><p><code>ExecTool</code> 使用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-meta">@tool_parameters(<span class="hljs-params"></span></span><br><span class="hljs-params"><span class="hljs-meta"></span></span><br><span class="hljs-params"><span class="hljs-meta">tool_parameters_schema(<span class="hljs-params"></span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta"></span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta">command=StringSchema(<span class="hljs-params">...</span>),</span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta"></span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta">timeout=IntegerSchema(<span class="hljs-params">...</span>),</span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta"></span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta">...</span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta"></span></span></span><br><span class="hljs-params"><span class="hljs-params"><span class="hljs-meta"></span>)</span></span><br><span class="hljs-params"><span class="hljs-meta"></span></span><br><span class="hljs-params"><span class="hljs-meta"></span>)</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">ExecTool</span>(<span class="hljs-title class_ inherited__">Tool</span>):<br><br>...<br><br></code></pre></td></tr></table></figure>
+
+<p>这个装饰器给 <code>ExecTool</code> 动态注入 <code>parameters</code> 属性：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-meta">@property</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">parameters</span>(<span class="hljs-params">self: <span class="hljs-type">Any</span></span>) -&gt; <span class="hljs-built_in">dict</span>[<span class="hljs-built_in">str</span>, <span class="hljs-type">Any</span>]:<br><br><span class="hljs-keyword">return</span> deepcopy(frozen)<br><br>  <br><br>cls.parameters = parameters<br><br></code></pre></td></tr></table></figure>
+
+<p>等价于在 <code>ExecTool</code> 中手写：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-meta">@property</span><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">parameters</span>(<span class="hljs-params">self</span>):<br><br><span class="hljs-keyword">return</span> exec_parameter_schema<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-为什么需要-parameters"><a href="#2-为什么需要-parameters" class="headerlink" title="2. 为什么需要 parameters"></a>2. 为什么需要 <code>parameters</code></h3><p><code>Tool</code> 抽象基类要求每个工具提供：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>name<br><br>description<br><br>parameters<br><br>execute()<br><br></code></pre></td></tr></table></figure>
+
+<p><code>parameters</code> 用于生成发给 LLM 的 Function Calling Schema：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>&#123;<br><br><span class="hljs-string">&quot;type&quot;</span>: <span class="hljs-string">&quot;function&quot;</span>,<br><br><span class="hljs-string">&quot;function&quot;</span>: &#123;<br><br><span class="hljs-string">&quot;name&quot;</span>: self.name,<br><br><span class="hljs-string">&quot;description&quot;</span>: self.description,<br><br><span class="hljs-string">&quot;parameters&quot;</span>: self.parameters,<br><br>&#125;,<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>它也用于执行前：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>cast_params()<br><br>= 根据 Schema 做安全类型转换<br><br>  <br><br>validate_params()<br><br>= 检查类型、必填项、最小值和最大值<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-deepcopy"><a href="#3-deepcopy" class="headerlink" title="3. deepcopy"></a>3. <code>deepcopy</code></h3><p>Schema 保存和返回时都使用 <code>deepcopy</code>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>frozen = deepcopy(schema)<br><br><span class="hljs-keyword">return</span> deepcopy(frozen)<br><br></code></pre></td></tr></table></figure>
+
+<p>第一层复制防止调用者在装饰完成后修改原始 <code>schema</code>。</p>
+<p>第二层复制防止读取者修改返回值后污染类内部保存的 Schema。</p>
+<h2 id="八、工具什么时候加载"><a href="#八、工具什么时候加载" class="headerlink" title="八、工具什么时候加载"></a>八、工具什么时候加载</h2><h3 id="1-主-Agent"><a href="#1-主-Agent" class="headerlink" title="1. 主 Agent"></a>1. 主 Agent</h3><p><code>AgentLoop.__init__()</code> 中：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>self.tools = ToolRegistry()<br><br>self._register_default_tools()<br><br></code></pre></td></tr></table></figure>
+
+<p><code>_register_default_tools()</code> 创建 <code>ToolContext</code>，然后调用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>loader = ToolLoader()<br><br>registered = loader.load(ctx, self.tools)<br><br></code></pre></td></tr></table></figure>
+
+<p>所以主 Agent 的工具通常在 Gateway 启动时加载一次，后续聊天复用同一个注册表和工具实例。</p>
+<h3 id="2-ToolLoader"><a href="#2-ToolLoader" class="headerlink" title="2. ToolLoader"></a>2. ToolLoader</h3><p><code>ToolLoader</code> 会扫描：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>agent/tools/*.py<br><br></code></pre></td></tr></table></figure>
+
+<p>寻找所有可发现的 <code>Tool</code> 子类，然后执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">if</span> <span class="hljs-keyword">not</span> tool_cls.enabled(ctx):<br><br><span class="hljs-keyword">continue</span><br><br>  <br><br>tool = tool_cls.create(ctx)<br><br>registry.register(tool)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>sandbox.py</code> 位于跳过列表中，因为它只是 <code>ExecTool</code> 的辅助模块，不是可以直接给 LLM 调用的 Tool。</p>
+<h3 id="3-Subagent"><a href="#3-Subagent" class="headerlink" title="3. Subagent"></a>3. Subagent</h3><p>每个 Subagent 启动任务时会创建独立注册表：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>registry = ToolRegistry()<br><br>ToolLoader().load(ctx, registry, scope=<span class="hljs-string">&quot;subagent&quot;</span>)<br><br></code></pre></td></tr></table></figure>
+
+<p>主 Agent 的注册表通常一直存在到 Gateway 退出；Subagent 注册表在任务完成并失去引用后可以被垃圾回收。</p>
+<h2 id="九、ToolRegistry-如何使用工具"><a href="#九、ToolRegistry-如何使用工具" class="headerlink" title="九、ToolRegistry 如何使用工具"></a>九、ToolRegistry 如何使用工具</h2><p>注册时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">register</span>(<span class="hljs-params">self, tool: Tool</span>) -&gt; <span class="hljs-literal">None</span>:<br><br>self._tools[tool.name] = tool<br><br></code></pre></td></tr></table></figure>
+
+<p>内存结构类似：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>&#123;<br><br><span class="hljs-string">&quot;exec&quot;</span>: ExecTool(...),<br><br><span class="hljs-string">&quot;read_file&quot;</span>: ReadFileTool(...),<br><br><span class="hljs-string">&quot;write_file&quot;</span>: WriteFileTool(...),<br><br><span class="hljs-string">&quot;web_fetch&quot;</span>: WebFetchTool(...),<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>执行时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>tool, params, error = self.prepare_call(name, params)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>prepare_call()</code> 通过：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>tool = self._tools.get(name)<br><br></code></pre></td></tr></table></figure>
+
+<p>取得具体工具实例。</p>
+<p>虽然类型标注是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>Tool | <span class="hljs-literal">None</span><br><br></code></pre></td></tr></table></figure>
+
+<p>运行时返回的是具体子类，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>name == &quot;exec&quot;<br><br>→ ExecTool 实例<br><br>  <br><br>name == &quot;read_file&quot;<br><br>→ ReadFileTool 实例<br><br></code></pre></td></tr></table></figure>
+
+<p>随后：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>result = <span class="hljs-keyword">await</span> tool.execute(**params)<br><br></code></pre></td></tr></table></figure>
+
+<p>Python 根据实际对象类型调用对应子类的 <code>execute()</code>。</p>
+<h2 id="十、bwrap-沙箱配置"><a href="#十、bwrap-沙箱配置" class="headerlink" title="十、bwrap 沙箱配置"></a>十、bwrap 沙箱配置</h2><p>Linux 环境可以配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;sandbox&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bwrap&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>当前沙箱后端注册表只有：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>_BACKENDS = &#123;<br><br><span class="hljs-string">&quot;bwrap&quot;</span>: _bwrap,<br><br>&#125;<br><br></code></pre></td></tr></table></figure>
+
+<p>因此：</p>
+<ul>
+<li><p>Linux 安装 Bubblewrap 后可以使用。</p>
+</li>
+<li><p>macOS 没有 Linux Namespace，不能直接运行。</p>
+</li>
+<li><p>Windows 代码会记录不支持警告并按当前逻辑不包装命令。</p>
+</li>
+</ul>
+<p>在 macOS 上需要严格隔离时，更合适的方案是：</p>
+<ul>
+<li><p>在 Docker Desktop 的 Linux VM 中运行 nanobot。</p>
+</li>
+<li><p>使用 Linux 虚拟机。</p>
+</li>
+<li><p>不需要 Shell 时关闭 <code>exec</code>。</p>
+</li>
+</ul>
+<h2 id="十一、沙箱命令如何生成"><a href="#十一、沙箱命令如何生成" class="headerlink" title="十一、沙箱命令如何生成"></a>十一、沙箱命令如何生成</h2><h3 id="1-没有-Sandbox"><a href="#1-没有-Sandbox" class="headerlink" title="1. 没有 Sandbox"></a>1. 没有 Sandbox</h3><p>假设原始命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>pytest -v<br><br></code></pre></td></tr></table></figure>
+
+<p>没有沙箱时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>command = <span class="hljs-string">&quot;pytest -v&quot;</span><br><br>cwd = <span class="hljs-string">&quot;/home/user/.nanobot/workspace&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p><code>_spawn()</code> 最终大致启动：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>bash -l -c <span class="hljs-string">&#x27;pytest -v&#x27;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>进程关系：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>nanobot<br><br>└── bash -l -c &quot;pytest -v&quot;<br><br>└── pytest<br><br></code></pre></td></tr></table></figure>
+
+<p>这个进程直接拥有 nanobot 系统用户的文件和网络权限。</p>
+<h3 id="2-使用-Sandbox"><a href="#2-使用-Sandbox" class="headerlink" title="2. 使用 Sandbox"></a>2. 使用 Sandbox</h3><p>设置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;sandbox&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bwrap&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>后，<code>_prepare_command()</code> 执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>command = wrap_command(<br><br>self.sandbox,<br><br>command,<br><br>workspace,<br><br>cwd,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>wrap_command()</code> 根据名称取得后端：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">if</span> backend := _BACKENDS.get(sandbox):<br><br><span class="hljs-keyword">return</span> backend(command, workspace, cwd)<br><br></code></pre></td></tr></table></figure>
+
+<p>最终进入：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>_bwrap(command, workspace, cwd)<br><br></code></pre></td></tr></table></figure>
+
+<p>原始命令会变成类似：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>bwrap \<br><br>--new-session \<br><br>--die-with-parent \<br><br>--ro-bind /usr /usr \<br><br>--ro-bind-try /bin /bin \<br><br>--ro-bind-try /lib /lib \<br><br>--proc /proc \<br><br>--dev /dev \<br><br>--tmpfs /tmp \<br><br>--tmpfs /home/user/.nanobot \<br><br>--<span class="hljs-built_in">dir</span> /home/user/.nanobot/workspace \<br><br>--<span class="hljs-built_in">bind</span> /home/user/.nanobot/workspace /home/user/.nanobot/workspace \<br><br>--ro-bind-try /home/user/.nanobot/media /home/user/.nanobot/media \<br><br>--<span class="hljs-built_in">chdir</span> /home/user/.nanobot/workspace \<br><br>-- sh -c <span class="hljs-string">&#x27;pytest -v&#x27;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>随后外层 <code>_spawn()</code> 再执行包装后的命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>bash -l -c <span class="hljs-string">&#x27;bwrap ... -- sh -c &quot;pytest -v&quot;&#x27;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>进程关系：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>nanobot<br><br>└── bash<br><br>└── bwrap<br><br>└── sh -c &quot;pytest -v&quot;<br><br>└── pytest<br><br></code></pre></td></tr></table></figure>
+
+<p>每次 <code>exec</code> 调用都会创建新的临时沙箱。命令结束后，该沙箱进程随之结束，不存在一个长期运行的共享 bwrap 容器。</p>
+<p><img src="https://files.seeusercontent.com/2026/06/15/3iQw/03-bwrap-flow.webp" srcset="/img/loading.gif" lazyload alt="展示原始 Shell 命令经过 ToolRegistry、参数校验、Shell Guard 和 bwrap 包装后在临时沙箱内执行的完整流程图"></p>
+<h2 id="十二、-bwrap-做了什么"><a href="#十二、-bwrap-做了什么" class="headerlink" title="十二、_bwrap() 做了什么"></a>十二、<code>_bwrap()</code> 做了什么</h2><h3 id="1-规范化路径"><a href="#1-规范化路径" class="headerlink" title="1. 规范化路径"></a>1. 规范化路径</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>ws = Path(workspace).resolve()<br><br>media = get_media_dir().resolve()<br><br></code></pre></td></tr></table></figure>
+
+<p>将 workspace 和媒体目录解析成规范绝对路径。</p>
+<h3 id="2-计算沙箱工作目录"><a href="#2-计算沙箱工作目录" class="headerlink" title="2. 计算沙箱工作目录"></a>2. 计算沙箱工作目录</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">try</span>:<br><br>sandbox_cwd = <span class="hljs-built_in">str</span>(ws / Path(cwd).resolve().relative_to(ws))<br><br><span class="hljs-keyword">except</span> ValueError:<br><br>sandbox_cwd = <span class="hljs-built_in">str</span>(ws)<br><br></code></pre></td></tr></table></figure>
+
+<p>如果 <code>cwd</code> 在 workspace 内，则保留对应目录；如果位于外部，则回退到 workspace 根目录。</p>
+<h3 id="3-系统目录只读挂载"><a href="#3-系统目录只读挂载" class="headerlink" title="3. 系统目录只读挂载"></a>3. 系统目录只读挂载</h3><p>必需目录：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>required = [<span class="hljs-string">&quot;/usr&quot;</span>]<br><br></code></pre></td></tr></table></figure>
+
+<p>可选目录：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>[<br><br><span class="hljs-string">&quot;/bin&quot;</span>,<br><br><span class="hljs-string">&quot;/lib&quot;</span>,<br><br><span class="hljs-string">&quot;/lib64&quot;</span>,<br><br><span class="hljs-string">&quot;/etc/alternatives&quot;</span>,<br><br><span class="hljs-string">&quot;/etc/ssl/certs&quot;</span>,<br><br><span class="hljs-string">&quot;/etc/resolv.conf&quot;</span>,<br><br><span class="hljs-string">&quot;/etc/ld.so.cache&quot;</span>,<br><br>]<br><br></code></pre></td></tr></table></figure>
+
+<p>它们通过：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--ro-bind<br><br>--ro-bind-try<br><br></code></pre></td></tr></table></figure>
+
+<p>挂载为只读，使沙箱内命令可以使用系统程序、动态链接库、证书和 DNS 配置，但不能修改这些文件。</p>
+<h3 id="4-创建运行时目录"><a href="#4-创建运行时目录" class="headerlink" title="4. 创建运行时目录"></a>4. 创建运行时目录</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--proc /proc<br><br>--dev /dev<br><br>--tmpfs /tmp<br><br></code></pre></td></tr></table></figure>
+
+<p>作用：</p>
+<ul>
+<li><p>创建沙箱内的 <code>/proc</code>。</p>
+</li>
+<li><p>创建受限 <code>/dev</code>。</p>
+</li>
+<li><p>使用独立、临时的 <code>/tmp</code>。</p>
+</li>
+</ul>
+<h3 id="5-隐藏配置目录"><a href="#5-隐藏配置目录" class="headerlink" title="5. 隐藏配置目录"></a>5. 隐藏配置目录</h3><p>假设：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>workspace = /home/user/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>那么：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>ws.parent<br><br></code></pre></td></tr></table></figure>
+
+<p>是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>/home/user/.nanobot<br><br></code></pre></td></tr></table></figure>
+
+<p>代码执行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--tmpfs /home/user/.nanobot<br><br></code></pre></td></tr></table></figure>
+
+<p>用空的临时文件系统遮盖真实 <code>.nanobot</code> 目录，因此：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>config.json<br><br>pairing.json<br><br>其他同级运行数据<br><br></code></pre></td></tr></table></figure>
+
+<p>默认不会出现在沙箱视图中。</p>
+<h3 id="6-重新暴露-workspace"><a href="#6-重新暴露-workspace" class="headerlink" title="6. 重新暴露 workspace"></a>6. 重新暴露 workspace</h3><p>父目录被遮盖后，代码先创建 workspace 挂载点：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--<span class="hljs-built_in">dir</span> /home/user/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>再把真实 workspace 读写挂载回来：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--<span class="hljs-built_in">bind</span> \<br><br>/home/user/.nanobot/workspace \<br><br>/home/user/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>所以沙箱内仍然存在相同路径：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>/home/user/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>它不是 workspace 的副本，而是宿主机真实目录的 bind mount。</p>
+<h3 id="7-媒体目录只读"><a href="#7-媒体目录只读" class="headerlink" title="7. 媒体目录只读"></a>7. 媒体目录只读</h3><p>媒体目录通过：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--ro-bind-try media media<br><br></code></pre></td></tr></table></figure>
+
+<p>挂载，因此命令可以读取上传附件，但不能修改附件目录。</p>
+<h3 id="8-执行原始命令"><a href="#8-执行原始命令" class="headerlink" title="8. 执行原始命令"></a>8. 执行原始命令</h3><p>最后：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--<span class="hljs-built_in">chdir</span> &lt;sandbox_cwd&gt;<br><br>-- sh -c &lt;<span class="hljs-built_in">command</span>&gt;<br><br></code></pre></td></tr></table></figure>
+
+<p>表示在沙箱内切换到工作目录，再由 <code>sh</code> 执行原始命令。</p>
+<p><code>shlex.join(args)</code> 负责安全拼接参数和引号，返回完整命令字符串。</p>
+<h2 id="十三、沙箱中的-Workspace"><a href="#十三、沙箱中的-Workspace" class="headerlink" title="十三、沙箱中的 Workspace"></a>十三、沙箱中的 Workspace</h2><h3 id="1-沙箱中是否存在-Workspace"><a href="#1-沙箱中是否存在-Workspace" class="headerlink" title="1. 沙箱中是否存在 Workspace"></a>1. 沙箱中是否存在 Workspace</h3><p>存在，而且通常与宿主机路径相同：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>宿主机：<br><br>/home/user/.nanobot/workspace<br><br>  <br><br>沙箱：<br><br>/home/user/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>原因是：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--<span class="hljs-built_in">bind</span> 宿主路径 沙箱路径<br><br></code></pre></td></tr></table></figure>
+
+<p>源路径和目标路径使用同一个字符串。</p>
+<h3 id="2-修改是否影响真实文件"><a href="#2-修改是否影响真实文件" class="headerlink" title="2. 修改是否影响真实文件"></a>2. 修改是否影响真实文件</h3><p>会影响。</p>
+<p>因为 <code>--bind</code> 是读写绑定挂载，不是复制：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>沙箱创建文件<br><br>→ 宿主 workspace 出现文件<br><br>  <br><br>沙箱修改文件<br><br>→ 宿主文件被修改<br><br>  <br><br>沙箱删除文件<br><br>→ 宿主文件被删除<br><br></code></pre></td></tr></table></figure>
+
+<p>因此 bwrap 的安全目标不是保护 workspace，而是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>允许 Agent 正常修改 workspace，<br><br>同时尽量隐藏和保护 workspace 外的宿主机文件。<br><br></code></pre></td></tr></table></figure>
+
+<p>如果 workspace 自身含有 <code>.env</code>、私钥或其他秘密，沙箱内命令仍然可以读取它们。</p>
+<h2 id="十四、bwrap-可以隔离什么"><a href="#十四、bwrap-可以隔离什么" class="headerlink" title="十四、bwrap 可以隔离什么"></a>十四、bwrap 可以隔离什么</h2><p>当前实现主要提供文件系统视图隔离。</p>
+<p>可以保护：</p>
+<ul>
+<li><p><code>~/.nanobot/config.json</code> 等 workspace 同级文件。</p>
+</li>
+<li><p>没有挂载进沙箱的用户私人文件。</p>
+</li>
+<li><p><code>~/.ssh</code> 等宿主机敏感目录。</p>
+</li>
+<li><p><code>/usr</code>、<code>/bin</code>、<code>/lib</code> 等系统目录的写入。</p>
+</li>
+<li><p>宿主机真实 <code>/tmp</code>。</p>
+</li>
+<li><p>部分设备文件。</p>
+</li>
+<li><p>父进程退出后的遗留子进程。</p>
+</li>
+</ul>
+<p>可以正常使用：</p>
+<ul>
+<li><p>workspace，读写。</p>
+</li>
+<li><p>media，默认只读。</p>
+</li>
+<li><p>系统命令和动态库，只读。</p>
+</li>
+<li><p>DNS 和证书相关文件，只读。</p>
+</li>
+</ul>
+<h2 id="十五、bwrap-不能隔离什么"><a href="#十五、bwrap-不能隔离什么" class="headerlink" title="十五、bwrap 不能隔离什么"></a>十五、bwrap 不能隔离什么</h2><h3 id="1-Workspace-内容"><a href="#1-Workspace-内容" class="headerlink" title="1. Workspace 内容"></a>1. Workspace 内容</h3><p>workspace 是读写挂载，沙箱不能防止：</p>
+<ul>
+<li><p>删除项目文件。</p>
+</li>
+<li><p>修改源代码。</p>
+</li>
+<li><p>覆盖构建配置。</p>
+</li>
+<li><p>读取 workspace 内的秘密。</p>
+</li>
+</ul>
+<h3 id="2-网络"><a href="#2-网络" class="headerlink" title="2. 网络"></a>2. 网络</h3><p>当前 <code>_bwrap()</code> 没有使用：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>--unshare-net<br><br></code></pre></td></tr></table></figure>
+
+<p>因此沙箱内进程仍然使用宿主网络能力。</p>
+<p>虽然 <code>ExecTool</code> 会检查命令文本中的内网 URL，但这仍是应用层检查，不能等同于网络 Namespace 隔离。</p>
+<h3 id="3-CPU、内存和磁盘资源"><a href="#3-CPU、内存和磁盘资源" class="headerlink" title="3. CPU、内存和磁盘资源"></a>3. CPU、内存和磁盘资源</h3><p>当前实现没有 cgroup 或资源配额，因此不能严格限制：</p>
+<ul>
+<li><p>CPU 使用量。</p>
+</li>
+<li><p>内存使用量。</p>
+</li>
+<li><p>写入 workspace 的磁盘量。</p>
+</li>
+<li><p>创建的进程数量。</p>
+</li>
+</ul>
+<p>命令超时可以终止运行过久的命令，但不等于完整资源治理。</p>
+<h3 id="4-内核边界"><a href="#4-内核边界" class="headerlink" title="4. 内核边界"></a>4. 内核边界</h3><p>bwrap 不是虚拟机，沙箱进程仍与宿主机共享 Linux 内核。它不能提供虚拟机级别的内核隔离。</p>
+<p><img src="https://files.seeusercontent.com/2026/06/15/o5cD/04-boundary-comparison.webp" srcset="/img/loading.gif" lazyload alt="对比 bwrap 对宿主机文件的保护、Workspace 读写挂载的实际影响，以及网络和资源配额等未覆盖边界"></p>
+<h2 id="十六、网络-SSRF-防护"><a href="#十六、网络-SSRF-防护" class="headerlink" title="十六、网络 SSRF 防护"></a>十六、网络 SSRF 防护</h2><h3 id="1-阻止的地址"><a href="#1-阻止的地址" class="headerlink" title="1. 阻止的地址"></a>1. 阻止的地址</h3><p><code>security/network.py</code> 默认阻止：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>0.0.0.0/8<br><br>10.0.0.0/8<br><br>100.64.0.0/10<br><br>127.0.0.0/8<br><br>169.254.0.0/16<br><br>172.16.0.0/12<br><br>192.168.0.0/16<br><br>::1/128<br><br>fc00::/7<br><br>fe80::/10<br><br></code></pre></td></tr></table></figure>
+
+<p>包括：</p>
+<ul>
+<li><p>IPv4 私网。</p>
+</li>
+<li><p>IPv6 本地地址。</p>
+</li>
+<li><p>loopback。</p>
+</li>
+<li><p>link-local。</p>
+</li>
+<li><p>云元数据常用地址。</p>
+</li>
+<li><p>CGNAT 地址。</p>
+</li>
+</ul>
+<h3 id="2-URL-校验流程"><a href="#2-URL-校验流程" class="headerlink" title="2. URL 校验流程"></a>2. URL 校验流程</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>解析 URL<br><br>↓<br><br>只允许 http / https<br><br>↓<br><br>解析 hostname<br><br>↓<br><br>DNS 查询所有地址<br><br>↓<br><br>任意地址命中 blocked networks<br><br>↓<br><br>拒绝请求<br><br></code></pre></td></tr></table></figure>
+
+<p>IPv6 映射的 IPv4 地址，例如：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>::ffff:127.0.0.1<br><br></code></pre></td></tr></table></figure>
+
+<p>会先规范化为 IPv4，避免绕过 blocklist。</p>
+<h3 id="3-重定向"><a href="#3-重定向" class="headerlink" title="3. 重定向"></a>3. 重定向</h3><p>Web fetch 不会直接自动跟随无限重定向，而是每次检查下一个目标：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>请求 URL<br><br>↓<br><br>收到 3xx<br><br>↓<br><br>解析 Location<br><br>↓<br><br>再次执行 SSRF 校验<br><br>↓<br><br>最多 5 次<br><br></code></pre></td></tr></table></figure>
+
+<p>因此公开 URL 重定向到 <code>127.0.0.1</code> 或云元数据地址时也会被拒绝。</p>
+<h3 id="4-SSRF-whitelist"><a href="#4-SSRF-whitelist" class="headerlink" title="4. SSRF whitelist"></a>4. SSRF whitelist</h3><p>配置可以显式放行 CIDR：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;ssrfWhitelist&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">[</span><br><br><span class="hljs-string">&quot;100.64.0.0/10&quot;</span><br><br><span class="hljs-punctuation">]</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这适用于明确需要访问 Tailscale 等网络的场景，但会扩大网络访问边界。</p>
+<h2 id="十七、WebSocket-与服务暴露"><a href="#十七、WebSocket-与服务暴露" class="headerlink" title="十七、WebSocket 与服务暴露"></a>十七、WebSocket 与服务暴露</h2><h3 id="1-默认只监听本机"><a href="#1-默认只监听本机" class="headerlink" title="1. 默认只监听本机"></a>1. 默认只监听本机</h3><p>API、Gateway 和 WebSocket 默认 host 都是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>127.0.0.1<br><br></code></pre></td></tr></table></figure>
+
+<p>这使服务默认不会直接暴露到局域网或公网。</p>
+<h3 id="2-WebSocket-Token"><a href="#2-WebSocket-Token" class="headerlink" title="2. WebSocket Token"></a>2. WebSocket Token</h3><p>WebSocket 支持：</p>
+<ul>
+<li><p>静态 Token。</p>
+</li>
+<li><p>有过期时间的临时 Token。</p>
+</li>
+<li><p>Token issue secret。</p>
+</li>
+<li><p><code>hmac.compare_digest()</code> 常量时间比较。</p>
+</li>
+<li><p>TLS 证书配置。</p>
+</li>
+<li><p>最大消息大小限制。</p>
+</li>
+</ul>
+<p>当 host 设置为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>0.0.0.0<br><br>::<br><br></code></pre></td></tr></table></figure>
+
+<p>配置校验要求必须提供 Token 或 Token issue secret，避免无认证绑定所有网络接口。</p>
+<h3 id="3-OpenAI-兼容-API"><a href="#3-OpenAI-兼容-API" class="headerlink" title="3. OpenAI 兼容 API"></a>3. OpenAI 兼容 API</h3><p>OpenAI 兼容 API 当前主要依赖：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>默认绑定 127.0.0.1<br><br></code></pre></td></tr></table></figure>
+
+<p>提供边界。代码中没有看到与 WebSocket 同等级别的内置 Bearer Token 中间件，因此不应把它未经反向代理认证直接暴露到公网。</p>
+<h2 id="十八、Session-数据保护"><a href="#十八、Session-数据保护" class="headerlink" title="十八、Session 数据保护"></a>十八、Session 数据保护</h2><p>Session key 会经过安全文件名转换：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>safe_filename(key.replace(<span class="hljs-string">&quot;:&quot;</span>, <span class="hljs-string">&quot;_&quot;</span>))<br><br></code></pre></td></tr></table></figure>
+
+<p>保存 Session 时采用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>写入 .jsonl.tmp<br><br>↓<br><br>可选 flush + fsync<br><br>↓<br><br>os.replace(tmp, 正式文件)<br><br>↓<br><br>可选 fsync 父目录<br><br></code></pre></td></tr></table></figure>
+
+<p>这种原子替换主要保护：</p>
+<ul>
+<li><p>进程崩溃时不会留下半个正式文件。</p>
+</li>
+<li><p>正常关闭时可以将缓存写入持久存储。</p>
+</li>
+<li><p>FUSE、NFS 等写回缓存环境中减少最近数据丢失。</p>
+</li>
+</ul>
+<p>它解决的是持久化完整性，不是文件内容加密。聊天历史和配置仍然是本地明文文件，需要依靠操作系统权限保护。</p>
+<h2 id="十九、Gateway-中安全配置的生命周期"><a href="#十九、Gateway-中安全配置的生命周期" class="headerlink" title="十九、Gateway 中安全配置的生命周期"></a>十九、Gateway 中安全配置的生命周期</h2><p>Gateway 启动流程：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>nanobot gateway<br><br>↓<br><br>Typer 调用 gateway()<br><br>↓<br><br>加载 config.json<br><br>↓<br><br>_run_gateway()<br><br>↓<br><br>创建 MessageBus / Provider / SessionManager / Cron<br><br>↓<br><br>AgentLoop.from_config()<br><br>↓<br><br>AgentLoop.__init__()<br><br>↓<br><br>注册 Tool<br><br>↓<br><br>创建 ChannelManager<br><br>↓<br><br>asyncio.run(run())<br><br></code></pre></td></tr></table></figure>
+
+<p>长期任务：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-keyword">await</span> asyncio.gather(<br><br>agent.run(),<br><br>channels.start_all(),<br><br>health_server,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p>所以主 Agent 的 <code>ToolRegistry</code> 和其中的 Tool 实例通常在整个 Gateway 进程期间一直存在。</p>
+<p>普通聊天消息不会重新读取 <code>exec.sandbox</code> 并重建 <code>ExecTool</code>。配置更新后需要重新创建 AgentLoop，通常就是重启 Gateway。</p>
+<h2 id="二十、常见问题"><a href="#二十、常见问题" class="headerlink" title="二十、常见问题"></a>二十、常见问题</h2><h3 id="1-开启-restrictToWorkspace-后为什么还能访问外部目录？"><a href="#1-开启-restrictToWorkspace-后为什么还能访问外部目录？" class="headerlink" title="1. 开启 restrictToWorkspace 后为什么还能访问外部目录？"></a>1. 开启 <code>restrictToWorkspace</code> 后为什么还能访问外部目录？</h3><p>常见原因有两个。</p>
+<p>第一，当前 WebUI 会话保存了：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;access_mode&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;full&quot;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>它会覆盖全局 workspace 限制。</p>
+<p>第二，Shell 检查是命令文本分析，复杂 Shell 展开可能绕过显式路径提取。</p>
+<h3 id="2-restrictToWorkspace-能代替沙箱吗？"><a href="#2-restrictToWorkspace-能代替沙箱吗？" class="headerlink" title="2. restrictToWorkspace 能代替沙箱吗？"></a>2. <code>restrictToWorkspace</code> 能代替沙箱吗？</h3><p>不能。</p>
+<p>它对文件工具的路径控制比较直接，但 Shell 具有变量展开、子 Shell、命令替换等复杂语法，应用层正则无法覆盖所有形式。</p>
+<h3 id="3-配置了-sandbox-后是否还需要-restrictToWorkspace？"><a href="#3-配置了-sandbox-后是否还需要-restrictToWorkspace？" class="headerlink" title="3. 配置了 sandbox 后是否还需要 restrictToWorkspace？"></a>3. 配置了 <code>sandbox</code> 后是否还需要 <code>restrictToWorkspace</code>？</h3><p>建议同时开启。</p>
+<p>当前文件工具在检测到 <code>exec.sandbox</code> 时会自动限制 workspace，但显式配置：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><br><br></code></pre></td></tr></table></figure>
+
+<p>能更清楚地表达安全策略，也能保证没有通过 Shell 的其他文件工具继续受到限制。</p>
+<h3 id="4-沙箱是否保护项目文件？"><a href="#4-沙箱是否保护项目文件？" class="headerlink" title="4. 沙箱是否保护项目文件？"></a>4. 沙箱是否保护项目文件？</h3><p>不保护。</p>
+<p>workspace 是读写 bind mount。沙箱的目标是保护宿主机其他目录，不是保护项目目录不被 Agent 修改。</p>
+<h3 id="5-沙箱是否完全断网？"><a href="#5-沙箱是否完全断网？" class="headerlink" title="5. 沙箱是否完全断网？"></a>5. 沙箱是否完全断网？</h3><p>不会。</p>
+<p>当前没有 <code>--unshare-net</code>，沙箱仍可访问网络。</p>
+<h3 id="6-macOS-可以使用-bwrap-吗？"><a href="#6-macOS-可以使用-bwrap-吗？" class="headerlink" title="6. macOS 可以使用 bwrap 吗？"></a>6. macOS 可以使用 bwrap 吗？</h3><p>不能直接使用。</p>
+<p>Bubblewrap 依赖 Linux Namespace。macOS 可以通过 Docker Desktop 或 Linux 虚拟机间接运行 Linux 环境中的 bwrap。</p>
+<h3 id="7-最严格的-Shell-策略是什么？"><a href="#7-最严格的-Shell-策略是什么？" class="headerlink" title="7. 最严格的 Shell 策略是什么？"></a>7. 最严格的 Shell 策略是什么？</h3><p>如果不需要命令执行，直接关闭：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>这会让 <code>ToolLoader</code> 不注册 <code>ExecTool</code>，从根源上移除 Shell 攻击面。</p>
+<h2 id="二十一、推荐配置"><a href="#二十一、推荐配置" class="headerlink" title="二十一、推荐配置"></a>二十一、推荐配置</h2><h3 id="1-Linux-开发环境"><a href="#1-Linux-开发环境" class="headerlink" title="1. Linux 开发环境"></a>1. Linux 开发环境</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;sandbox&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;bwrap&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>并保证：</p>
+<ul>
+<li><p>使用非 root 用户运行。</p>
+</li>
+<li><p>workspace 中不保存长期密钥。</p>
+</li>
+<li><p>配置文件权限为 <code>0600</code>。</p>
+</li>
+<li><p>聊天使用 Default Access。</p>
+</li>
+</ul>
+<h3 id="2-macOS-本机"><a href="#2-macOS-本机" class="headerlink" title="2. macOS 本机"></a>2. macOS 本机</h3><p>如果需要 Shell：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;sandbox&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;&quot;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>此时只有应用层限制，不应把它视为严格沙箱。</p>
+<p>需要更强隔离时，应在 Docker 或 Linux VM 中运行。</p>
+<p>如果不需要 Shell：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;tools&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;restrictToWorkspace&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">true</span></span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;exec&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;enable&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-literal"><span class="hljs-keyword">false</span></span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<h2 id="二十二、源码阅读入口"><a href="#二十二、源码阅读入口" class="headerlink" title="二十二、源码阅读入口"></a>二十二、源码阅读入口</h2><p>建议按下面顺序阅读。</p>
+<h3 id="1-配置与-Gateway"><a href="#1-配置与-Gateway" class="headerlink" title="1. 配置与 Gateway"></a>1. 配置与 Gateway</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>config/schema.py<br><br>ToolsConfig<br><br>ExecToolConfig<br><br>  <br><br>cli/commands.py<br><br>gateway()<br><br>_load_runtime_config()<br><br>_run_gateway()<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="2-Tool-加载与调用"><a href="#2-Tool-加载与调用" class="headerlink" title="2. Tool 加载与调用"></a>2. Tool 加载与调用</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>agent/loop.py<br><br>AgentLoop.__init__()<br><br>_register_default_tools()<br><br>  <br><br>agent/tools/loader.py<br><br>ToolLoader.discover()<br><br>ToolLoader.load()<br><br>  <br><br>agent/tools/registry.py<br><br>register()<br><br>prepare_call()<br><br>execute()<br><br>  <br><br>agent/tools/base.py<br><br>Tool<br><br>tool_parameters()<br><br>to_schema()<br><br>validate_params()<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="3-Workspace-边界"><a href="#3-Workspace-边界" class="headerlink" title="3. Workspace 边界"></a>3. Workspace 边界</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>security/workspace_access.py<br><br>WorkspaceScope<br><br>current_tool_workspace()<br><br>  <br><br>security/workspace_policy.py<br><br>resolve_allowed_path()<br><br>is_path_within()<br><br>  <br><br>agent/tools/filesystem.py<br><br>_FsTool.create()<br><br>_FsTool._resolve()<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="4-Shell-与-Sandbox"><a href="#4-Shell-与-Sandbox" class="headerlink" title="4. Shell 与 Sandbox"></a>4. Shell 与 Sandbox</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>agent/tools/shell.py<br><br>ExecTool.create()<br><br>execute()<br><br>_prepare_command()<br><br>_guard_command()<br><br>_spawn()<br><br>  <br><br>agent/tools/sandbox.py<br><br>wrap_command()<br><br>_bwrap()<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="5-网络与-Channel"><a href="#5-网络与-Channel" class="headerlink" title="5. 网络与 Channel"></a>5. 网络与 Channel</h3><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>security/network.py<br><br>validate_url_target()<br><br>contains_internal_url()<br><br>  <br><br>agent/tools/web.py<br><br>_get_with_safe_redirects()<br><br>  <br><br>channels/base.py<br><br>is_allowed()<br><br>_handle_message()<br><br>  <br><br>pairing/store.py<br><br>generate_code()<br><br>approve_code()<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="二十三、一句话总结"><a href="#二十三、一句话总结" class="headerlink" title="二十三、一句话总结"></a>二十三、一句话总结</h2><p>nanobot 当前的安全模型可以概括为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Channel allowFrom 和 pairing 控制谁能访问；<br><br>workspace scope 和路径解析限制文件工具；<br><br>Shell guard 拦截明显危险命令；<br><br>bwrap 在 Linux 内核层隐藏 workspace 外的文件系统；<br><br>SSRF 校验阻止工具访问内网和云元数据；<br><br>但 workspace 本身、网络和资源消耗仍需要额外保护。<br><br></code></pre></td></tr></table></figure>
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/ai/nanobot-security.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/agent/" class="print-no-link">#agent</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nanobot的安全机制</div>
+      <div>https://yilinyo.github.io/2026/06/16/ai/nanobot-security/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月16日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/22/ai/ai%20vibecoding%20workflow/" title="ai vibecoding workflow">
+                                                                                                    <i class="iconfont icon-arrowleft"></i>
+                                                                                                    <span class="hidden-mobile">ai vibecoding workflow</span>
+                                                                                                    <span class="visible-mobile">上一篇</span>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/12/ai/nanobot-memory/" title="nanobot的记忆机制">
+                                                                                                    <span class="hidden-mobile">nanobot的记忆机制</span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>

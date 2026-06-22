@@ -1,0 +1,985 @@
+<!--
+ * @Author: Yilin
+ * @LastEditors: Yilin
+ * @Description: Do not edit
+ * @Date: 2024-01-29 01:08:40
+ * @LastEditTime: 2024-01-29 02:17:50
+ * @FilePath: \hexo-blog\themes\fluid\layout\layout.ejs
+-->
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="yilin">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="nanobot Session、SessionManager 与 Workspace 机制本文结合 nanobot.md 的执行流程梳理，说明 nanobot 中 Session、SessionManager 与 Workspace 的设计关系，以及一条会话从创建、使用、持久化、压缩到删除的生命周期。 1. 总体关系nanobot 的会话系统可以按下面的层次理解： 1234567Workspace">
+<meta property="og:type" content="article">
+<meta property="og:title" content="nanobot的session和workspace机制">
+<meta property="og:url" content="https://yilinyo.github.io/2026/06/22/ai/nanobot-session/index.html">
+<meta property="og:site_name" content="Yilin派哟yoo🥧">
+<meta property="og:description" content="nanobot Session、SessionManager 与 Workspace 机制本文结合 nanobot.md 的执行流程梳理，说明 nanobot 中 Session、SessionManager 与 Workspace 的设计关系，以及一条会话从创建、使用、持久化、压缩到删除的生命周期。 1. 总体关系nanobot 的会话系统可以按下面的层次理解： 1234567Workspace">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-06-22T15:03:00.000Z">
+<meta property="article:modified_time" content="2026-06-22T11:31:30.339Z">
+<meta property="article:author" content="yilin">
+<meta property="article:tag" content="agent">
+<meta name="twitter:card" content="summary_large_image">
+  
+  
+  
+  <title>nanobot的session和workspace机制 - Yilin派哟yoo🥧</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"yilinyo.github.io","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"0AJIqU9UX1WpgCbc0J4NCD0x-MdYXbMMI","app_key":"EnJuvqNfHNeI8d1RbBtG9bXP","server_url":null,"path":"window.location.pathname","ignore_local":false},"gtag":null},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 5.4.2"></head>
+
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>YilinPai🥧</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/navigate/" target="_self">
+                <i class="iconfont icon-link-fill"></i>
+                <span>资源仓库</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/backend.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="nanobot的session和workspace机制"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2026-06-22 15:03" pubdate>
+          2026年6月22日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.1k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          18 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+    <div class="container-fluid nopadding-x">
+
+        <div class="row nomargin-x">
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+
+            </div>
+
+
+            <div class="col-lg-8 nopadding-x-md">
+
+
+                <div class="container nopadding-x-md" id="board-ctn">
+                    <div id="board">
+
+
+                        <article class="post-content mx-auto">
+                            <!-- SEO header -->
+                            <h1 style="display: none">
+                                nanobot的session和workspace机制
+                            </h1>
+                            
+                                    
+                                                            <div class="markdown-body">
+                                                                
+                                                                    <h1 id="nanobot-Session、SessionManager-与-Workspace-机制"><a href="#nanobot-Session、SessionManager-与-Workspace-机制" class="headerlink" title="nanobot Session、SessionManager 与 Workspace 机制"></a>nanobot Session、SessionManager 与 Workspace 机制</h1><p>本文结合 <code>nanobot.md</code> 的执行流程梳理，说明 nanobot 中 Session、SessionManager 与 Workspace 的设计关系，以及一条会话从创建、使用、持久化、压缩到删除的生命周期。</p>
+<h2 id="1-总体关系"><a href="#1-总体关系" class="headerlink" title="1. 总体关系"></a>1. 总体关系</h2><p>nanobot 的会话系统可以按下面的层次理解：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Workspace<br><br>-&gt; SessionManager<br><br>-&gt; Session<br><br></code></pre></td></tr></table></figure>
+
+<ul>
+<li><p><code>Workspace</code> 是 nanobot 的状态与上下文根目录。</p>
+</li>
+<li><p><code>SessionManager</code> 绑定到某一个 workspace，管理该 workspace 下的所有 session 文件。</p>
+</li>
+<li><p><code>Session</code> 表示一条具体聊天线程，通常对应一个 <code>channel:chat_id</code>。</p>
+</li>
+</ul>
+<p>普通 CLI/gateway 模式中，workspace 同时承担这些职责：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>&lt;workspace&gt;/<br><br>sessions/ # 会话文件<br><br>memory/ # 长期记忆与历史归档<br><br>skills/ # workspace 级技能<br><br>AGENTS.md # 工作区指令<br><br>USER.md<br><br>SOUL.md<br><br>HEARTBEAT.md<br><br></code></pre></td></tr></table></figure>
+
+<p>默认 workspace 是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>~/.nanobot/workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>启动时可以通过 <code>--workspace</code> 或 <code>-w</code> 覆盖：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>nanobot agent -w /path/to/project<br><br>nanobot gateway -w /path/to/project<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="2-Workspace-与-Session-的绑定关系"><a href="#2-Workspace-与-Session-的绑定关系" class="headerlink" title="2. Workspace 与 Session 的绑定关系"></a>2. Workspace 与 Session 的绑定关系</h2><p>Session 文件存放在 workspace 下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>&lt;workspace&gt;/sessions/&lt;safe_session_key&gt;.jsonl<br><br></code></pre></td></tr></table></figure>
+
+<p>因此，同一个 session key 在不同 workspace 下是不同会话：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>~/.nanobot/workspace/sessions/cli_direct.jsonl<br><br>/path/to/project/sessions/cli_direct.jsonl<br><br></code></pre></td></tr></table></figure>
+
+<p>它们都可以对应 <code>cli:direct</code>，但内容彼此独立。</p>
+<p>所以 workspace 与 session 的关系不是 session 自己携带一个独立 workspace 字段，而是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>workspace -&gt; SessionManager -&gt; sessions/*.jsonl<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="3-Session-是什么"><a href="#3-Session-是什么" class="headerlink" title="3. Session 是什么"></a>3. Session 是什么</h2><p><code>Session</code> 定义在 <code>session/manager.py</code>，核心结构如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs python"><br><span class="hljs-meta">@dataclass</span><br><br><span class="hljs-keyword">class</span> <span class="hljs-title class_">Session</span>:<br><br>key: <span class="hljs-built_in">str</span><br><br>messages: <span class="hljs-built_in">list</span>[<span class="hljs-built_in">dict</span>[<span class="hljs-built_in">str</span>, <span class="hljs-type">Any</span>]]<br><br>created_at: datetime<br><br>updated_at: datetime<br><br>metadata: <span class="hljs-built_in">dict</span>[<span class="hljs-built_in">str</span>, <span class="hljs-type">Any</span>]<br><br>last_consolidated: <span class="hljs-built_in">int</span> = <span class="hljs-number">0</span><br><br></code></pre></td></tr></table></figure>
+
+<p>字段含义：</p>
+<ul>
+<li><p><code>key</code>：会话唯一标识，通常是 <code>channel:chat_id</code>。</p>
+</li>
+<li><p><code>messages</code>：会话中持久化保存的消息。</p>
+</li>
+<li><p><code>created_at</code>：创建时间。</p>
+</li>
+<li><p><code>updated_at</code>：最近一次更新或维护时间。</p>
+</li>
+<li><p><code>metadata</code>：扩展状态，例如 WebUI 标题、workspace scope、goal state、摘要、checkpoint 等。</p>
+</li>
+<li><p><code>last_consolidated</code>：已经被归档/摘要过的消息前缀长度。</p>
+</li>
+</ul>
+<p>未归档、仍可能进入近期上下文的消息是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>session.messages[session.last_consolidated:]<br><br></code></pre></td></tr></table></figure>
+
+<p>常见 session key：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>cli:direct<br><br>websocket:&lt;chat_id&gt;<br><br>telegram:&lt;chat_id&gt;<br><br>discord:&lt;chat_id&gt;<br><br>heartbeat<br><br></code></pre></td></tr></table></figure>
+
+<p><code>nanobot agent</code> 默认使用：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>cli:direct<br><br></code></pre></td></tr></table></figure>
+
+<p>也可以手动指定：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br>nanobot agent -s cli:project-a<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="4-SessionManager-是什么"><a href="#4-SessionManager-是什么" class="headerlink" title="4. SessionManager 是什么"></a>4. SessionManager 是什么</h2><p><code>SessionManager</code> 是当前 workspace 下所有 session 的仓库和持久化层。</p>
+<p>初始化时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>SessionManager(workspace)<br><br></code></pre></td></tr></table></figure>
+
+<p>内部会设置：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>self.workspace = workspace<br><br>self.sessions_dir = workspace / <span class="hljs-string">&quot;sessions&quot;</span><br><br>self._cache: <span class="hljs-built_in">dict</span>[<span class="hljs-built_in">str</span>, Session]<br><br></code></pre></td></tr></table></figure>
+
+<p>它管理的是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>&lt;workspace&gt;/sessions/*.jsonl<br><br></code></pre></td></tr></table></figure>
+
+<p>注意：它不是全局管理所有 workspace。换一个 workspace，就会有另一个 <code>SessionManager</code>。</p>
+<p>核心职责：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>get_or_create(key) 获取或创建 Session<br><br>_load(key) 从 JSONL 加载 Session<br><br>_repair(key) 尝试修复损坏 JSONL<br><br>save(session) 原子保存 Session<br><br>flush_all() 退出时 fsync 保存缓存中的 Session<br><br>invalidate(key) 清除内存缓存<br><br>delete_session(key) 删除 Session 文件<br><br>read_session_file(key) 只读加载，供 WebUI/API 使用<br><br>list_sessions() 扫描 sessions 目录，生成会话列表<br><br></code></pre></td></tr></table></figure>
+
+<p>典型使用方式：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>manager = SessionManager(workspace)<br><br>  <br><br>session = manager.get_or_create(<span class="hljs-string">&quot;cli:direct&quot;</span>)<br><br>session.add_message(<span class="hljs-string">&quot;user&quot;</span>, <span class="hljs-string">&quot;hello&quot;</span>)<br><br>manager.save(session)<br><br></code></pre></td></tr></table></figure>
+
+<p><code>Session</code> 负责一条会话自身的数据和局部逻辑，<code>SessionManager</code> 负责多条会话的生命周期和磁盘持久化。</p>
+<h2 id="5-Session-文件格式"><a href="#5-Session-文件格式" class="headerlink" title="5. Session 文件格式"></a>5. Session 文件格式</h2><p>Session 文件是 JSONL：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>第一行：metadata<br><br>后续每行：一条消息<br><br></code></pre></td></tr></table></figure>
+
+<p>第一行大致如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><br><br><span class="hljs-attr">&quot;_type&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;metadata&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;key&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;cli:direct&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;created_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;updated_at&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;metadata&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-punctuation">&#123;</span><span class="hljs-punctuation">&#125;</span><span class="hljs-punctuation">,</span><br><br><span class="hljs-attr">&quot;last_consolidated&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-number">0</span><br><br><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>后续消息行大致如下：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs json"><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;user&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hello&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">&#125;</span><br><br><span class="hljs-punctuation">&#123;</span><span class="hljs-attr">&quot;role&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;assistant&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;content&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;hi&quot;</span><span class="hljs-punctuation">,</span> <span class="hljs-attr">&quot;timestamp&quot;</span><span class="hljs-punctuation">:</span> <span class="hljs-string">&quot;...&quot;</span><span class="hljs-punctuation">&#125;</span><br><br></code></pre></td></tr></table></figure>
+
+<p>保存时采用临时文件加原子替换：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>写入 .jsonl.tmp<br><br>-&gt; os.replace(tmp, target)<br><br></code></pre></td></tr></table></figure>
+
+<p>进程退出时还会通过 <code>flush_all(fsync=True)</code> 尽量保证缓存中的 session 稳定落盘。</p>
+<h2 id="6-Session-生命周期"><a href="#6-Session-生命周期" class="headerlink" title="6. Session 生命周期"></a>6. Session 生命周期</h2><p>一个 session 的生命周期可以概括为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>不存在<br><br>-&gt; get_or_create(key)<br><br>内存 Session<br><br>-&gt; save(session)<br><br>磁盘 JSONL Session<br><br>-&gt; 进程重启后再次 get_or_create(key)<br><br>从磁盘恢复到内存<br><br>-&gt; 每个 turn 更新 messages / metadata<br><br>持续保存<br><br>-&gt; compact / archive<br><br>旧消息被压缩或归档，但 session 继续存在<br><br>-&gt; delete_session(key)<br><br>从内存和磁盘删除<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-1-创建"><a href="#6-1-创建" class="headerlink" title="6.1 创建"></a>6.1 创建</h3><p>当某个 <code>channel:chat_id</code> 第一次被处理时，AgentLoop 会调用：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>session = self.sessions.get_or_create(key)<br><br></code></pre></td></tr></table></figure>
+
+<p>如果内存缓存中已有，则直接返回。<br>如果磁盘存在对应 JSONL，则加载。<br>如果都不存在，则创建新的：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>Session(key=key)<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="6-2-使用"><a href="#6-2-使用" class="headerlink" title="6.2 使用"></a>6.2 使用</h3><p>每次处理用户消息时，AgentLoop 会：</p>
+<ol>
+<li><p>根据 <code>InboundMessage</code> 得到 session key。</p>
+</li>
+<li><p>使用 <code>SessionManager.get_or_create()</code> 获取 session。</p>
+</li>
+<li><p>通过 <code>session.get_history()</code> 取近期历史。</p>
+</li>
+<li><p>用 <code>ContextBuilder</code> 构建模型上下文。</p>
+</li>
+<li><p>调用 <code>AgentRunner</code> 执行 LLM/tool 循环。</p>
+</li>
+<li><p>将用户消息、assistant 回复、tool call/result 等写回 session。</p>
+</li>
+<li><p>调用 <code>SessionManager.save()</code> 保存。</p>
+</li>
+</ol>
+<h3 id="6-3-恢复"><a href="#6-3-恢复" class="headerlink" title="6.3 恢复"></a>6.3 恢复</h3><p>进程重启后，内存 cache 清空。</p>
+<p>下一次访问同一个 key 时：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>get_or_create(key)<br><br></code></pre></td></tr></table></figure>
+
+<p>会重新从 JSONL 文件恢复 session。</p>
+<p>如果 JSONL 中有损坏行，<code>SessionManager._repair()</code> 会尝试跳过坏行，尽量恢复可用消息。</p>
+<h3 id="6-4-删除"><a href="#6-4-删除" class="headerlink" title="6.4 删除"></a>6.4 删除</h3><p>普通运行不会自动删除整个 session。</p>
+<p>显式删除主要来自 WebUI 删除聊天，对应：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>delete_session(key)<br><br></code></pre></td></tr></table></figure>
+
+<p>删除时会：</p>
+<ol>
+<li><p>从内存 cache 移除。</p>
+</li>
+<li><p>删除 <code>&lt;workspace&gt;/sessions/&lt;safe_key&gt;.jsonl</code>。</p>
+</li>
+<li><p>WebUI 还会清理自己的 thread/transcript 文件。</p>
+</li>
+</ol>
+<p>需要区分：</p>
+<ul>
+<li><p>删除 session：整个会话文件消失。</p>
+</li>
+<li><p>压缩/归档 session：旧消息被摘要或迁移，但会话仍然存在。</p>
+</li>
+</ul>
+<h2 id="7-AgentLoop-如何使用-Session"><a href="#7-AgentLoop-如何使用-Session" class="headerlink" title="7. AgentLoop 如何使用 Session"></a>7. AgentLoop 如何使用 Session</h2><p><code>nanobot.md</code> 中的一条请求主线是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Channel 收到用户消息<br><br>-&gt; 转成 InboundMessage<br><br>-&gt; MessageBus<br><br>-&gt; AgentLoop<br><br>-&gt; 恢复 Session<br><br>-&gt; 构建上下文<br><br>-&gt; AgentRunner 调 LLM / 执行工具<br><br>-&gt; SAVE 写回 Session<br><br>-&gt; OutboundMessage 返回 Channel<br><br></code></pre></td></tr></table></figure>
+
+<p><code>AgentLoop</code> 是产品层编排器，负责：</p>
+<ul>
+<li><p>从 <code>MessageBus</code> 接收消息。</p>
+</li>
+<li><p>按 session 串行、跨 session 并发地调度任务。</p>
+</li>
+<li><p>维护 turn 状态机。</p>
+</li>
+<li><p>构建历史、记忆、技能和运行时上下文。</p>
+</li>
+<li><p>调用 <code>AgentRunner</code>。</p>
+</li>
+<li><p>保存 session 并发布响应。</p>
+</li>
+</ul>
+<p>同一个 session 会用锁串行执行：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>同一个 Session：串行<br><br>不同 Session：可以并发<br><br></code></pre></td></tr></table></figure>
+
+<p>这样可以避免同一条聊天同时跑多个互相覆盖的 turn。</p>
+<h2 id="8-Session-不等于最终-Prompt"><a href="#8-Session-不等于最终-Prompt" class="headerlink" title="8. Session 不等于最终 Prompt"></a>8. Session 不等于最终 Prompt</h2><p>Session 是上下文来源之一，但最终发给模型的 prompt 不是简单地把 <code>session.messages</code> 全量塞进去。</p>
+<p><code>ContextBuilder</code> 会组合：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>System prompt<br><br>+ workspace 说明<br><br>+ AGENTS.md / USER.md / SOUL.md<br><br>+ tools contract<br><br>+ memory/MEMORY.md<br><br>+ skills<br><br>+ archived summary<br><br>+ 最近 session history<br><br>+ 当前用户消息<br><br>+ runtime context<br><br></code></pre></td></tr></table></figure>
+
+<p><code>session.get_history()</code> 也会对历史做处理：</p>
+<ul>
+<li><p>只取 <code>last_consolidated</code> 之后的未归档消息。</p>
+</li>
+<li><p>按 <code>max_messages</code> 截取尾部。</p>
+</li>
+<li><p>尽量从 user turn 开始。</p>
+</li>
+<li><p>避免孤立 tool result。</p>
+</li>
+<li><p>可按 token 预算裁剪。</p>
+</li>
+<li><p>图片消息回放时加占位 breadcrumb。</p>
+</li>
+</ul>
+<p>因此可以理解为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Session 保存现场<br><br>ContextBuilder 负责把现场和 workspace/memory/skills 组装成模型输入<br><br></code></pre></td></tr></table></figure>
+
+<h2 id="9-压缩、归档与-last-consolidated"><a href="#9-压缩、归档与-last-consolidated" class="headerlink" title="9. 压缩、归档与 last_consolidated"></a>9. 压缩、归档与 last_consolidated</h2><p>nanobot 有多层上下文控制机制：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>AutoCompact<br><br>Token consolidation<br><br>Runner snip<br><br>Session 文件硬上限<br><br></code></pre></td></tr></table></figure>
+
+<h3 id="9-1-AutoCompact"><a href="#9-1-AutoCompact" class="headerlink" title="9.1 AutoCompact"></a>9.1 AutoCompact</h3><p>空闲时间达到配置阈值后，对 session 做后台压缩。</p>
+<p>它可能会：</p>
+<ul>
+<li><p>将旧消息通过 LLM 归档。</p>
+</li>
+<li><p>保留最近合法消息尾巴。</p>
+</li>
+<li><p>替换 <code>session.messages</code>。</p>
+</li>
+<li><p>保存 <code>_last_summary</code>。</p>
+</li>
+</ul>
+<h3 id="9-2-Token-consolidation"><a href="#9-2-Token-consolidation" class="headerlink" title="9.2 Token consolidation"></a>9.2 Token consolidation</h3><p>在 BUILD 前同步检查，并在 SAVE 后后台检查。</p>
+<p>当历史重放窗口或 prompt token 接近预算时，它会：</p>
+<ul>
+<li><p>对旧消息生成摘要。</p>
+</li>
+<li><p>写入 <code>memory/history.jsonl</code>。</p>
+</li>
+<li><p>推进 <code>last_consolidated</code>。</p>
+</li>
+<li><p>让 <code>get_history()</code> 忽略已归档前缀。</p>
+</li>
+</ul>
+<h3 id="9-3-Runner-snip"><a href="#9-3-Runner-snip" class="headerlink" title="9.3 Runner snip"></a>9.3 Runner snip</h3><p>这是 AgentRunner 请求模型前的临时防线。</p>
+<p>它只影响当前发送给模型的 <code>messages_for_model</code>：</p>
+<ul>
+<li><p>不修改 Session。</p>
+</li>
+<li><p>不更新 <code>last_consolidated</code>。</p>
+</li>
+<li><p>不写入摘要。</p>
+</li>
+</ul>
+<h3 id="9-4-Session-文件硬上限"><a href="#9-4-Session-文件硬上限" class="headerlink" title="9.4 Session 文件硬上限"></a>9.4 Session 文件硬上限</h3><p>SAVE 阶段还会执行：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs python"><br>ctx.session.enforce_file_cap(<br><br>on_archive=self.context.memory.raw_archive,<br><br>)<br><br></code></pre></td></tr></table></figure>
+
+<p>它限制 session 文件中实际保存的消息数量。如果超过上限，会保留最近合法后缀，并把尚未归档的被删除消息 raw archive 到历史中。</p>
+<h2 id="10-WebUI-的-workspace-scope"><a href="#10-WebUI-的-workspace-scope" class="headerlink" title="10. WebUI 的 workspace_scope"></a>10. WebUI 的 workspace_scope</h2><p>普通 CLI 模式中，workspace 同时是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>session 存储目录<br><br>memory/skills 目录<br><br>工具相对路径根<br><br></code></pre></td></tr></table></figure>
+
+<p>WebUI 多了一层 <code>workspace_scope</code>。</p>
+<p>这表示：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>session 文件仍然存放在默认 workspace/sessions 下<br><br>但某个 WebUI 聊天可以指定自己的 project path<br><br></code></pre></td></tr></table></figure>
+
+<p>可以区分为：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>storage workspace:<br><br>session、memory、skills 存放在哪里<br><br>  <br><br>effective project workspace scope:<br><br>当前 WebUI 聊天这一轮工具在哪个项目目录工作<br><br></code></pre></td></tr></table></figure>
+
+<p>因此 WebUI 可以做到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>默认 workspace 存 nanobot 状态<br><br>聊天 A 操作 project-a<br><br>聊天 B 操作 project-b<br><br></code></pre></td></tr></table></figure>
+
+<p>而 CLI 模式目前没有完整的 data-dir/project-dir 分离。</p>
+<h2 id="11-总结"><a href="#11-总结" class="headerlink" title="11. 总结"></a>11. 总结</h2><p>核心关系如下：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>Workspace<br><br>是 nanobot 的状态与上下文根目录<br><br>包含 sessions、memory、skills、bootstrap files<br><br>  <br><br>SessionManager(workspace)<br><br>管理 workspace/sessions<br><br>负责加载、缓存、保存、删除 Session<br><br>  <br><br>Session(key)<br><br>表示一条 channel/chat 维度的聊天线程<br><br>key 通常是 channel:chat_id<br><br>保存 messages、metadata、last_consolidated<br><br>  <br><br>AgentLoop<br><br>每次 turn 根据 InboundMessage 找 Session<br><br>读取历史并构造上下文<br><br>调用 AgentRunner<br><br>将结果写回 Session<br><br>  <br><br>ContextBuilder<br><br>不只读取 Session<br><br>还合并 workspace bootstrap、memory、skills、runtime context<br><br>  <br><br>WebUI workspace_scope<br><br>让某个 WebUI session 的有效项目目录可以不同于存储 workspace<br><br></code></pre></td></tr></table></figure>
+
+<p>一句话概括：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs text"><br>workspace 是 nanobot 的状态与上下文根；<br><br>SessionManager 是绑定到某个 workspace 的会话仓库；<br><br>Session 是某个 channel/chat 的持久化线程；<br><br>AgentLoop 在每个 turn 中把 session 历史、workspace 信息、memory、skills 和当前消息组装起来交给 AgentRunner，<br><br>并在结束后通过 SessionManager 保存现场。<br><br></code></pre></td></tr></table></figure>
+                                                                        
+                                                            </div>
+                                                            
+                                                                <hr/>
+                                                                <div style="text-align: center ">
+                                                                    <a href="https://github.com/yilinyo/yilinyo.github.io/edit/myblog/source/_posts/ai/nanobot-session.md" target="_blank">编辑文章✏</a>
+                                                                </div>
+                                                                <div>
+                                                                    <div class="post-metas my-3">
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/agent/" class="print-no-link">#agent</a>
+      
+    </div>
+  
+</div>
+
+
+                                                                        
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>nanobot的session和workspace机制</div>
+      <div>https://yilinyo.github.io/2026/06/22/ai/nanobot-session/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>yilin</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2026年6月22日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+                                                                            
+                                                                                <div class="post-prevnext my-3">
+                                                                                    <article class="post-prev col-6">
+                                                                                        
+                                                                                            
+                                                                                    </article>
+
+                                                                                    <article class="post-next col-6">
+                                                                                        
+                                                                                            
+                                                                                                <a href="/2026/06/22/%E6%B5%8B%E8%AF%95/%E6%B5%8B%E8%AF%95/" title="">
+                                                                                                    <span class="hidden-mobile"></span>
+                                                                                                    <span class="visible-mobile">下一篇</span>
+                                                                                                    <i class="iconfont icon-arrowright"></i>
+                                                                                                </a>
+                                                                                                
+                                                                                    </article>
+
+                                                                                </div>
+                                                                                
+                                                                </div>
+
+                                                                
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="waline"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#waline', function() {
+      Fluid.utils.createCssLink('https://cdn.staticfile.org/waline/2.15.5/waline.min.css')
+      Fluid.utils.createScript('https://cdn.staticfile.org/waline/2.15.5/waline.min.js', function() {
+        var options = Object.assign(
+          {"serverURL":"https://waline-blog-kappa-ten.vercel.app","path":"window.location.pathname","meta":["nick","mail","link"],"requiredMeta":["nick"],"lang":"zh-CN","emoji":["https://cdn.jsdelivr.net/gh/walinejs/emojis/weibo"],"dark":"html[data-user-color-scheme=\"dark\"]","wordLimit":0,"pageSize":10},
+          {
+            el: '#waline',
+            path: window.location.pathname
+          }
+        )
+        Waline.init(options);
+        Fluid.utils.waitElementVisible('#waline .vcontent', () => {
+          var imgSelector = '#waline .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+                        </article>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div class="side-col d-none d-lg-block col-lg-2">
+                
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+    
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+        
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> <div> <span id="timeDate">载入天数...</span> <span id="times">载入时分秒...</span> <script src="/js/duration.js"></script> </div> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         人
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <!-- Scripts -->
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+</body>
+</html>
